@@ -1,5 +1,7 @@
 using Godot;
 using System;
+using System.Runtime.InteropServices;
+using System.Transactions;
 
 [Tool]
 public partial class CurveComparison : Node
@@ -89,15 +91,104 @@ public partial class CurveComparison : Node
         newErrorValue.Approx = ApproxCurve(input);
         newErrorValue.ErrorWeight = errorWeight;
 
-        CalculateError(ref newErrorValue);
+        CalculateError(ref newErrorValue, agxRefLog2MiddleGrey);
 
         errorValues.Add(newErrorValue);
     }
 
-    public void CalculateError(ref ErrorValue value)
+    public static void CalculateError(ref ErrorValue value, double middleGrey)
     {
         value.ErrorLinear = Math.Abs(value.Reference - value.Approx);
-        value.ErrorLog2 = Math.Abs(Math.Log2(Math.Max(value.Reference / agxRefLog2MiddleGrey, 1e-10)) - Math.Log2(Math.Max(value.Approx / agxRefLog2MiddleGrey, 1e-10)));
+        value.ErrorLog2 = Math.Abs(Math.Log2(Math.Max(value.Reference / middleGrey, 1e-10)) - Math.Log2(Math.Max(value.Approx / middleGrey, 1e-10)));
+    }
+
+    public static (double totalErrorLinear, double totalErrorLog2) CalculateTotalError(ref ErrorValue[] errorValues)
+    {
+        (double totalErrorLinear, double totalErrorLog2) result;
+        result.totalErrorLinear = 0.0;
+        result.totalErrorLog2 = 0.0;
+        foreach (ErrorValue value in errorValues)
+        {
+            result.totalErrorLinear += value.ErrorLinear * value.ErrorWeight;
+            result.totalErrorLog2 += value.ErrorLog2 * value.ErrorWeight;
+        }
+        return result;
+    }
+
+    public static void RefreshApprox(ref ErrorValue[] errorValues, double middleGrey, double a, double b, double c, double d, double e, double f, double g)
+    {
+        for (int i = 0; i < errorValues.Length; i++)
+        {
+            errorValues[i].Approx = BasicSecondOrderCurve(errorValues[i].Input, a, b, c, d, e, f, g);
+            CalculateError(ref errorValues[i], middleGrey);
+        }
+    }
+
+    public struct BestResult
+    {
+        public BestResult() { }
+        public double A = 0.0;
+        public double B = 0.0;
+        public double C = 0.0;
+        public double D = 0.0;
+        public double E = 0.0;
+        public double F = 0.0;
+        public double G = 0.0;
+        public double totalErrorLinear = 999999;
+        public double totalErrorLog2 = 999999;
+    }
+
+    public void BruteForceFit()
+    {
+        double originalA = A;
+        double originalB = B;
+        double originalC = C;
+        double originalD = D;
+        double originalE = E;
+        double originalF = F;
+        double originalG = G;
+        ErrorValue[] originalErrorValues = errorValues.ToArray();
+
+        double thisA = A;
+        double thisB = B;
+        double thisC = C;
+        double thisD = D;
+        double thisE = E;
+        double thisF = F;
+        double thisG = G;
+
+        BestResult bestResult = new BestResult();
+
+        for (double mod = Math.Abs(thisA / 2) * - 1.0; mod <= thisA + Math.Abs(thisA / 2); mod += Math.Abs(thisA / 20))
+        {
+            thisA = originalA + mod;
+
+            ErrorValue[] newErrorValues = new ErrorValue[originalErrorValues.Length];
+            originalErrorValues.CopyTo(newErrorValues, 0);
+            RefreshApprox(ref newErrorValues, agxRefLog2MiddleGrey, thisA, thisB, thisC, thisD, thisE, thisF, thisG);
+
+            (double totalErrorLinear, double totalErrorLog2) error = CalculateTotalError(ref newErrorValues);
+            if (error.totalErrorLog2 < bestResult.totalErrorLog2)
+            {
+                bestResult.A = thisA;
+                bestResult.B = thisB;
+                bestResult.C = thisC;
+                bestResult.D = thisD;
+                bestResult.E = thisE;
+                bestResult.F = thisF;
+                bestResult.G = thisG;
+                bestResult.totalErrorLinear = error.totalErrorLinear;
+                bestResult.totalErrorLog2 = error.totalErrorLog2;
+            }
+        }
+
+        A = bestResult.A;
+        B = bestResult.B;
+        C = bestResult.C;
+        D = bestResult.D;
+        E = bestResult.E;
+        F = bestResult.F;
+        G = bestResult.G;
     }
 
     public double ReferenceCurve(double x)
@@ -109,12 +200,26 @@ public partial class CurveComparison : Node
     {
         if (OptionB)
         {
-            return MinimaxApproximation(x);
+            return BasicSecondOrderCurve(x, A, B, C, D, E, F, G);
         }
         else
         {
             return AgXLog2Approx(x);
         }
+    }
+
+    // self_shadow ACES:
+    [Export] public double A = 1.0;
+    [Export] public double B = 0.0245786;
+    [Export] public double C = -0.000090537;
+    [Export] public double D = 0.983729;
+    [Export] public double E = 0.4329510;
+    [Export] public double F = 0.238081;
+    [Export] public double G = 0.0;
+
+    public static double BasicSecondOrderCurve(double x, double a, double b, double c, double d, double e, double f, double g)
+    {
+        return (x * (a * x + b) + c) / (x * (d * x + e) + f) + g;
     }
 
     public static double KrzysztofNarkowiczACES(double x)

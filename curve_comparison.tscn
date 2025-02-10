@@ -5,6 +5,7 @@
 
 [node name="CurveComparison" type="Node2D"]
 script = ExtResource("1_2rroq")
+OptionB = true
 
 [node name="CurveView" parent="." node_paths=PackedStringArray("curves") instance=ExtResource("1_t77ya")]
 position = Vector2(1381, 24)
@@ -128,12 +129,12 @@ offset_bottom = 1433.0
 [node name="TotalErrorLinearLabel" type="Label" parent="VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Total weighted error (linear): 0.0793560"
+text = "Total weighted error (linear): 0.6395620"
 
 [node name="TotalErrorLog2Label" type="Label" parent="VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Total weighted error (log2, middle grey: 0.18): 2.2356665"
+text = "Total weighted error (log2, middle grey: 0.18): 106.4785865"
 
 [node name="ErrorTree" type="Tree" parent="VBoxContainer"]
 unique_name_in_owner = true
