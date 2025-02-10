@@ -34,11 +34,11 @@ public partial class CurveComparison : Node
     {
         if (OptionB)
         {
-            return AgXReferenceSimplified(x);
+            return MinimaxApproximation(x);
         }
         else
         {
-            return RationalInterpolation(x);
+            return AgXLog2Approx(x);
         }
     }
 
@@ -61,6 +61,29 @@ public partial class CurveComparison : Node
     public static double MinimaxApproximation(double x)
     {
         return (-0.000264666 + 1.50561 * x + 0.225389 * x * x) / (1 + 1.91729 * x + 0.196494 * x * x);
+    }
+
+    public static double AgXLog2Approx(double color)
+    {
+        const double min_ev = -12.4739311883324; // log2(pow(2, LOG2_MIN) * MIDDLE_GRAY)
+        const double max_ev = 4.02606881166759; // log2(pow(2, LOG2_MAX) * MIDDLE_GRAY)
+        color = Math.Max(color, 1e-10);
+
+        // Log2 space encoding.
+        // Must be clamped because agx_contrast_approx may not work
+        // well with values outside of the range [0.0, 1.0]
+        color = Math.Clamp(Math.Log2(color), min_ev, max_ev);
+        color = (color - min_ev) / (max_ev - min_ev);
+
+        double x = color;
+        double x2 = x * x;
+        double x4 = x2 * x2;
+        color = 0.021 * x + 4.0111 * x2 - 25.682 * x2 * x + 70.359 * x4 - 74.778 * x4 * x + 27.069 * x4 * x2;
+
+        // Convert back to linear before applying outset matrix.
+        color = Math.Pow(color, 2.4);
+
+        return color;
     }
 
     #region AgX Reference
