@@ -1,0 +1,114 @@
+[gd_scene load_steps=3 format=3 uid="uid://dqxlq8h1de18"]
+
+[ext_resource type="Script" path="res://CurveComparison.cs" id="1_2rroq"]
+[ext_resource type="PackedScene" uid="uid://cwk0gcnvakk2b" path="res://curve_view.tscn" id="1_t77ya"]
+
+[node name="CurveComparison" type="Node2D"]
+script = ExtResource("1_2rroq")
+OptionB = true
+
+[node name="CurveView" parent="." node_paths=PackedStringArray("curves") instance=ExtResource("1_t77ya")]
+position = Vector2(913, 24)
+scale = Vector2(0.62, 0.62)
+curves = NodePath("..")
+x_encoding_type = 1
+y_encoding_type = 1
+log2_middle_grey = 0.18
+log2_min_x = -10.0
+log2_max_x = -2.0
+log2_min_y = -10.0
+log2_max_y = -2.07
+
+[node name="CurveView2" parent="." node_paths=PackedStringArray("curves") instance=ExtResource("1_t77ya")]
+position = Vector2(1625, 24)
+scale = Vector2(0.62, 0.62)
+curves = NodePath("..")
+x_encoding_type = 1
+y_encoding_type = 1
+log2_middle_grey = 0.18
+log2_min_x = -10.0
+log2_max_x = 6.5
+log2_min_y = -10.0
+log2_max_y = 3.02
+
+[node name="CurveView3" parent="." node_paths=PackedStringArray("curves") instance=ExtResource("1_t77ya")]
+position = Vector2(2323, 24)
+scale = Vector2(0.62, 0.62)
+curves = NodePath("..")
+x_encoding_type = 1
+y_encoding_type = 1
+log2_middle_grey = 0.18
+log2_min_x = 0.0
+log2_max_x = 6.5
+log2_min_y = 0.215
+log2_max_y = 2.58
+
+[node name="CurveView4" parent="." node_paths=PackedStringArray("curves") instance=ExtResource("1_t77ya")]
+position = Vector2(913, 696)
+scale = Vector2(0.62, 0.62)
+curves = NodePath("..")
+x_encoding_type = 1
+linear_max_y = 0.04
+log2_middle_grey = 0.18
+log2_min_x = -8.305
+log2_max_x = -2.0
+log2_min_y = -10.59
+log2_max_y = -2.07
+
+[node name="CurveView5" parent="." node_paths=PackedStringArray("curves") instance=ExtResource("1_t77ya")]
+position = Vector2(1625, 696)
+scale = Vector2(0.62, 0.62)
+curves = NodePath("..")
+x_encoding_type = 1
+log2_middle_grey = 0.18
+log2_min_x = -10.0
+log2_max_x = 6.5
+log2_min_y = -10.0
+log2_max_y = 3.02
+
+[node name="CurveView6" parent="." node_paths=PackedStringArray("curves") instance=ExtResource("1_t77ya")]
+position = Vector2(2323, 696)
+scale = Vector2(0.62, 0.62)
+curves = NodePath("..")
+x_encoding_type = 1
+linear_min_y = 0.15
+log2_middle_grey = 0.18
+log2_min_x = 0.0
+log2_max_x = 6.5
+log2_min_y = 0.215
+log2_max_y = 2.58
+
+[node name="CurveView7" parent="." node_paths=PackedStringArray("curves") instance=ExtResource("1_t77ya")]
+position = Vector2(913, 1366)
+scale = Vector2(0.62, 0.62)
+curves = NodePath("..")
+linear_max_x = 0.2
+linear_max_y = 0.21
+log2_middle_grey = 0.18
+log2_min_x = -8.305
+log2_max_x = -2.0
+log2_min_y = -10.59
+log2_max_y = -2.07
+
+[node name="CurveView8" parent="." node_paths=PackedStringArray("curves") instance=ExtResource("1_t77ya")]
+position = Vector2(1625, 1366)
+scale = Vector2(0.62, 0.62)
+curves = NodePath("..")
+linear_max_x = 6.0
+log2_middle_grey = 0.18
+log2_min_x = -10.0
+log2_max_x = 6.5
+log2_min_y = -10.0
+log2_max_y = 3.02
+
+[node name="CurveView9" parent="." node_paths=PackedStringArray("curves") instance=ExtResource("1_t77ya")]
+position = Vector2(2323, 1366)
+scale = Vector2(0.62, 0.62)
+curves = NodePath("..")
+linear_min_x = 6.0
+linear_min_y = 0.885
+log2_middle_grey = 0.18
+log2_min_x = 0.0
+log2_max_x = 6.5
+log2_min_y = 0.215
+log2_max_y = 2.58
