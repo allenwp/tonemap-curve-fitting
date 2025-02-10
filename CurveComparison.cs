@@ -14,6 +14,16 @@ public partial class CurveComparison : Node
         OptionB = value;
     }
 
+
+    // default to self_shadow ACES:
+    [Export] public double A = 1.0;
+    [Export] public double B = 0.0245786;
+    [Export] public double C = -0.000090537;
+    [Export] public double D = 0.983729;
+    [Export] public double E = 0.4329510;
+    [Export] public double F = 0.238081;
+    [Export] public double G = 0.0;
+
     public double agxRefLog2MiddleGrey = 0.18f;
     [Export]
     public double agxRefLog2Min = -10.0f;
@@ -81,6 +91,7 @@ public partial class CurveComparison : Node
         }
         GetNode<Label>("%TotalErrorLinearLabel").Text = $"Total weighted error (linear): {totalErrorLinear:F7}";
         GetNode<Label>("%TotalErrorLog2Label").Text = $"Total weighted error (log2, middle grey: {agxRefLog2MiddleGrey:F2}): {totalErrorLog2:F7}";
+        GetNode<TextEdit>("%RationalApproxTextEdit").Text = $"(x * (x * {A:F15} + ({B:F15})) + ({C:F15})) / (x * (x * {D:F15} + ({E:F15})) + ({F:F15})) + ({G:F15})";
     }
 
     public void AddValue(double input, double errorWeight)
@@ -140,45 +151,93 @@ public partial class CurveComparison : Node
 
     public void BruteForceFit()
     {
-        double originalA = A;
-        double originalB = B;
-        double originalC = C;
-        double originalD = D;
-        double originalE = E;
-        double originalF = F;
-        double originalG = G;
+        double original_A = A;
+        double original_B = B;
+        double original_C = C;
+        double original_D = D;
+        double original_E = E;
+        double original_F = F;
+        double original_G = G;
         ErrorValue[] originalErrorValues = errorValues.ToArray();
 
-        double thisA = A;
-        double thisB = B;
-        double thisC = C;
-        double thisD = D;
-        double thisE = E;
-        double thisF = F;
-        double thisG = G;
+        double this_A = A;
+        double this_B = B;
+        double this_C = C;
+        double this_D = D;
+        double this_E = E;
+        double this_F = F;
+        double this_G = G;
 
         BestResult bestResult = new BestResult();
 
-        for (double mod = Math.Abs(thisA / 2) * - 1.0; mod <= thisA + Math.Abs(thisA / 2); mod += Math.Abs(thisA / 20))
+        int numSteps = 10;
+        double minHalfRange = 0.05;
+        double half_range_denom = 1.2;
+
+        double halfRange_A = Math.Max(minHalfRange, Math.Abs(original_A / half_range_denom));
+        double start_A = original_A - halfRange_A;
+        double step_A = Math.Abs(halfRange_A / numSteps);
+        double max_A = original_A + halfRange_A;
+        for (this_A = start_A; this_A <= max_A; this_A += step_A)
         {
-            thisA = originalA + mod;
-
-            ErrorValue[] newErrorValues = new ErrorValue[originalErrorValues.Length];
-            originalErrorValues.CopyTo(newErrorValues, 0);
-            RefreshApprox(ref newErrorValues, agxRefLog2MiddleGrey, thisA, thisB, thisC, thisD, thisE, thisF, thisG);
-
-            (double totalErrorLinear, double totalErrorLog2) error = CalculateTotalError(ref newErrorValues);
-            if (error.totalErrorLog2 < bestResult.totalErrorLog2)
+            double halfRange_B = Math.Max(minHalfRange, Math.Abs(original_B / half_range_denom));
+            double start_B = original_B - halfRange_B;
+            double step_B = Math.Abs(halfRange_B / numSteps);
+            double max_B = original_B + halfRange_B;
+            for (this_B = start_B; this_B <= max_B; this_B += step_B)
             {
-                bestResult.A = thisA;
-                bestResult.B = thisB;
-                bestResult.C = thisC;
-                bestResult.D = thisD;
-                bestResult.E = thisE;
-                bestResult.F = thisF;
-                bestResult.G = thisG;
-                bestResult.totalErrorLinear = error.totalErrorLinear;
-                bestResult.totalErrorLog2 = error.totalErrorLog2;
+                double halfRange_C = Math.Max(minHalfRange, Math.Abs(original_C / half_range_denom));
+                double start_C = original_C - halfRange_C;
+                double step_C = Math.Abs(halfRange_C / numSteps);
+                double max_C = original_C + halfRange_C;
+                for (this_C = start_C; this_C <= max_C; this_C += step_C)
+                {
+                    double halfRange_D = Math.Max(minHalfRange, Math.Abs(original_D / half_range_denom));
+                    double start_D = original_D - halfRange_D;
+                    double step_D = Math.Abs(halfRange_D / numSteps);
+                    double max_D = original_D + halfRange_D;
+                    for (this_D = start_D; this_D <= max_D; this_D += step_D)
+                    {
+                        double halfRange_E = Math.Max(minHalfRange, Math.Abs(original_E / half_range_denom));
+                        double start_E = original_E - halfRange_E;
+                        double step_E = Math.Abs(halfRange_E / numSteps);
+                        double max_E = original_E + halfRange_E;
+                        for (this_E = start_E; this_E <= max_E; this_E += step_E)
+                        {
+                            double halfRange_F = Math.Max(minHalfRange, Math.Abs(original_F / half_range_denom));
+                            double start_F = original_F - halfRange_F;
+                            double step_F = Math.Abs(halfRange_F / numSteps);
+                            double max_F = original_F + halfRange_F;
+                            for (this_F = start_F; this_F <= max_F; this_F += step_F)
+                            {
+                                double halfRange_G = Math.Max(minHalfRange, Math.Abs(original_G / half_range_denom));
+                                double start_G = original_G - halfRange_G;
+                                double step_G = Math.Abs(halfRange_G / numSteps);
+                                double max_G = original_G + halfRange_G;
+                                for (this_G = start_G; this_G <= max_G; this_G += step_G)
+                                {
+                                    ErrorValue[] newErrorValues = new ErrorValue[originalErrorValues.Length];
+                                    originalErrorValues.CopyTo(newErrorValues, 0);
+                                    RefreshApprox(ref newErrorValues, agxRefLog2MiddleGrey, this_A, this_B, this_C, this_D, this_E, this_F, this_G);
+
+                                    (double totalErrorLinear, double totalErrorLog2) error = CalculateTotalError(ref newErrorValues);
+                                    if (error.totalErrorLog2 < bestResult.totalErrorLog2)
+                                    {
+                                        bestResult.A = this_A;
+                                        bestResult.B = this_B;
+                                        bestResult.C = this_C;
+                                        bestResult.D = this_D;
+                                        bestResult.E = this_E;
+                                        bestResult.F = this_F;
+                                        bestResult.G = this_G;
+                                        bestResult.totalErrorLinear = error.totalErrorLinear;
+                                        bestResult.totalErrorLog2 = error.totalErrorLog2;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
 
@@ -200,22 +259,13 @@ public partial class CurveComparison : Node
     {
         if (OptionB)
         {
-            return BasicSecondOrderCurve(x, A, B, C, D, E, F, G);
+            return AgXLog2Approx(x);
         }
         else
         {
-            return AgXLog2Approx(x);
+            return BasicSecondOrderCurve(x, A, B, C, D, E, F, G);
         }
     }
-
-    // self_shadow ACES:
-    [Export] public double A = 1.0;
-    [Export] public double B = 0.0245786;
-    [Export] public double C = -0.000090537;
-    [Export] public double D = 0.983729;
-    [Export] public double E = 0.4329510;
-    [Export] public double F = 0.238081;
-    [Export] public double G = 0.0;
 
     public static double BasicSecondOrderCurve(double x, double a, double b, double c, double d, double e, double f, double g)
     {
@@ -241,6 +291,11 @@ public partial class CurveComparison : Node
     public static double MinimaxApproximation(double x)
     {
         return (-0.000264666 + 1.50561 * x + 0.225389 * x * x) / (1 + 1.91729 * x + 0.196494 * x * x);
+    }
+
+    public static double BruteForceResult(double x)
+    {
+        return (x * (x * 26.995000031999972 + (0.291144222600000)) + (-0.000090537000000)) / (x * (x * 26.605032966046089 + (19.804014854971200)) + (0.778588437627000)) + (0.000000000000000);
     }
 
     public static double AgXLog2Approx(double color)
