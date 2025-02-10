@@ -7,22 +7,97 @@ public partial class CurveComparison : Node
     [Export]
     public bool OptionB { get; set; } = false;
 
+    public void set_option_b(bool value)
+    {
+        OptionB = value;
+    }
 
+    public double agxRefLog2MiddleGrey = 0.18f;
     [Export]
-    public float agxRefLog2MiddleGrey = 0.18f;
+    public double agxRefLog2Min = -10.0f;
     [Export]
-    public float agxRefLog2Min = -10.0f;
-    [Export]
-    public float agxRefLog2Max = 6.5f;
-    
-    // Called when the node enters the scene tree for the first time.
-    public override void _Ready()
-	{
-	}
+    public double agxRefLog2Max = 6.5f;
 
-	// Called every frame. 'delta' is the elapsed time since the previous frame.
+    public struct ErrorValue
+    {
+        public double Input;
+        public double Reference;
+        public double Approx;
+        public double ErrorLinear;
+        public double ErrorLog2;
+        public double ErrorWeight;
+    }
+
+    public System.Collections.Generic.List<ErrorValue> errorValues = new System.Collections.Generic.List<ErrorValue>();
+
 	public override void _Process(double delta)
 	{
+        Tree tree = GetNode<Tree>("%ErrorTree");
+        tree.Clear();
+        tree.SetColumnTitle(0, "Input");
+        tree.SetColumnTitle(1, "Reference");
+        tree.SetColumnTitle(2, "Approx");
+        tree.SetColumnTitle(3, "ErrorLinear");
+        tree.SetColumnTitle(4, "ErrorLog2");
+        tree.SetColumnTitle(5, "ErrorWeight");
+        TreeItem root = tree.CreateItem();
+
+        errorValues.Clear();
+
+        AddValue(Math.Pow(2, agxRefLog2Min) * agxRefLog2MiddleGrey, 2.0);
+        AddValue(Math.Pow(2, -9.0) * agxRefLog2MiddleGrey, 1.0);
+        AddValue(Math.Pow(2, -8.0) * agxRefLog2MiddleGrey, 1.0);
+        AddValue(Math.Pow(2, -7.0) * agxRefLog2MiddleGrey, 1.0);
+        AddValue(Math.Pow(2, -6.0) * agxRefLog2MiddleGrey, 1.0);
+        AddValue(Math.Pow(2, -5.0) * agxRefLog2MiddleGrey, 1.0);
+        AddValue(Math.Pow(2, -4.0) * agxRefLog2MiddleGrey, 1.0);
+        AddValue(Math.Pow(2, -3.0) * agxRefLog2MiddleGrey, 1.0);
+        AddValue(Math.Pow(2, -2.0) * agxRefLog2MiddleGrey, 1.0);
+        AddValue(Math.Pow(2, -1.0) * agxRefLog2MiddleGrey, 1.0);
+        AddValue(agxRefLog2MiddleGrey, 2.0);
+        AddValue(Math.Pow(2, 1.0) * agxRefLog2MiddleGrey, 1.0);
+        AddValue(Math.Pow(2, 2.0) * agxRefLog2MiddleGrey, 1.0);
+        AddValue(Math.Pow(2, 3.0) * agxRefLog2MiddleGrey, 1.0);
+        AddValue(Math.Pow(2, 4.0) * agxRefLog2MiddleGrey, 1.0);
+        AddValue(Math.Pow(2, 5.0) * agxRefLog2MiddleGrey, 1.0);
+        AddValue(Math.Pow(2, 6.0) * agxRefLog2MiddleGrey, 1.0);
+        AddValue(Math.Pow(2, agxRefLog2Max) * agxRefLog2MiddleGrey, 2.0);
+
+        double totalErrorLinear = 0;
+        double totalErrorLog2 = 0;
+        foreach (ErrorValue value in errorValues)
+        {
+            totalErrorLinear += value.ErrorLinear * value.ErrorWeight;
+            totalErrorLog2 += value.ErrorLog2 * value.ErrorWeight;
+            TreeItem treeItem = tree.CreateItem();
+            treeItem.SetText(0, $"{value.Input:F7}");
+            treeItem.SetText(1, $"{value.Reference:F7}");
+            treeItem.SetText(2, $"{value.Approx:F7}");
+            treeItem.SetText(3, $"{value.ErrorLinear:F7}");
+            treeItem.SetText(4, $"{value.ErrorLog2:F7}");
+            treeItem.SetText(5, $"{value.ErrorWeight:F7}");
+        }
+        GetNode<Label>("%TotalErrorLinearLabel").Text = $"Total weighted error (linear): {totalErrorLinear:F7}";
+        GetNode<Label>("%TotalErrorLog2Label").Text = $"Total weighted error (log2, middle grey: {agxRefLog2MiddleGrey:F2}): {totalErrorLog2:F7}";
+    }
+
+    public void AddValue(double input, double errorWeight)
+    {
+        ErrorValue newErrorValue = new ErrorValue();
+        newErrorValue.Input = input;
+        newErrorValue.Reference = ReferenceCurve(input);
+        newErrorValue.Approx = ApproxCurve(input);
+        newErrorValue.ErrorWeight = errorWeight;
+
+        CalculateError(ref newErrorValue);
+
+        errorValues.Add(newErrorValue);
+    }
+
+    public void CalculateError(ref ErrorValue value)
+    {
+        value.ErrorLinear = Math.Abs(value.Reference - value.Approx);
+        value.ErrorLog2 = Math.Abs(Math.Log2(Math.Max(value.Reference / agxRefLog2MiddleGrey, 1e-10)) - Math.Log2(Math.Max(value.Approx / agxRefLog2MiddleGrey, 1e-10)));
     }
 
     public double ReferenceCurve(double x)
