@@ -135,12 +135,12 @@ offset_bottom = 1433.0
 [node name="TotalErrorLinearLabel" type="Label" parent="VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Total weighted error (linear): 0.1940820"
+text = "Total weighted error (linear): 0.1940825"
 
 [node name="TotalErrorLog2Label" type="Label" parent="VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Total weighted error (log2, middle grey: 0.18): 1.6369047"
+text = "Total weighted error (log2, middle grey: 0.18): 1.6237179"
 
 [node name="ErrorTree" type="Tree" parent="VBoxContainer"]
 unique_name_in_owner = true
@@ -153,8 +153,9 @@ hide_root = true
 
 [node name="RationalApproxTextEdit" type="TextEdit" parent="VBoxContainer"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 58.045)
+custom_minimum_size = Vector2(0, 67.265)
 layout_mode = 2
-text = "(x * (x * 5.108360667287568 + (-0.160545427777778)) + (-0.006340537000000)) / (x * (x * 5.268336693547675 + (4.226340348494918)) + (0.126480531250000)) + (0.050000000000000)"
+text = "(x * (x * 5.108360000000000 + (-0.160545000000000)) + (-0.006340540000000)) / (x * (x * 5.268340000000000 + (4.226340000000000)) + (0.126481000000000)) + (0.050000000000000)"
+wrap_mode = 1
 
 [connection signal="toggled" from="CheckButton" to="." method="set_option_b"]
