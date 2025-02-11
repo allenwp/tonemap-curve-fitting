@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Transactions;
+using static CurveComparison;
 
 [Tool]
 public partial class CurveComparison : Node
@@ -58,7 +59,7 @@ public partial class CurveComparison : Node
 
         errorValues.Clear();
 
-        AddValue(Math.Pow(2, agxRefLog2Min) * agxRefLog2MiddleGrey, 2.0);
+        AddValue(Math.Pow(2, agxRefLog2Min) * agxRefLog2MiddleGrey, 1.0);
         AddValue(Math.Pow(2, -9.0) * agxRefLog2MiddleGrey, 1.0);
         AddValue(Math.Pow(2, -8.0) * agxRefLog2MiddleGrey, 1.0);
         AddValue(Math.Pow(2, -7.0) * agxRefLog2MiddleGrey, 1.0);
@@ -68,21 +69,25 @@ public partial class CurveComparison : Node
         AddValue(Math.Pow(2, -3.0) * agxRefLog2MiddleGrey, 1.0);
         AddValue(Math.Pow(2, -2.0) * agxRefLog2MiddleGrey, 1.0);
         AddValue(Math.Pow(2, -1.0) * agxRefLog2MiddleGrey, 1.0);
-        AddValue(agxRefLog2MiddleGrey, 2.0);
+        AddValue(agxRefLog2MiddleGrey, 10.0);
         AddValue(Math.Pow(2, 1.0) * agxRefLog2MiddleGrey, 1.0);
         AddValue(Math.Pow(2, 2.0) * agxRefLog2MiddleGrey, 1.0);
         AddValue(Math.Pow(2, 3.0) * agxRefLog2MiddleGrey, 1.0);
+        AddValue(Math.Pow(2, 3.5) * agxRefLog2MiddleGrey, 1.0);
         AddValue(Math.Pow(2, 4.0) * agxRefLog2MiddleGrey, 1.0);
+        AddValue(Math.Pow(2, 4.5) * agxRefLog2MiddleGrey, 1.0);
         AddValue(Math.Pow(2, 5.0) * agxRefLog2MiddleGrey, 1.0);
+        AddValue(Math.Pow(2, 5.5) * agxRefLog2MiddleGrey, 1.0);
         AddValue(Math.Pow(2, 6.0) * agxRefLog2MiddleGrey, 1.0);
-        AddValue(Math.Pow(2, agxRefLog2Max) * agxRefLog2MiddleGrey, 2.0);
+        AddValue(Math.Pow(2, 6.25) * agxRefLog2MiddleGrey, 1.0);
+        AddValue(Math.Pow(2, agxRefLog2Max) * agxRefLog2MiddleGrey, 1.0);
 
-        double totalErrorLinear = 0;
-        double totalErrorLog2 = 0;
+        ErrorValue[] errorValuesArray = new ErrorValue[errorValues.Count];
+        errorValues.CopyTo(errorValuesArray, 0);
+        (double totalErrorLinear, double totalErrorLog2) error = CalculateTotalError(ref errorValuesArray);
+
         foreach (ErrorValue value in errorValues)
         {
-            totalErrorLinear += value.ErrorLinear * value.ErrorWeight;
-            totalErrorLog2 += value.ErrorLog2 * value.ErrorWeight;
             TreeItem treeItem = tree.CreateItem();
             treeItem.SetText(0, $"{value.Input:F7}");
             treeItem.SetText(1, $"{value.Reference:F7}");
@@ -91,8 +96,8 @@ public partial class CurveComparison : Node
             treeItem.SetText(4, $"{value.ErrorLog2:F7}");
             treeItem.SetText(5, $"{value.ErrorWeight:F7}");
         }
-        GetNode<Label>("%TotalErrorLinearLabel").Text = $"Total weighted error (linear): {totalErrorLinear:F7}";
-        GetNode<Label>("%TotalErrorLog2Label").Text = $"Total weighted error (log2, middle grey: {agxRefLog2MiddleGrey:F2}): {totalErrorLog2:F7}";
+        GetNode<Label>("%TotalErrorLinearLabel").Text = $"Total weighted error (linear): {error.totalErrorLinear:F7}";
+        GetNode<Label>("%TotalErrorLog2Label").Text = $"Total weighted error (log2, middle grey: {agxRefLog2MiddleGrey:F2}): {error.totalErrorLog2:F7}";
         GetNode<TextEdit>("%RationalApproxTextEdit").Text = $"(x * (x * {A:F15} + ({B:F15})) + ({C:F15})) / (x * (x * {D:F15} + ({E:F15})) + ({F:F15})) + ({G:F15})";
     }
 
@@ -120,10 +125,16 @@ public partial class CurveComparison : Node
         (double totalErrorLinear, double totalErrorLog2) result;
         result.totalErrorLinear = 0.0;
         result.totalErrorLog2 = 0.0;
-        foreach (ErrorValue value in errorValues)
+        for (int i = 0; i < errorValues.Length; i++)
         {
-            result.totalErrorLinear += value.ErrorLinear * value.ErrorWeight;
-            result.totalErrorLog2 += value.ErrorLog2 * value.ErrorWeight;
+            double thisWeight = errorValues[i].ErrorWeight;
+            if ((i == 0 && errorValues[i].Approx > errorValues[i].Reference)
+                || (i == errorValues.Length - 1 && errorValues[i].Approx < errorValues[i].Reference))
+            {
+                thisWeight *= 1000.0;
+            }
+            result.totalErrorLinear += errorValues[i].ErrorLinear * thisWeight;
+            result.totalErrorLog2 += errorValues[i].ErrorLog2 * thisWeight;
         }
         return result;
     }
@@ -171,9 +182,9 @@ public partial class CurveComparison : Node
         public double E = 0.0;
         public double F = 0.0;
         public double G = 0.0;
-        public int numSteps = 8;
+        public int numSteps = 10;
         public double minHalfRange = 0.05;
-        public double half_range_denom = 1.2;
+        public double half_range_denom = 2;
         public ErrorValue[] originalErrorValues;
         public double agxRefLog2MiddleGrey = 0.18;
     }
@@ -288,11 +299,11 @@ public partial class CurveComparison : Node
                         double max_F = original_F + halfRange_F;
                         for (this_F = start_F; this_F <= max_F; this_F += step_F)
                         {
-                            double halfRange_G = Math.Max(bfInput.minHalfRange, Math.Abs(original_G / bfInput.half_range_denom));
-                            double start_G = original_G - halfRange_G;
-                            double step_G = Math.Abs(halfRange_G / bfInput.numSteps);
-                            double max_G = original_G + halfRange_G;
-                            for (this_G = start_G; this_G <= max_G; this_G += step_G)
+                            //double halfRange_G = Math.Max(bfInput.minHalfRange, Math.Abs(original_G / bfInput.half_range_denom));
+                            //double start_G = original_G - halfRange_G;
+                            //double step_G = Math.Abs(halfRange_G / bfInput.numSteps);
+                            //double max_G = original_G + halfRange_G;
+                            //for (this_G = start_G; this_G <= max_G; this_G += step_G)
                             {
                                 ErrorValue[] newErrorValues = new ErrorValue[bfInput.originalErrorValues.Length];
                                 bfInput.originalErrorValues.CopyTo(newErrorValues, 0);
