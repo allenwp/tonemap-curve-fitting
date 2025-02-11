@@ -98,6 +98,16 @@ public partial class CurveComparison : Node
         }
     }
 
+    public static void RefreshApprox(ref ErrorValue[] errorValues, double middleGrey, double a, double b, double c, double d, double e, double f, double g)
+    {
+        for (int i = 0; i < errorValues.Length; i++)
+        {
+            errorValues[i].Approx = JohHableUncharted2(errorValues[i].Input, a, b, c, d, e, f, g);
+            //errorValues[i].Approx = BasicSecondOrderCurve(errorValues[i].Input, a, b, c, d, e, f, g);
+            CalculateError(ref errorValues[i], middleGrey);
+        }
+    }
+
     public override void _Process(double delta)
 	{
         Tree tree = GetNode<Tree>("%ErrorTree");
@@ -181,25 +191,15 @@ public partial class CurveComparison : Node
         for (int i = 0; i < errorValues.Length; i++)
         {
             double thisWeight = errorValues[i].ErrorWeight;
-            // Override for John Hable's approach:
-            //if ((i == 0 && errorValues[i].Approx > errorValues[i].Reference)
-            //    || (i == errorValues.Length - 1 && errorValues[i].Approx < errorValues[i].Reference))
-            //{
-            //    thisWeight *= 100.0;
-            //}
+            if ((i == 0 && errorValues[i].Approx > errorValues[i].Reference)
+                || (i == errorValues.Length - 1 && errorValues[i].Approx < errorValues[i].Reference))
+                {
+                    thisWeight *= 100.0;
+                }
             result.totalErrorLinear += errorValues[i].ErrorLinear * thisWeight;
             result.totalErrorLog2 += errorValues[i].ErrorLog2 * thisWeight;
         }
         return result;
-    }
-
-    public static void RefreshApprox(ref ErrorValue[] errorValues, double middleGrey, double a, double b, double c, double d, double e, double f, double g)
-    {
-        for (int i = 0; i < errorValues.Length; i++)
-        {
-            errorValues[i].Approx = BasicSecondOrderCurve(errorValues[i].Input, a, b, c, d, e, f, g);
-            CalculateError(ref errorValues[i], middleGrey);
-        }
     }
 
     public struct BestResult
