@@ -27,6 +27,15 @@ public partial class CurveComparison : Node
     //[Export] public double F = 1;
     //[Export] public double G = 0.0;
 
+    // alternative starting point calculated from John Hable's, but matching AgX
+    [Export] public double A = 1.0526;
+    [Export] public double B = -0.000268387;
+    [Export] public double C = 0.0;
+    [Export] public double D = 1;
+    [Export] public double E = 0.856447;
+    [Export] public double F = 0.00264133;
+    [Export] public double G = 0.0;
+
     // default to John Hable's Uncharted 2:
     //[Export] public double A = 0.22;
     //[Export] public double B = 0.3;
@@ -37,13 +46,13 @@ public partial class CurveComparison : Node
     //[Export] public double G = 16.291;
 
     // Starting point for John Hable's, but matching AgX:
-    [Export] public double A = 0.03;
-    [Export] public double B = 0.245;
-    [Export] public double C = -11.37;
-    [Export] public double D = 0.47;
-    [Export] public double E = -22.52;
-    [Export] public double F = 0.37;
-    [Export] public double G = 16.291;
+    //[Export] public double A = 0.03;
+    //[Export] public double B = 0.245;
+    //[Export] public double C = -11.37;
+    //[Export] public double D = 0.47;
+    //[Export] public double E = -22.52;
+    //[Export] public double F = 0.37;
+    //[Export] public double G = 16.291;
 
     public double agxRefLog2MiddleGrey = 0.18f;
     [Export]
@@ -75,7 +84,7 @@ public partial class CurveComparison : Node
         public double G = 0.0;
         public int numSteps = 10;
         public double minHalfRange = 0.000005;
-        public double half_range_denom = 2;
+        public double half_range_denom = 1.2;
         public ErrorValue[] originalErrorValues;
         public double agxRefLog2MiddleGrey = 0.18;
     }
@@ -93,8 +102,8 @@ public partial class CurveComparison : Node
         }
         else
         {
-            return JohHableUncharted2(x, A, B, C, D, E, F, G);
-            //return BasicSecondOrderCurve(x, A, B, C, D, E, F, G);
+            //return JohHableUncharted2(x, A, B, C, D, E, F, G);
+            return BasicSecondOrderCurve(x, A, B, C, D, E, F, G);
         }
     }
 
@@ -102,8 +111,8 @@ public partial class CurveComparison : Node
     {
         for (int i = 0; i < errorValues.Length; i++)
         {
-            errorValues[i].Approx = JohHableUncharted2(errorValues[i].Input, a, b, c, d, e, f, g);
-            //errorValues[i].Approx = BasicSecondOrderCurve(errorValues[i].Input, a, b, c, d, e, f, g);
+            //errorValues[i].Approx = JohHableUncharted2(errorValues[i].Input, a, b, c, d, e, f, g);
+            errorValues[i].Approx = BasicSecondOrderCurve(errorValues[i].Input, a, b, c, d, e, f, g);
             CalculateError(ref errorValues[i], middleGrey);
         }
     }
@@ -220,6 +229,7 @@ public partial class CurveComparison : Node
         /// </summary>
         public bool isResultBetter(double totalErrorLinear_A, double totalErrorLog2_A)
         {
+            //return totalErrorLinear_A < this.totalErrorLinear;
             return totalErrorLog2_A < this.totalErrorLog2;
             double linearWeight = 10.0;
             return (totalErrorLinear_A * linearWeight + totalErrorLog2_A) < (this.totalErrorLinear * linearWeight + this.totalErrorLog2);
