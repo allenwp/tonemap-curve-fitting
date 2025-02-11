@@ -19,13 +19,31 @@ public partial class CurveComparison : Node
 
 
     // default to self_shadow ACES:
-    [Export] public double A = 1.0;
-    [Export] public double B = 0.0245786;
-    [Export] public double C = -0.000090537;
-    [Export] public double D = 0.983729;
-    [Export] public double E = 0.4329510;
-    [Export] public double F = 0.238081;
-    [Export] public double G = 0.0;
+    //[Export] public double A = 0.194039;
+    //[Export] public double B = 1.49227;
+    //[Export] public double C = -0.00169047;
+    //[Export] public double D = 0.167678;
+    //[Export] public double E = 1.86073;
+    //[Export] public double F = 1;
+    //[Export] public double G = 0.0;
+
+    // default to John Hable's Uncharted 2:
+    //[Export] public double A = 0.22;
+    //[Export] public double B = 0.3;
+    //[Export] public double C = 0.1;
+    //[Export] public double D = 0.2;
+    //[Export] public double E = 0.01;
+    //[Export] public double F = 0.3;
+    //[Export] public double G = 16.291;
+
+    // Starting point for John Hable's, but matching AgX:
+    [Export] public double A = 0.03;
+    [Export] public double B = 0.245;
+    [Export] public double C = -11.37;
+    [Export] public double D = 0.47;
+    [Export] public double E = -22.52;
+    [Export] public double F = 0.37;
+    [Export] public double G = 16.291;
 
     public double agxRefLog2MiddleGrey = 0.18f;
     [Export]
@@ -45,7 +63,42 @@ public partial class CurveComparison : Node
 
     public System.Collections.Generic.List<ErrorValue> errorValues = new System.Collections.Generic.List<ErrorValue>();
 
-	public override void _Process(double delta)
+    public struct BruteForceInput
+    {
+        public BruteForceInput(ErrorValue[] originalErrorValues) { this.originalErrorValues = originalErrorValues; }
+        public double A = 0.0;
+        public double B = 0.0;
+        public double C = 0.0;
+        public double D = 0.0;
+        public double E = 0.0;
+        public double F = 0.0;
+        public double G = 0.0;
+        public int numSteps = 10;
+        public double minHalfRange = 0.000005;
+        public double half_range_denom = 2;
+        public ErrorValue[] originalErrorValues;
+        public double agxRefLog2MiddleGrey = 0.18;
+    }
+
+    public double ReferenceCurve(double x)
+    {
+        return AgxReference(x);
+    }
+
+    public double ApproxCurve(double x)
+    {
+        if (OptionB)
+        {
+            return AgXLog2Approx(x);
+        }
+        else
+        {
+            return JohHableUncharted2(x, A, B, C, D, E, F, G);
+            //return BasicSecondOrderCurve(x, A, B, C, D, E, F, G);
+        }
+    }
+
+    public override void _Process(double delta)
 	{
         Tree tree = GetNode<Tree>("%ErrorTree");
         tree.Clear();
@@ -128,11 +181,12 @@ public partial class CurveComparison : Node
         for (int i = 0; i < errorValues.Length; i++)
         {
             double thisWeight = errorValues[i].ErrorWeight;
-            if ((i == 0 && errorValues[i].Approx > errorValues[i].Reference)
-                || (i == errorValues.Length - 1 && errorValues[i].Approx < errorValues[i].Reference))
-            {
-                thisWeight *= 1000.0;
-            }
+            // Override for John Hable's approach:
+            //if ((i == 0 && errorValues[i].Approx > errorValues[i].Reference)
+            //    || (i == errorValues.Length - 1 && errorValues[i].Approx < errorValues[i].Reference))
+            //{
+            //    thisWeight *= 100.0;
+            //}
             result.totalErrorLinear += errorValues[i].ErrorLinear * thisWeight;
             result.totalErrorLog2 += errorValues[i].ErrorLog2 * thisWeight;
         }
@@ -170,23 +224,6 @@ public partial class CurveComparison : Node
             double linearWeight = 10.0;
             return (totalErrorLinear_A * linearWeight + totalErrorLog2_A) < (this.totalErrorLinear * linearWeight + this.totalErrorLog2);
         }
-    }
-
-    public struct BruteForceInput
-    {
-        public BruteForceInput(ErrorValue[] originalErrorValues) { this.originalErrorValues = originalErrorValues; }
-        public double A = 0.0;
-        public double B = 0.0;
-        public double C = 0.0;
-        public double D = 0.0;
-        public double E = 0.0;
-        public double F = 0.0;
-        public double G = 0.0;
-        public int numSteps = 10;
-        public double minHalfRange = 0.05;
-        public double half_range_denom = 2;
-        public ErrorValue[] originalErrorValues;
-        public double agxRefLog2MiddleGrey = 0.18;
     }
 
     public void BruteForceFit()
@@ -332,23 +369,6 @@ public partial class CurveComparison : Node
         return bestResult;
     }
 
-    public double ReferenceCurve(double x)
-    {
-        return AgxReference(x);
-    }
-
-    public double ApproxCurve(double x)
-    {
-        if (OptionB)
-        {
-            return AgXLog2Approx(x);
-        }
-        else
-        {
-            return BasicSecondOrderCurve(x, A, B, C, D, E, F, G);
-        }
-    }
-
     public static double BasicSecondOrderCurve(double x, double a, double b, double c, double d, double e, double f, double g)
     {
         return (x * (a * x + b) + c) / (x * (d * x + e) + f) + g;
@@ -363,6 +383,17 @@ public partial class CurveComparison : Node
         double d = 0.59;
         double e = 0.14;
         return (x * (a * x + b)) / (x * (c * x + d) + e);
+    }
+
+    public static double JohHableUncharted2Func(double x, double A, double B, double C, double D, double E, double F)
+    {
+        return ((x * (A * x + C * B) + D * E) / (x * (A * x + B) + D * F)) - E / F;
+    }
+
+    public static double JohHableUncharted2(double x, double a, double b, double c, double d, double e, double f, double g)
+    {
+        return JohHableUncharted2Func(x, a, b, c, d, e, f)
+            / JohHableUncharted2Func(g, a, b, c, d, e, f);
     }
 
     public static double RationalInterpolation(double x)
