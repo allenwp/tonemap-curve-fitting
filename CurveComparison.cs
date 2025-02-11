@@ -1,6 +1,8 @@
 using Godot;
 using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 using System.Transactions;
 
 [Tool]
@@ -147,97 +149,70 @@ public partial class CurveComparison : Node
         public double G = 0.0;
         public double totalErrorLinear = 999999;
         public double totalErrorLog2 = 999999;
+
+        /// <summary>
+        /// Returns true if A is better than this
+        /// </summary>
+        public bool isResultBetter(double totalErrorLinear_A, double totalErrorLog2_A)
+        {
+            return totalErrorLog2_A < this.totalErrorLog2;
+            double linearWeight = 10.0;
+            return (totalErrorLinear_A * linearWeight + totalErrorLog2_A) < (this.totalErrorLinear * linearWeight + this.totalErrorLog2);
+        }
+    }
+
+    public struct BruteForceInput
+    {
+        public BruteForceInput(ErrorValue[] originalErrorValues) { this.originalErrorValues = originalErrorValues; }
+        public double A = 0.0;
+        public double B = 0.0;
+        public double C = 0.0;
+        public double D = 0.0;
+        public double E = 0.0;
+        public double F = 0.0;
+        public double G = 0.0;
+        public int numSteps = 8;
+        public double minHalfRange = 0.05;
+        public double half_range_denom = 1.2;
+        public ErrorValue[] originalErrorValues;
+        public double agxRefLog2MiddleGrey = 0.18;
     }
 
     public void BruteForceFit()
     {
-        double original_A = A;
-        double original_B = B;
-        double original_C = C;
-        double original_D = D;
-        double original_E = E;
-        double original_F = F;
-        double original_G = G;
-        ErrorValue[] originalErrorValues = errorValues.ToArray();
+        BruteForceInput bfInput = new BruteForceInput(errorValues.ToArray());
+        bfInput.A = A;
+        bfInput.B = B;
+        bfInput.C = C;
+        bfInput.D = D;
+        bfInput.E = E;
+        bfInput.F = F;
+        bfInput.G = G;
+        bfInput.agxRefLog2MiddleGrey = agxRefLog2MiddleGrey;
 
-        double this_A = A;
-        double this_B = B;
-        double this_C = C;
-        double this_D = D;
-        double this_E = E;
-        double this_F = F;
-        double this_G = G;
+        int variationsCount = bfInput.numSteps * 2;
+        BestResult[] bestResults = new BestResult[variationsCount];
+        Parallel.For(0, variationsCount, i => bestResults[i] = BruteForceFitFunction(bfInput, i));
 
         BestResult bestResult = new BestResult();
+        bestResult.A = A;
+        bestResult.B = B;
+        bestResult.C = C;
+        bestResult.D = D;
+        bestResult.E = E;
+        bestResult.F = F;
+        bestResult.G = G;
+        ErrorValue[] newErrorValues = new ErrorValue[bfInput.originalErrorValues.Length];
+        errorValues.CopyTo(newErrorValues, 0);
+        (double totalErrorLinear, double totalErrorLog2) error = CalculateTotalError(ref newErrorValues);
+        bestResult.totalErrorLinear = error.totalErrorLinear;
+        bestResult.totalErrorLog2 = error.totalErrorLog2;
 
-        int numSteps = 10;
-        double minHalfRange = 0.05;
-        double half_range_denom = 1.2;
-
-        double halfRange_A = Math.Max(minHalfRange, Math.Abs(original_A / half_range_denom));
-        double start_A = original_A - halfRange_A;
-        double step_A = Math.Abs(halfRange_A / numSteps);
-        double max_A = original_A + halfRange_A;
-        for (this_A = start_A; this_A <= max_A; this_A += step_A)
+        for (int i = 0; i < bestResults.Length; i++)
         {
-            double halfRange_B = Math.Max(minHalfRange, Math.Abs(original_B / half_range_denom));
-            double start_B = original_B - halfRange_B;
-            double step_B = Math.Abs(halfRange_B / numSteps);
-            double max_B = original_B + halfRange_B;
-            for (this_B = start_B; this_B <= max_B; this_B += step_B)
+            if (bestResult.isResultBetter(bestResults[i].totalErrorLinear, bestResults[i].totalErrorLog2))
             {
-                double halfRange_C = Math.Max(minHalfRange, Math.Abs(original_C / half_range_denom));
-                double start_C = original_C - halfRange_C;
-                double step_C = Math.Abs(halfRange_C / numSteps);
-                double max_C = original_C + halfRange_C;
-                for (this_C = start_C; this_C <= max_C; this_C += step_C)
-                {
-                    double halfRange_D = Math.Max(minHalfRange, Math.Abs(original_D / half_range_denom));
-                    double start_D = original_D - halfRange_D;
-                    double step_D = Math.Abs(halfRange_D / numSteps);
-                    double max_D = original_D + halfRange_D;
-                    for (this_D = start_D; this_D <= max_D; this_D += step_D)
-                    {
-                        double halfRange_E = Math.Max(minHalfRange, Math.Abs(original_E / half_range_denom));
-                        double start_E = original_E - halfRange_E;
-                        double step_E = Math.Abs(halfRange_E / numSteps);
-                        double max_E = original_E + halfRange_E;
-                        for (this_E = start_E; this_E <= max_E; this_E += step_E)
-                        {
-                            double halfRange_F = Math.Max(minHalfRange, Math.Abs(original_F / half_range_denom));
-                            double start_F = original_F - halfRange_F;
-                            double step_F = Math.Abs(halfRange_F / numSteps);
-                            double max_F = original_F + halfRange_F;
-                            for (this_F = start_F; this_F <= max_F; this_F += step_F)
-                            {
-                                double halfRange_G = Math.Max(minHalfRange, Math.Abs(original_G / half_range_denom));
-                                double start_G = original_G - halfRange_G;
-                                double step_G = Math.Abs(halfRange_G / numSteps);
-                                double max_G = original_G + halfRange_G;
-                                for (this_G = start_G; this_G <= max_G; this_G += step_G)
-                                {
-                                    ErrorValue[] newErrorValues = new ErrorValue[originalErrorValues.Length];
-                                    originalErrorValues.CopyTo(newErrorValues, 0);
-                                    RefreshApprox(ref newErrorValues, agxRefLog2MiddleGrey, this_A, this_B, this_C, this_D, this_E, this_F, this_G);
-
-                                    (double totalErrorLinear, double totalErrorLog2) error = CalculateTotalError(ref newErrorValues);
-                                    if (error.totalErrorLog2 < bestResult.totalErrorLog2)
-                                    {
-                                        bestResult.A = this_A;
-                                        bestResult.B = this_B;
-                                        bestResult.C = this_C;
-                                        bestResult.D = this_D;
-                                        bestResult.E = this_E;
-                                        bestResult.F = this_F;
-                                        bestResult.G = this_G;
-                                        bestResult.totalErrorLinear = error.totalErrorLinear;
-                                        bestResult.totalErrorLog2 = error.totalErrorLog2;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
+                bestResult = bestResults[i];
             }
         }
 
@@ -248,6 +223,102 @@ public partial class CurveComparison : Node
         E = bestResult.E;
         F = bestResult.F;
         G = bestResult.G;
+    }
+
+    public static BestResult BruteForceFitFunction(BruteForceInput bfInput, int A_index)
+    {
+        double original_A = bfInput.A;
+        double original_B = bfInput.B;
+        double original_C = bfInput.C;
+        double original_D = bfInput.D;
+        double original_E = bfInput.E;
+        double original_F = bfInput.F;
+        double original_G = bfInput.G;
+
+        double this_A = bfInput.A;
+        double this_B = bfInput.B;
+        double this_C = bfInput.C;
+        double this_D = bfInput.D;
+        double this_E = bfInput.E;
+        double this_F = bfInput.F;
+        double this_G = bfInput.G;
+
+        BestResult bestResult = new BestResult();
+        bestResult.A = this_A;
+        bestResult.B = this_B;
+        bestResult.C = this_C;
+        bestResult.D = this_D;
+        bestResult.E = this_E;
+        bestResult.F = this_F;
+        bestResult.G = this_G;
+
+        double halfRange_A = Math.Max(bfInput.minHalfRange, Math.Abs(original_A / bfInput.half_range_denom));
+        double start_A = original_A - halfRange_A;
+        double step_A = Math.Abs(halfRange_A / bfInput.numSteps);
+        double max_A = original_A + halfRange_A;
+        this_A = start_A + step_A * A_index;
+
+        double halfRange_B = Math.Max(bfInput.minHalfRange, Math.Abs(original_B / bfInput.half_range_denom));
+        double start_B = original_B - halfRange_B;
+        double step_B = Math.Abs(halfRange_B / bfInput.numSteps);
+        double max_B = original_B + halfRange_B;
+        for (this_B = start_B; this_B <= max_B; this_B += step_B)
+        {
+            double halfRange_C = Math.Max(bfInput.minHalfRange, Math.Abs(original_C / bfInput.half_range_denom));
+            double start_C = original_C - halfRange_C;
+            double step_C = Math.Abs(halfRange_C / bfInput.numSteps);
+            double max_C = original_C + halfRange_C;
+            for (this_C = start_C; this_C <= max_C; this_C += step_C)
+            {
+                double halfRange_D = Math.Max(bfInput.minHalfRange, Math.Abs(original_D / bfInput.half_range_denom));
+                double start_D = original_D - halfRange_D;
+                double step_D = Math.Abs(halfRange_D / bfInput.numSteps);
+                double max_D = original_D + halfRange_D;
+                for (this_D = start_D; this_D <= max_D; this_D += step_D)
+                {
+                    double halfRange_E = Math.Max(bfInput.minHalfRange, Math.Abs(original_E / bfInput.half_range_denom));
+                    double start_E = original_E - halfRange_E;
+                    double step_E = Math.Abs(halfRange_E / bfInput.numSteps);
+                    double max_E = original_E + halfRange_E;
+                    for (this_E = start_E; this_E <= max_E; this_E += step_E)
+                    {
+                        double halfRange_F = Math.Max(bfInput.minHalfRange, Math.Abs(original_F / bfInput.half_range_denom));
+                        double start_F = original_F - halfRange_F;
+                        double step_F = Math.Abs(halfRange_F / bfInput.numSteps);
+                        double max_F = original_F + halfRange_F;
+                        for (this_F = start_F; this_F <= max_F; this_F += step_F)
+                        {
+                            double halfRange_G = Math.Max(bfInput.minHalfRange, Math.Abs(original_G / bfInput.half_range_denom));
+                            double start_G = original_G - halfRange_G;
+                            double step_G = Math.Abs(halfRange_G / bfInput.numSteps);
+                            double max_G = original_G + halfRange_G;
+                            for (this_G = start_G; this_G <= max_G; this_G += step_G)
+                            {
+                                ErrorValue[] newErrorValues = new ErrorValue[bfInput.originalErrorValues.Length];
+                                bfInput.originalErrorValues.CopyTo(newErrorValues, 0);
+                                RefreshApprox(ref newErrorValues, bfInput.agxRefLog2MiddleGrey, this_A, this_B, this_C, this_D, this_E, this_F, this_G);
+
+                                (double totalErrorLinear, double totalErrorLog2) error = CalculateTotalError(ref newErrorValues);
+                                if (bestResult.isResultBetter(error.totalErrorLinear, error.totalErrorLog2))
+                                {
+                                    bestResult.A = this_A;
+                                    bestResult.B = this_B;
+                                    bestResult.C = this_C;
+                                    bestResult.D = this_D;
+                                    bestResult.E = this_E;
+                                    bestResult.F = this_F;
+                                    bestResult.G = this_G;
+                                    bestResult.totalErrorLinear = error.totalErrorLinear;
+                                    bestResult.totalErrorLog2 = error.totalErrorLog2;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return bestResult;
     }
 
     public double ReferenceCurve(double x)
