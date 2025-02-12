@@ -5,6 +5,7 @@
 
 [node name="CurveComparison" type="Node2D"]
 script = ExtResource("1_2rroq")
+A = 30.0
 
 [node name="CurveView" parent="." node_paths=PackedStringArray("curves") instance=ExtResource("1_t77ya")]
 position = Vector2(1381, 24)
@@ -147,7 +148,7 @@ hide_root = true
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 67.265)
 layout_mode = 2
-text = "(x * (x * 50.000000000000000 + (50.000000000000000)) + (50.000000000000000)) / (x * (x * 50.000000000000000 + (50.000000000000000)) + (50.000000000000000)) + (50.000000000000000)"
+text = "(x * (x * 30.000000000000000 + (50.000000000000000)) + (50.000000000000000)) / (x * (x * 50.000000000000000 + (50.000000000000000)) + (50.000000000000000)) + (50.000000000000000)"
 wrap_mode = 1
 
 [connection signal="toggled" from="CheckButton" to="." method="set_option_b"]

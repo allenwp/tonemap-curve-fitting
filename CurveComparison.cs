@@ -96,7 +96,7 @@ public partial class CurveComparison : Node
         public double E = 0.0;
         public double F = 0.0;
         public double G = 0.0;
-        public int numSteps = 18;
+        public int numSteps = 19;
         public double minHalfRange = 0.000005;
         public double half_range_denom = 1.5;
         public ErrorValue[] originalErrorValues;
@@ -119,10 +119,10 @@ public partial class CurveComparison : Node
         }
         else
         {
-            return AgxReference(x, agxRefLog2Max);
+            //return AgxReference(x, agxRefLog2Max);
             //return BruteForceResult2(x);
             //return JohHableUncharted2(x, A, B, C, D, E, F, G);
-            //return BasicSecondOrderCurve(x, A, B, C, D, E, F, G);
+            return BasicSecondOrderCurve(x, A, B, C, D, E, F, G);
         }
     }
 
@@ -267,9 +267,11 @@ public partial class CurveComparison : Node
         bfInput.G = G;
         bfInput.agxRefLog2MiddleGrey = agxRefLog2MiddleGrey;
 
-        int variationsCount = bfInput.numSteps * 2;
+        int variationsCount = bfInput.numSteps * 2 + 3;
         BestResult[] bestResults = new BestResult[variationsCount];
         Parallel.For(0, variationsCount, i => bestResults[i] = BruteForceBallparkFunction(bfInput, i));
+        //int variationsCount = bfInput.numSteps * 2;
+        //BestResult[] bestResults = new BestResult[variationsCount];
         //Parallel.For(0, variationsCount, i => bestResults[i] = BruteForceFitFunction(bfInput, i));
 
         BestResult bestResult = new BestResult();
@@ -323,23 +325,36 @@ public partial class CurveComparison : Node
         bestResult.G = this_G;
         ErrorValue[] newErrorValues = new ErrorValue[bfInput.originalErrorValues.Length];
 
-        for (int i_A = 0; i_A < A_index; i_A++)
+        double[] values = new double[bfInput.numSteps * 2 + 3];
+        values[0] = bfInput.A;
+        for (int i = 1; i < bfInput.numSteps * 2; i++)
         {
-            this_A = this_A / (i_A % 2 == 0 ? -1.0 : -1.0 * bfInput.half_range_denom); // TODO: Need to add 0.0 to these.
+            values[i] = values[i-1] / (i % 2 == 0 ? -1.0 * bfInput.half_range_denom : -1.0);
         }
+        values[values.Length - 1] = 0.0;
+        values[values.Length - 2] = 1.0;
+        values[values.Length - 3] = -1.0;
 
-        for (int i_B = 0; i_B < bfInput.numSteps * 2; i_B++)
+        this_A = values[A_index];
+        for (int i_B = 0; i_B < values.Length; i_B++)
         {
-            for (int i_C = 0; i_C < bfInput.numSteps * 2; i_C++)
+            this_B = values[i_B];
+            for (int i_C = 0; i_C < values.Length; i_C++)
             {
-                for (int i_D = 0; i_D < bfInput.numSteps * 2; i_D++)
+                this_C = values[i_C];
+                for (int i_D = 0; i_D < values.Length; i_D++)
                 {
-                    for (int i_E = 0; i_E < bfInput.numSteps * 2; i_E++)
+                    this_D = values[i_D];
+                    for (int i_E = 0; i_E < values.Length; i_E++)
                     {
-                        for (int i_F = 0; i_F < bfInput.numSteps * 2; i_F++)
+                        this_E = values[i_E];
+                        for (int i_F = 0; i_F < values.Length; i_F++)
                         {
-                            //for (int i_G = 0; i_G < bfInput.numSteps * 2; i_G++)
+                            this_F = values[i_F];
+                            //for (int i_G = 0; i_G < values.Length; i_G++)
                             {
+                                //this_G = values[i_G];
+                                this_G = 0.0;
                                 bfInput.originalErrorValues.CopyTo(newErrorValues, 0);
                                 RefreshApprox(ref newErrorValues, bfInput.agxRefLog2MiddleGrey, this_A, this_B, this_C, this_D, this_E, this_F, this_G);
 
@@ -356,17 +371,11 @@ public partial class CurveComparison : Node
                                     bestResult.totalErrorLinear = error.totalErrorLinear;
                                     bestResult.totalErrorLog2 = error.totalErrorLog2;
                                 }
-                                //this_G = this_G / (i_G % 2 == 0 ? -1.0 : -1.0 * bfInput.half_range_denom);
                             }
-                            this_F = this_F / (i_F % 2 == 0 ? -1.0 : -1.0 * bfInput.half_range_denom);
                         }
-                        this_E = this_E / (i_E % 2 == 0 ? -1.0 : -1.0 * bfInput.half_range_denom);
                     }
-                    this_D = this_D / (i_D % 2 == 0 ? -1.0 : -1.0 * bfInput.half_range_denom);
                 }
-                this_C = this_C / (i_C % 2 == 0 ? -1.0 : -1.0 * bfInput.half_range_denom);
             }
-            this_B = this_B / (i_B % 2 == 0 ? -1.0 : -1.0 * bfInput.half_range_denom);
         }
 
         return bestResult;
