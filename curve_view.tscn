@@ -25,6 +25,12 @@ points = PackedVector2Array(0, 0, 1000, 0)
 width = 3.0
 default_color = Color(0.192197, 0.192197, 0.192197, 1)
 
+[node name="LinearLine" type="Line2D" parent="."]
+unique_name_in_owner = true
+position = Vector2(0, 1000)
+width = 1.5
+default_color = Color(0.43618, 0.43618, 0.43618, 1)
+
 [node name="YUpperLable" type="Label" parent="."]
 unique_name_in_owner = true
 anchors_preset = 6
@@ -139,4 +145,4 @@ width = 1.5
 unique_name_in_owner = true
 position = Vector2(0, 1000)
 width = 1.5
-default_color = Color(1, 0.433333, 0, 1)
+default_color = Color(0.999997, 0.514525, 0.255579, 1)

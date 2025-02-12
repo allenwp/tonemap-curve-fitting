@@ -11,7 +11,7 @@ enum EncodingType { LINEAR, LOG2}
 @export var x_encoding_type: EncodingType = EncodingType.LINEAR
 @export var y_encoding_type: EncodingType = EncodingType.LINEAR
 @export var linear_min_x: float = 0.0
-@export var linear_max_x: float = 16.3
+@export var linear_max_x: float = 16.2917402385381
 @export var linear_min_y: float = 0.0
 @export var linear_max_y: float = 1.0
 @export var log2_middle_grey: float = 1.0
@@ -20,6 +20,7 @@ enum EncodingType { LINEAR, LOG2}
 @export var log2_min_y: float = -12.0
 @export var log2_max_y: float = 4.0
 @export var clip: bool = true
+@export var show_linear: bool = true
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -57,6 +58,7 @@ func _process(_delta: float) -> void:
 			%YMiddleGreyLine.position.y = (1.0 - (log2(log2_middle_grey / log2_middle_grey) - log2_min_y) / (log2_max_y - log2_min_y)) * 1000.0
 	%YMiddleGreyLine.visible = %YMiddleGreyLine.position.y >= 0.0 && %YMiddleGreyLine.position.y <= 1000.0
 
+	var linear_points: PackedVector2Array
 	var reference_points: PackedVector2Array
 	var approx_points: PackedVector2Array
 	for i in range(num_points):
@@ -69,6 +71,7 @@ func _process(_delta: float) -> void:
 				x = (float(i) / (num_points - 1)) * (log2_max_x - log2_min_x) + log2_min_x
 				x = pow(2.0, x) * log2_middle_grey # convert from log2 encoding to linear encoding
 
+		var y_linear: float = x
 		var y_reference: float = curves.ReferenceCurve(x)
 		var y_approx: float = curves.ApproxCurve(x)
 
@@ -82,19 +85,25 @@ func _process(_delta: float) -> void:
 		# scale y from linear encoding to match the [0,-1000] graph range
 		match y_encoding_type:
 			EncodingType.LINEAR:
+				y_linear = (y_linear - linear_min_y) / (linear_max_y - linear_min_y) * -1000.0
 				y_reference = (y_reference - linear_min_y) / (linear_max_y - linear_min_y) * -1000.0
 				y_approx = (y_approx - linear_min_y) / (linear_max_y - linear_min_y) * -1000.0
 			EncodingType.LOG2:
+				y_linear = maxf(1e-10, y_linear / log2_middle_grey) # prevent log2(0)
 				y_reference = maxf(1e-10, y_reference / log2_middle_grey) # prevent log2(0)
 				y_approx = maxf(1e-10, y_approx / log2_middle_grey) # prevent log2(0)
+				y_linear = (log2(y_linear) - log2_min_y) / (log2_max_y - log2_min_y) * -1000.0
 				y_reference = (log2(y_reference) - log2_min_y) / (log2_max_y - log2_min_y) * -1000.0
 				y_approx = (log2(y_approx) - log2_min_y) / (log2_max_y - log2_min_y) * -1000.0
 		
+		if show_linear && (x >= 0.0 && x <= 1000.0 && y_linear <= 0.0 && y_linear >= -1000.0):
+			linear_points.push_back(Vector2(x, y_linear))
 		if !clip || (x >= 0.0 && x <= 1000.0 && y_reference <= 0.0 && y_reference >= -1000.0):
 			reference_points.push_back(Vector2(x, y_reference))
 		if !clip || (x >= 0.0 && x <= 1000.0 && y_approx <= 0.0 && y_approx >= -1000.0):
 			approx_points.push_back(Vector2(x, y_approx))
-
+	
+	%LinearLine.points = linear_points
 	%ReferenceLine.points = reference_points
 	%ApproxLine.points = approx_points
 
