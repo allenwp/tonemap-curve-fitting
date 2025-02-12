@@ -28,7 +28,7 @@ log2_middle_grey = 0.18
 log2_min_x = -10.0
 log2_max_x = 6.5
 log2_min_y = -10.0
-log2_max_y = 3.02
+log2_max_y = 2.474
 
 [node name="CurveView3" parent="." node_paths=PackedStringArray("curves") instance=ExtResource("1_t77ya")]
 position = Vector2(2791, 24)
@@ -47,6 +47,7 @@ position = Vector2(1381, 696)
 scale = Vector2(0.62, 0.62)
 curves = NodePath("..")
 x_encoding_type = 1
+linear_max_x = 16.3
 linear_max_y = 0.04
 log2_middle_grey = 0.18
 log2_min_x = -8.305
@@ -82,7 +83,7 @@ position = Vector2(1381, 1366)
 scale = Vector2(0.62, 0.62)
 curves = NodePath("..")
 linear_max_x = 0.2
-linear_max_y = 0.21
+linear_max_y = 0.2
 log2_middle_grey = 0.18
 log2_min_x = -8.305
 log2_max_x = -2.0
@@ -93,7 +94,6 @@ log2_max_y = -2.07
 position = Vector2(2093, 1366)
 scale = Vector2(0.62, 0.62)
 curves = NodePath("..")
-linear_max_x = 16.292
 log2_middle_grey = 0.18
 log2_max_x = 6.5
 log2_min_y = -10.0
@@ -127,12 +127,12 @@ offset_bottom = 1433.0
 [node name="TotalErrorLinearLabel" type="Label" parent="VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Total weighted error (linear): 1419.6011232"
+text = "Total weighted error (linear): 0.0000000"
 
 [node name="TotalErrorLog2Label" type="Label" parent="VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Total weighted error (log2, middle grey: 0.18): 4127.8648595"
+text = "Total weighted error (log2, middle grey: 0.18): 0.0000000"
 
 [node name="ErrorTree" type="Tree" parent="VBoxContainer"]
 unique_name_in_owner = true
@@ -147,7 +147,7 @@ hide_root = true
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 67.265)
 layout_mode = 2
-text = "(x * (x * 10.000000000000000 + (10.000000000000000)) + (10.000000000000000)) / (x * (x * 10.000000000000000 + (10.000000000000000)) + (10.000000000000000)) + (10.000000000000000)"
+text = "(x * (x * 50.000000000000000 + (50.000000000000000)) + (50.000000000000000)) / (x * (x * 50.000000000000000 + (50.000000000000000)) + (50.000000000000000)) + (50.000000000000000)"
 wrap_mode = 1
 
 [connection signal="toggled" from="CheckButton" to="." method="set_option_b"]

@@ -68,6 +68,12 @@ public partial class CurveComparison : Node
     [Export]
     public double agxRefLog2Max = 6.5f;
 
+    [Export]
+    public double white = Math.Pow(2.0, 6.5f) * 0.18;
+
+    [Export]
+    public double input_exposure_scale = 1.0;
+
     public struct ErrorValue
     {
         public double Input;
@@ -99,20 +105,24 @@ public partial class CurveComparison : Node
 
     public double ReferenceCurve(double x)
     {
-        return AgxReference(x);
+        return AgxReference(x, agxRefLog2Max);
     }
 
     public double ApproxCurve(double x)
     {
         if (OptionB)
         {
-            return MinimaxApproximation(x);
+            double agx = AgxReference(input_exposure_scale * x, agxRefLog2Max);
+            double white_scale = AgxReference(input_exposure_scale * white, agxRefLog2Max);
+            return agx / white_scale;
+            //return MinimaxApproximation(x);
         }
         else
         {
+            return AgxReference(x, agxRefLog2Max);
             //return BruteForceResult2(x);
             //return JohHableUncharted2(x, A, B, C, D, E, F, G);
-            return BasicSecondOrderCurve(x, A, B, C, D, E, F, G);
+            //return BasicSecondOrderCurve(x, A, B, C, D, E, F, G);
         }
     }
 
@@ -315,7 +325,7 @@ public partial class CurveComparison : Node
 
         for (int i_A = 0; i_A < A_index; i_A++)
         {
-            this_A = this_A / (i_A % 2 == 0 ? -1.0 : -1.0 * bfInput.half_range_denom);
+            this_A = this_A / (i_A % 2 == 0 ? -1.0 : -1.0 * bfInput.half_range_denom); // TODO: Need to add 0.0 to these.
         }
 
         for (int i_B = 0; i_B < bfInput.numSteps * 2; i_B++)
@@ -541,12 +551,12 @@ public partial class CurveComparison : Node
         return xIn / Math.Pow(1 + Math.Pow(xIn, power), 1 / power);
     }
 
-    private double CalculateSigmoid(double x)
+    private double CalculateSigmoid(double x, double middleGrey, double minExposure, double maxExposure)
     {
         const double slope = 2.4;
         const double power = 1.5;
-        double pivotX = Math.Abs(agxRefLog2Min / (agxRefLog2Max - agxRefLog2Min));
-        double pivotY = Math.Pow(agxRefLog2MiddleGrey, 1.0 / 2.4);
+        double pivotX = Math.Abs(minExposure / (maxExposure - minExposure));
+        double pivotY = Math.Pow(middleGrey, 1.0 / 2.4);
 
         double scaleValue = (x < pivotX)
             ? -1.0 * ScaleFunction(1.0 - pivotX, 1.0 - pivotY, power, slope)
@@ -562,14 +572,14 @@ public partial class CurveComparison : Node
         return logNorm; // Might be negative, but negatives are clipped later.
     }
 
-    public double AgxReference(double color)
+    public double AgxReference(double color, double log2Max)
     {
         color = Math.Max(color, 1e-10);
 
-        color = LogEncodingLog2(color, agxRefLog2MiddleGrey, agxRefLog2Min, agxRefLog2Max);
+        color = LogEncodingLog2(color, agxRefLog2MiddleGrey, agxRefLog2Min, log2Max);
 
         // Apply sigmoid function approximation.
-        color = CalculateSigmoid(color);
+        color = CalculateSigmoid(color, agxRefLog2MiddleGrey, agxRefLog2Min, log2Max);
 
         // Convert back to linear.
         color = Math.Pow(color, 2.4);
