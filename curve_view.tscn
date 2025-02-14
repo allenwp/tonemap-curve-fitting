@@ -11,6 +11,17 @@ offset_right = 1000.0
 offset_bottom = 1000.0
 color = Color(0, 0, 0, 1)
 
+[node name="ReferenceInflectionMiddle" type="Line2D" parent="."]
+unique_name_in_owner = true
+points = PackedVector2Array(0, 10, 0, -10, 0, 0, 10, 0, -10, 0)
+width = 1.5
+
+[node name="ApproxInflectionMiddle" type="Line2D" parent="."]
+unique_name_in_owner = true
+points = PackedVector2Array(0, 10, 0, -10, 0, 0, 10, 0, -10, 0)
+width = 1.5
+default_color = Color(1, 0.513726, 0.254902, 1)
+
 [node name="XMiddleGreyLine" type="Line2D" parent="."]
 unique_name_in_owner = true
 position = Vector2(248, 0)

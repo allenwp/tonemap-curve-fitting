@@ -17,23 +17,23 @@ public partial class CurveComparison : Node
         OptionB = value;
     }
 
-    const double ballparkStartingPoint = 50.0;
-    [Export] public double A = ballparkStartingPoint;
-    [Export] public double B = ballparkStartingPoint;
-    [Export] public double C = ballparkStartingPoint;
-    [Export] public double D = ballparkStartingPoint;
-    [Export] public double E = ballparkStartingPoint;
-    [Export] public double F = ballparkStartingPoint;
-    [Export] public double G = ballparkStartingPoint;
+    //const double ballparkStartingPoint = 30.0;
+    //[Export] public double A = ballparkStartingPoint;
+    //[Export] public double B = ballparkStartingPoint;
+    //[Export] public double C = ballparkStartingPoint;
+    //[Export] public double D = ballparkStartingPoint;
+    //[Export] public double E = ballparkStartingPoint;
+    //[Export] public double F = ballparkStartingPoint;
+    //[Export] public double G = ballparkStartingPoint;
 
     // default to self_shadow ACES:
-    //[Export] public double A = 0.194039;
-    //[Export] public double B = 1.49227;
-    //[Export] public double C = -0.00169047;
-    //[Export] public double D = 0.167678;
-    //[Export] public double E = 1.86073;
-    //[Export] public double F = 1;
-    //[Export] public double G = 0.0;
+    [Export] public double A = 1.0;
+    [Export] public double B = 0.0245786;
+    [Export] public double C = -0.000090537;
+    [Export] public double D = 0.983729;
+    [Export] public double E = 0.4329510;
+    [Export] public double F = 0.238081;
+    [Export] public double G = 0.0;
 
     // alternative starting point calculated from John Hable's, but matching AgX
     //[Export] public double A = 1.0526;
@@ -45,8 +45,9 @@ public partial class CurveComparison : Node
     //[Export] public double G = 0.0;
 
     // default to John Hable's Uncharted 2:
-    //[Export] public double A = 0.22;
-    //[Export] public double B = 0.3;
+    const double exposure_bias = 2.0;
+    //[Export] public double A = 0.22;// * exposure_bias * exposure_bias;
+    //[Export] public double B = 0.3;// * exposure_bias;
     //[Export] public double C = 0.1;
     //[Export] public double D = 0.2;
     //[Export] public double E = 0.01;
@@ -73,6 +74,9 @@ public partial class CurveComparison : Node
 
     [Export]
     public double input_exposure_scale = 1.0;
+
+    public Vector2 reference_inflection_point;
+    public Vector2 approx_inflection_point;
 
     public struct ErrorValue
     {
@@ -105,6 +109,8 @@ public partial class CurveComparison : Node
 
     public double ReferenceCurve(double x)
     {
+        //return BasicSecondOrderCurve(x, A, B, C, D, E, F, G);
+        //return JohHableUncharted2(x, A, B, C, D, E, F, white);
         return AgxReference(x, agxRefLog2Max);
     }
 
@@ -112,17 +118,21 @@ public partial class CurveComparison : Node
     {
         if (OptionB)
         {
+            input_exposure_scale = 0.631;
             double agx = AgxReference(input_exposure_scale * x, agxRefLog2Max);
-            double white_scale = AgxReference(input_exposure_scale * white, agxRefLog2Max);
+            double white_scale = AgxReference(input_exposure_scale * 2.0, agxRefLog2Max);
             return agx / white_scale;
             //return MinimaxApproximation(x);
         }
         else
         {
+            return GodotACES(x, A, B, C, D, E, F, G);
+
+            agxRefLog2Max = Math.Log2(white / 0.18);
+            return AgxReference(x, agxRefLog2Max);
             //return AgxReference(x, agxRefLog2Max);
             //return BruteForceResult2(x);
-            //return JohHableUncharted2(x, A, B, C, D, E, F, G);
-            return BasicSecondOrderCurve(x, A, B, C, D, E, F, G);
+            //return BasicSecondOrderCurve(x, A, B, C, D, E, F, G);
         }
     }
 
@@ -190,7 +200,74 @@ public partial class CurveComparison : Node
         GetNode<Label>("%TotalErrorLinearLabel").Text = $"Total weighted error (linear): {error.totalErrorLinear:F7}";
         GetNode<Label>("%TotalErrorLog2Label").Text = $"Total weighted error (log2, middle grey: {agxRefLog2MiddleGrey:F2}): {error.totalErrorLog2:F7}";
         GetNode<TextEdit>("%RationalApproxTextEdit").Text = $"(x * (x * {A:F15} + ({B:F15})) + ({C:F15})) / (x * (x * {D:F15} + ({E:F15})) + ({F:F15})) + ({G:F15})";
+
+        reference_inflection_point = CalculateInflectionPoint((double x) => { return ReferenceCurve(x); });
+        approx_inflection_point = CalculateInflectionPoint((double x) => { return ApproxCurve(x); });
     }
+
+    //(points[i-1] - points[i-2]).x * v1.y - (points[i-1] - points[i-2]).y * v1.x
+    private Vector2 CalculateInflectionPoint(Func<double, double> value)
+    {
+        Vector2 result = new Vector2(-1, -1);
+        int numSteps = 10000;
+        int skipped = 10;
+        double[] x_vals = new double[numSteps - skipped];
+        double[] y_vals = new double[numSteps - skipped];
+        for (int i = skipped; i < numSteps; i++)
+        {
+            x_vals[i - skipped] = (double)i / numSteps;
+            y_vals[i - skipped] = value(x_vals[i - skipped]);
+        }
+
+        List<int> inflection_indices = new List<int>();
+        bool positive = true;
+        for (int i = 1; i < x_vals.Length - 1; i++)
+        {
+            double v1x = x_vals[i] - x_vals[i - 1];
+            double v1y = y_vals[i] - y_vals[i - 1];
+            double v2x = x_vals[i + 1] - x_vals[i];
+            double v2y = y_vals[i + 1] - y_vals[i];
+
+            double cross = v1x * v2y - v2x * v1y;
+            if (cross < 0.0)
+            {
+                if (positive)
+                {
+                    positive = false;
+                    if (i > 1)
+                    {
+                        inflection_indices.Add(i);
+                    }
+                }
+            }
+            else
+            {
+                if (!positive)
+                {
+                    positive = true;
+                    if (i > 1)
+                    {
+                        inflection_indices.Add(i);
+                    }
+                }
+            }
+        }
+
+        if (inflection_indices.Count > 1)
+        {
+            double middleX = (x_vals[inflection_indices[0]] + x_vals[inflection_indices[inflection_indices.Count - 1]]) / 2.0;
+            double middleY = (y_vals[inflection_indices[0]] + y_vals[inflection_indices[inflection_indices.Count - 1]]) / 2.0;
+            result = new Vector2((float)middleX, (float)middleY);
+        } else if (inflection_indices.Count == 1)
+        {
+            int i = inflection_indices[0];
+            result = new Vector2((float)x_vals[i], (float)y_vals[i]);
+        }
+
+        return result;
+    }
+
+    
 
     public void AddValue(double input, double errorWeight)
     {
@@ -341,7 +418,7 @@ public partial class CurveComparison : Node
             this_B = values[i_B];
             for (int i_C = 0; i_C < values.Length; i_C++)
             {
-                this_C = values[i_C];
+                this_C = values[i_C] / 1000.0;
                 for (int i_D = 0; i_D < values.Length; i_D++)
                 {
                     this_D = values[i_D];
@@ -474,6 +551,14 @@ public partial class CurveComparison : Node
         return (x * (a * x + b) + c) / (x * (d * x + e) + f) + g;
     }
 
+    public double GodotACES(double x, double a, double b, double c, double d, double e, double f, double g)
+    {
+        double exposure = 1.8;
+        double color_tonemapped = BasicSecondOrderCurve(x * exposure, a, b, c, d, e, f, g);
+        double white_tonemapped = BasicSecondOrderCurve(white * exposure, a, b, c, d, e, f, g);
+        return color_tonemapped / white_tonemapped;
+    }
+
     public static double KrzysztofNarkowiczACES(double x)
     {
         x *= 0.6;
@@ -492,6 +577,8 @@ public partial class CurveComparison : Node
 
     public static double JohHableUncharted2(double x, double a, double b, double c, double d, double e, double f, double g)
     {
+        x *= exposure_bias;
+        g *= exposure_bias;
         return JohHableUncharted2Func(x, a, b, c, d, e, f)
             / JohHableUncharted2Func(g, a, b, c, d, e, f);
     }
