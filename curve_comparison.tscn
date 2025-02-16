@@ -5,9 +5,15 @@
 
 [node name="CurveComparison" type="Node2D"]
 script = ExtResource("1_2rroq")
-agxRefLog2Max = 3.47393
-white = 2.0
-input_exposure_scale = 0.631
+OptionB = true
+A = 0.194039
+B = 1.49227
+C = -0.00169047
+D = 0.167678
+E = 1.86073
+F = 1.0
+white = 1.0
+input_exposure_scale = 0.555999
 
 [node name="CurveView" parent="." node_paths=PackedStringArray("curves") instance=ExtResource("1_t77ya")]
 position = Vector2(1381, 24)
@@ -102,7 +108,7 @@ clip = true
 position = Vector2(2093, 1366)
 scale = Vector2(0.62, 0.62)
 curves = NodePath("..")
-linear_max_x = 2.0
+linear_max_x = 16.3
 log2_middle_grey = 0.18
 log2_max_x = 6.5
 log2_min_y = -10.0
@@ -137,12 +143,12 @@ offset_bottom = 1433.0
 [node name="TotalErrorLinearLabel" type="Label" parent="VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Total weighted error (linear): 4.5452305"
+text = "Total weighted error (linear): 4.8898961"
 
 [node name="TotalErrorLog2Label" type="Label" parent="VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Total weighted error (log2, middle grey: 0.18): 110.0931155"
+text = "Total weighted error (log2, middle grey: 0.18): 16.6681619"
 
 [node name="ErrorTree" type="Tree" parent="VBoxContainer"]
 unique_name_in_owner = true
@@ -157,7 +163,7 @@ hide_root = true
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 67.265)
 layout_mode = 2
-text = "(x * (x * 1.000000000000000 + (0.024578600000000)) + (-0.000090537000000)) / (x * (x * 0.983729000000000 + (0.432951000000000)) + (0.238081000000000)) + (0.000000000000000)"
+text = "(x * (x * 0.194039000000000 + (1.492270000000000)) + (-0.001690470000000)) / (x * (x * 0.167678000000000 + (1.860730000000000)) + (1.000000000000000)) + (0.000000000000000)"
 wrap_mode = 1
 
 [connection signal="toggled" from="CheckButton" to="." method="set_option_b"]

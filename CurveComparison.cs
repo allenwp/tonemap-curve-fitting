@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Transactions;
@@ -63,7 +64,7 @@ public partial class CurveComparison : Node
     //[Export] public double F = 0.37;
     //[Export] public double G = 16.291;
 
-    public double agxRefLog2MiddleGrey = 0.18f;
+    public double agxRefMiddleGrey = 0.18f;
     [Export]
     public double agxRefLog2Min = -10.0f;
     [Export]
@@ -118,18 +119,16 @@ public partial class CurveComparison : Node
     {
         if (OptionB)
         {
-            input_exposure_scale = 0.631;
-            double agx = AgxReference(input_exposure_scale * x, agxRefLog2Max);
-            double white_scale = AgxReference(input_exposure_scale * 2.0, agxRefLog2Max);
-            return agx / white_scale;
+            return AgXNewWhiteParam1(x);
             //return MinimaxApproximation(x);
         }
         else
         {
-            return GodotACES(x, A, B, C, D, E, F, G);
+            return AgXNewWhiteParam(x);
+            //return GodotACES(x, A, B, C, D, E, F, G);
 
-            agxRefLog2Max = Math.Log2(white / 0.18);
-            return AgxReference(x, agxRefLog2Max);
+            //agxRefLog2Max = Math.Log2(white / 0.18);
+            //return AgxReference(x, agxRefLog2Max);
             //return AgxReference(x, agxRefLog2Max);
             //return BruteForceResult2(x);
             //return BasicSecondOrderCurve(x, A, B, C, D, E, F, G);
@@ -160,28 +159,28 @@ public partial class CurveComparison : Node
 
         errorValues.Clear();
 
-        AddValue(Math.Pow(2, agxRefLog2Min) * agxRefLog2MiddleGrey, 1.0);
-        AddValue(Math.Pow(2, -9.0) * agxRefLog2MiddleGrey, 1.0);
-        AddValue(Math.Pow(2, -8.0) * agxRefLog2MiddleGrey, 1.0);
-        AddValue(Math.Pow(2, -7.0) * agxRefLog2MiddleGrey, 1.0);
-        AddValue(Math.Pow(2, -6.0) * agxRefLog2MiddleGrey, 1.0);
-        AddValue(Math.Pow(2, -5.0) * agxRefLog2MiddleGrey, 1.0);
-        AddValue(Math.Pow(2, -4.0) * agxRefLog2MiddleGrey, 1.0);
-        AddValue(Math.Pow(2, -3.0) * agxRefLog2MiddleGrey, 1.0);
-        AddValue(Math.Pow(2, -2.0) * agxRefLog2MiddleGrey, 1.0);
-        AddValue(Math.Pow(2, -1.0) * agxRefLog2MiddleGrey, 1.0);
-        AddValue(agxRefLog2MiddleGrey, 10.0);
-        AddValue(Math.Pow(2, 1.0) * agxRefLog2MiddleGrey, 1.0);
-        AddValue(Math.Pow(2, 2.0) * agxRefLog2MiddleGrey, 1.0);
-        AddValue(Math.Pow(2, 3.0) * agxRefLog2MiddleGrey, 1.0);
-        AddValue(Math.Pow(2, 3.5) * agxRefLog2MiddleGrey, 1.0);
-        AddValue(Math.Pow(2, 4.0) * agxRefLog2MiddleGrey, 1.0);
-        AddValue(Math.Pow(2, 4.5) * agxRefLog2MiddleGrey, 1.0);
-        AddValue(Math.Pow(2, 5.0) * agxRefLog2MiddleGrey, 1.0);
-        AddValue(Math.Pow(2, 5.5) * agxRefLog2MiddleGrey, 1.0);
-        AddValue(Math.Pow(2, 6.0) * agxRefLog2MiddleGrey, 1.0);
-        AddValue(Math.Pow(2, 6.25) * agxRefLog2MiddleGrey, 1.0);
-        AddValue(Math.Pow(2, agxRefLog2Max) * agxRefLog2MiddleGrey, 1.0);
+        AddValue(Math.Pow(2, agxRefLog2Min) * agxRefMiddleGrey, 1.0);
+        AddValue(Math.Pow(2, -9.0) * agxRefMiddleGrey, 1.0);
+        AddValue(Math.Pow(2, -8.0) * agxRefMiddleGrey, 1.0);
+        AddValue(Math.Pow(2, -7.0) * agxRefMiddleGrey, 1.0);
+        AddValue(Math.Pow(2, -6.0) * agxRefMiddleGrey, 1.0);
+        AddValue(Math.Pow(2, -5.0) * agxRefMiddleGrey, 1.0);
+        AddValue(Math.Pow(2, -4.0) * agxRefMiddleGrey, 1.0);
+        AddValue(Math.Pow(2, -3.0) * agxRefMiddleGrey, 1.0);
+        AddValue(Math.Pow(2, -2.0) * agxRefMiddleGrey, 1.0);
+        AddValue(Math.Pow(2, -1.0) * agxRefMiddleGrey, 1.0);
+        AddValue(agxRefMiddleGrey, 10.0);
+        AddValue(Math.Pow(2, 1.0) * agxRefMiddleGrey, 1.0);
+        AddValue(Math.Pow(2, 2.0) * agxRefMiddleGrey, 1.0);
+        AddValue(Math.Pow(2, 3.0) * agxRefMiddleGrey, 1.0);
+        AddValue(Math.Pow(2, 3.5) * agxRefMiddleGrey, 1.0);
+        AddValue(Math.Pow(2, 4.0) * agxRefMiddleGrey, 1.0);
+        AddValue(Math.Pow(2, 4.5) * agxRefMiddleGrey, 1.0);
+        AddValue(Math.Pow(2, 5.0) * agxRefMiddleGrey, 1.0);
+        AddValue(Math.Pow(2, 5.5) * agxRefMiddleGrey, 1.0);
+        AddValue(Math.Pow(2, 6.0) * agxRefMiddleGrey, 1.0);
+        AddValue(Math.Pow(2, 6.25) * agxRefMiddleGrey, 1.0);
+        AddValue(Math.Pow(2, agxRefLog2Max) * agxRefMiddleGrey, 1.0);
 
         ErrorValue[] errorValuesArray = new ErrorValue[errorValues.Count];
         errorValues.CopyTo(errorValuesArray, 0);
@@ -198,7 +197,7 @@ public partial class CurveComparison : Node
             treeItem.SetText(5, $"{value.ErrorWeight:F7}");
         }
         GetNode<Label>("%TotalErrorLinearLabel").Text = $"Total weighted error (linear): {error.totalErrorLinear:F7}";
-        GetNode<Label>("%TotalErrorLog2Label").Text = $"Total weighted error (log2, middle grey: {agxRefLog2MiddleGrey:F2}): {error.totalErrorLog2:F7}";
+        GetNode<Label>("%TotalErrorLog2Label").Text = $"Total weighted error (log2, middle grey: {agxRefMiddleGrey:F2}): {error.totalErrorLog2:F7}";
         GetNode<TextEdit>("%RationalApproxTextEdit").Text = $"(x * (x * {A:F15} + ({B:F15})) + ({C:F15})) / (x * (x * {D:F15} + ({E:F15})) + ({F:F15})) + ({G:F15})";
 
         reference_inflection_point = CalculateInflectionPoint((double x) => { return ReferenceCurve(x); });
@@ -277,7 +276,7 @@ public partial class CurveComparison : Node
         newErrorValue.Approx = ApproxCurve(input);
         newErrorValue.ErrorWeight = errorWeight;
 
-        CalculateError(ref newErrorValue, agxRefLog2MiddleGrey);
+        CalculateError(ref newErrorValue, agxRefMiddleGrey);
 
         errorValues.Add(newErrorValue);
     }
@@ -342,7 +341,7 @@ public partial class CurveComparison : Node
         bfInput.E = E;
         bfInput.F = F;
         bfInput.G = G;
-        bfInput.agxRefLog2MiddleGrey = agxRefLog2MiddleGrey;
+        bfInput.agxRefLog2MiddleGrey = agxRefMiddleGrey;
 
         int variationsCount = bfInput.numSteps * 2 + 3;
         BestResult[] bestResults = new BestResult[variationsCount];
@@ -626,6 +625,31 @@ public partial class CurveComparison : Node
         return color;
     }
 
+    public double AgXNewWhiteParam1(double x)
+    {
+        double log2Max = 6.5;
+        double white_mapped = AgxReference(white, log2Max);
+        //double midgrey_mapped = AgxReference(agxRefMiddleGrey, log2Max);
+        double midgrey_mapped = agxRefMiddleGrey / white_mapped;
+
+        input_exposure_scale = agxRefMiddleGrey / midgrey_mapped;
+
+        double white_scale = AgxReference(white, log2Max);
+        //double white_scale = AgxReference(input_exposure_scale * white, log2Max);
+
+        double agx = AgxReference(input_exposure_scale * x, log2Max);
+        return agx / white_scale;
+    }
+
+    public double AgXNewWhiteParam(double x)
+    {
+        double log2Max = 6.5;
+
+        double white_scale = AgxReference(input_exposure_scale * white, log2Max);
+        double agx = AgxReference(input_exposure_scale * x, log2Max);
+        return agx / white_scale;
+    }
+
     #region AgX Reference
 
     private double ScaleFunction(double transitionX, double transitionY, double power, double slope)
@@ -672,10 +696,10 @@ public partial class CurveComparison : Node
     {
         color = Math.Max(color, 1e-10);
 
-        color = LogEncodingLog2(color, agxRefLog2MiddleGrey, agxRefLog2Min, log2Max);
+        color = LogEncodingLog2(color, agxRefMiddleGrey, agxRefLog2Min, log2Max);
 
         // Apply sigmoid function approximation.
-        color = CalculateSigmoid(color, agxRefLog2MiddleGrey, agxRefLog2Min, log2Max);
+        color = CalculateSigmoid(color, agxRefMiddleGrey, agxRefLog2Min, log2Max);
 
         // Convert back to linear.
         color = Math.Pow(color, 2.4);
