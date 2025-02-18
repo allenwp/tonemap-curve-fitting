@@ -76,8 +76,21 @@ public partial class CurveComparison : Node
     [Export]
     public double input_exposure_scale = 1.0;
 
+    [Export]
+    public double pivot_x = 118.835;
+
     public Vector2 reference_inflection_point;
     public Vector2 approx_inflection_point;
+
+    double A_scaled { get { return A / 1000.0; } }
+    double B_scaled { get { return B / 1000.0; } }
+    double C_scaled { get { return C / 1000.0; } }
+    double D_scaled { get { return D / 1000.0; } }
+    double E_scaled { get { return E / 1000.0; } }
+    double F_scaled { get { return F / 1000.0; } }
+    double G_scaled { get { return G / 1000.0; } }
+
+    public double pivot_x_scaled { get { return pivot_x / 1000.0; } }
 
     public struct ErrorValue
     {
@@ -119,12 +132,17 @@ public partial class CurveComparison : Node
     {
         if (OptionB)
         {
-            return AgXNewWhiteParam1(x);
+            //return nonlinearfit_amdform(x);
+            return AgXLog2Approx(x);
+            //return AgXNewWhiteParam1(x);
             //return MinimaxApproximation(x);
+            //return NonlinearModelFitApproximation2(x);
         }
         else
         {
-            return AgXNewWhiteParam(x);
+            return RandomNonsense(x);
+            //return NonlinearModelFitApproximation(x);
+            //return AgXNewWhiteParam(x);
             //return GodotACES(x, A, B, C, D, E, F, G);
 
             //agxRefLog2Max = Math.Log2(white / 0.18);
@@ -202,13 +220,17 @@ public partial class CurveComparison : Node
 
         reference_inflection_point = CalculateInflectionPoint((double x) => { return ReferenceCurve(x); });
         approx_inflection_point = CalculateInflectionPoint((double x) => { return ApproxCurve(x); });
+
+        if (GD.Randf() < 0.1)
+        {
+           //CalculateInflectionPoint((double x) => { return ReferenceCurve(x); }, 1000000);
+        }
     }
 
     //(points[i-1] - points[i-2]).x * v1.y - (points[i-1] - points[i-2]).y * v1.x
-    private Vector2 CalculateInflectionPoint(Func<double, double> value)
+    private Vector2 CalculateInflectionPoint(Func<double, double> value, int numSteps = 10000)
     {
         Vector2 result = new Vector2(-1, -1);
-        int numSteps = 10000;
         int skipped = 10;
         double[] x_vals = new double[numSteps - skipped];
         double[] y_vals = new double[numSteps - skipped];
@@ -255,6 +277,12 @@ public partial class CurveComparison : Node
         if (inflection_indices.Count > 1)
         {
             double middleX = (x_vals[inflection_indices[0]] + x_vals[inflection_indices[inflection_indices.Count - 1]]) / 2.0;
+
+            if (numSteps > 10000)
+            {
+                GD.Print($"Middle: {middleX:N15} Upper: {x_vals[inflection_indices[inflection_indices.Count - 1]]:N15} Lower: {x_vals[inflection_indices[0]]:N15}");
+            }
+
             double middleY = (y_vals[inflection_indices[0]] + y_vals[inflection_indices[inflection_indices.Count - 1]]) / 2.0;
             result = new Vector2((float)middleX, (float)middleY);
         } else if (inflection_indices.Count == 1)
@@ -295,8 +323,8 @@ public partial class CurveComparison : Node
         for (int i = 0; i < errorValues.Length; i++)
         {
             double thisWeight = errorValues[i].ErrorWeight;
-            if ((i == 0 && errorValues[i].Approx > errorValues[i].Reference)
-                || (i == errorValues.Length - 1 && errorValues[i].Approx < errorValues[i].Reference))
+            if ((i == 0 && errorValues[i].Approx > Math.Max(1e-4,errorValues[i].Reference))
+                || (i == errorValues.Length - 1 && errorValues[i].Approx < Math.Min(1.0 - 1e-4, errorValues[i].Reference)))
                 {
                     thisWeight *= 100.0;
                 }
@@ -590,6 +618,42 @@ public partial class CurveComparison : Node
     public static double MinimaxApproximation(double x)
     {
         return (-0.000264666 + 1.50561 * x + 0.225389 * x * x) / (1 + 1.91729 * x + 0.196494 * x * x);
+    }
+    
+    public static double NonlinearModelFitApproximation(double x)
+    {
+        return (0.000659361441666740 - 0.696889279695934 * x + 155.821863293030 * x * x) / (0.701797928424950 + 122.551728247573 * x + 155.782469136453 * x * x);
+    }
+
+    public static double NonlinearModelFitApproximation2(double x)
+    {
+        return (0.000759321162862364 - 0.764868897313159 * x + 166.417533651432 * x * x) / (0.676982309500238 + 131.398917467506 * x + 166.074755402244 * x * x);
+    }
+
+    public double RandomNonsense(double x)
+    {
+        x = Math.Pow(x, A_scaled) / (B_scaled / x) + C_scaled;
+        x = Math.Max(1e-10, x);
+        return x / (Math.Pow(x, F_scaled) * D_scaled + E_scaled) + G_scaled;
+
+        if (x < pivot_x_scaled)
+        {
+            return Math.Pow(x, A_scaled) / (B_scaled / x) + C_scaled; 
+        }
+        else
+        {
+            //return RationalInterpolation(x);
+            return x / (Math.Pow(x, F_scaled) * D_scaled + E_scaled) + G_scaled;
+        }
+
+        //return (0.0000247468 - 0.277006 * x + 774.964 * x * x) / (1 + 1062.35 * x - 1950.91 * x * x);
+    }
+
+
+    public static double nonlinearfit_amdform(double x)
+    {
+        x = -529.915417071248 + (0.00188942690895081 / Math.Pow(x, 2.67228665029058));
+        return x / (-527.558188047974 + 0.564397144632092 * Math.Pow(x, 1.07961998489504));
     }
 
     public static double BruteForceResult(double x)
