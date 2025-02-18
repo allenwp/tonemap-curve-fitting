@@ -114,7 +114,7 @@ public partial class CurveComparison : Node
         public double E = 0.0;
         public double F = 0.0;
         public double G = 0.0;
-        public int numSteps = 19;
+        public int numSteps = 10;
         public double minHalfRange = 0.000005;
         public double half_range_denom = 1.5;
         public ErrorValue[] originalErrorValues;
@@ -158,7 +158,8 @@ public partial class CurveComparison : Node
         for (int i = 0; i < errorValues.Length; i++)
         {
             //errorValues[i].Approx = JohHableUncharted2(errorValues[i].Input, a, b, c, d, e, f, g);
-            errorValues[i].Approx = BasicSecondOrderCurve(errorValues[i].Input, a, b, c, d, e, f, g);
+            //errorValues[i].Approx = BasicSecondOrderCurve(errorValues[i].Input, a, b, c, d, e, f, g);
+            errorValues[i].Approx = ComplexPowerCurve(errorValues[i].Input, a, b, c, d, e, f, g);
             CalculateError(ref errorValues[i], middleGrey);
         }
     }
@@ -187,7 +188,7 @@ public partial class CurveComparison : Node
         AddValue(Math.Pow(2, -3.0) * agxRefMiddleGrey, 1.0);
         AddValue(Math.Pow(2, -2.0) * agxRefMiddleGrey, 1.0);
         AddValue(Math.Pow(2, -1.0) * agxRefMiddleGrey, 1.0);
-        AddValue(agxRefMiddleGrey, 10.0);
+        AddValue(agxRefMiddleGrey, 1.0);
         AddValue(Math.Pow(2, 1.0) * agxRefMiddleGrey, 1.0);
         AddValue(Math.Pow(2, 2.0) * agxRefMiddleGrey, 1.0);
         AddValue(Math.Pow(2, 3.0) * agxRefMiddleGrey, 1.0);
@@ -197,7 +198,6 @@ public partial class CurveComparison : Node
         AddValue(Math.Pow(2, 5.0) * agxRefMiddleGrey, 1.0);
         AddValue(Math.Pow(2, 5.5) * agxRefMiddleGrey, 1.0);
         AddValue(Math.Pow(2, 6.0) * agxRefMiddleGrey, 1.0);
-        AddValue(Math.Pow(2, 6.25) * agxRefMiddleGrey, 1.0);
         AddValue(Math.Pow(2, agxRefLog2Max) * agxRefMiddleGrey, 1.0);
 
         ErrorValue[] errorValuesArray = new ErrorValue[errorValues.Count];
@@ -323,11 +323,23 @@ public partial class CurveComparison : Node
         for (int i = 0; i < errorValues.Length; i++)
         {
             double thisWeight = errorValues[i].ErrorWeight;
-            if ((i == 0 && errorValues[i].Approx > Math.Max(1e-4,errorValues[i].Reference))
+            if ((i == 0 && errorValues[i].Approx > Math.Max(1e-4, errorValues[i].Reference))
                 || (i == errorValues.Length - 1 && errorValues[i].Approx < Math.Min(1.0 - 1e-4, errorValues[i].Reference)))
+            {
+                thisWeight *= 100.0;
+            }
+            else
+            {
+                double pivot_x = 0.118835;
+                if (errorValues[i].Input < pivot_x && errorValues[i].Approx > errorValues[i].Reference)
                 {
-                    thisWeight *= 100.0;
+                    thisWeight *= 10.0;
                 }
+                else if (errorValues[i].Input > pivot_x && errorValues[i].Approx < errorValues[i].Reference)
+                {
+                    thisWeight *= 10.0;
+                }
+            }
             result.totalErrorLinear += errorValues[i].ErrorLinear * thisWeight;
             result.totalErrorLog2 += errorValues[i].ErrorLog2 * thisWeight;
         }
@@ -371,12 +383,12 @@ public partial class CurveComparison : Node
         bfInput.G = G;
         bfInput.agxRefLog2MiddleGrey = agxRefMiddleGrey;
 
-        int variationsCount = bfInput.numSteps * 2 + 3;
-        BestResult[] bestResults = new BestResult[variationsCount];
-        Parallel.For(0, variationsCount, i => bestResults[i] = BruteForceBallparkFunction(bfInput, i));
-        //int variationsCount = bfInput.numSteps * 2;
+        //int variationsCount = bfInput.numSteps * 2 + 3;
         //BestResult[] bestResults = new BestResult[variationsCount];
-        //Parallel.For(0, variationsCount, i => bestResults[i] = BruteForceFitFunction(bfInput, i));
+        //Parallel.For(0, variationsCount, i => bestResults[i] = BruteForceBallparkFunction(bfInput, i));
+        int variationsCount = bfInput.numSteps * 2;
+        BestResult[] bestResults = new BestResult[variationsCount];
+        Parallel.For(0, variationsCount, i => bestResults[i] = BruteForceFitFunction(bfInput, i));
 
         BestResult bestResult = new BestResult();
         bestResult.A = A;
@@ -578,6 +590,21 @@ public partial class CurveComparison : Node
         return (x * (a * x + b) + c) / (x * (d * x + e) + f) + g;
     }
 
+    public static double ComplexPowerCurve(double x, double a, double b, double c, double d, double e, double f, double g)
+    {
+        a /= 1000.0;
+        b /= 1000.0;
+        c /= 1000.0;
+        d /= 1000.0;
+        e /= 1000.0;
+        f /= 1000.0;
+        g /= 1000.0;
+
+        x = Math.Pow(x, a) / (b / x) + c;
+        x = Math.Max(0, x); // x might be negative from C
+        return x / (Math.Pow(x, f) * d + e) + g;
+    }
+
     public double GodotACES(double x, double a, double b, double c, double d, double e, double f, double g)
     {
         double exposure = 1.8;
@@ -633,7 +660,7 @@ public partial class CurveComparison : Node
     public double RandomNonsense(double x)
     {
         x = Math.Pow(x, A_scaled) / (B_scaled / x) + C_scaled;
-        x = Math.Max(1e-10, x);
+        x = Math.Max(0, x); // x might be negative from C
         return x / (Math.Pow(x, F_scaled) * D_scaled + E_scaled) + G_scaled;
 
         if (x < pivot_x_scaled)
