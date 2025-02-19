@@ -132,8 +132,9 @@ public partial class CurveComparison : Node
     {
         if (OptionB)
         {
+            return LearningFunc(x, A, B, C, D, E, F, G);
             //return nonlinearfit_amdform(x);
-            return AgXLog2Approx(x);
+            //return AgXLog2Approx(x);
             //return AgXNewWhiteParam1(x);
             //return MinimaxApproximation(x);
             //return NonlinearModelFitApproximation2(x);
@@ -216,7 +217,7 @@ public partial class CurveComparison : Node
         }
         GetNode<Label>("%TotalErrorLinearLabel").Text = $"Total weighted error (linear): {error.totalErrorLinear:F7}";
         GetNode<Label>("%TotalErrorLog2Label").Text = $"Total weighted error (log2, middle grey: {agxRefMiddleGrey:F2}): {error.totalErrorLog2:F7}";
-        GetNode<TextEdit>("%RationalApproxTextEdit").Text = $"(x * (x * {A:F15} + ({B:F15})) + ({C:F15})) / (x * (x * {D:F15} + ({E:F15})) + ({F:F15})) + ({G:F15})";
+        GetNode<TextEdit>("%RationalApproxTextEdit").Text = $"(x * (x * {A:F15} + ({B:F15})) + ({C:F15})) / (x * (x * {D:F15} + ({E:F15})) + ({F:F15})) + ({G:F15})\n\nx  = pow(x, vec3({(A/1000.0):F15})) / ({(B / 1000.0):F15} / x) + {(C / 1000.0):F15};\nx = max(x, 0.0); // x might be negative from c\nx = x / (pow(x, vec3({(F / 1000.0):F15})) * {(D / 1000.0):F15} + {(E / 1000.0):F15});";
 
         reference_inflection_point = CalculateInflectionPoint((double x) => { return ReferenceCurve(x); });
         approx_inflection_point = CalculateInflectionPoint((double x) => { return ApproxCurve(x); });
@@ -583,6 +584,11 @@ public partial class CurveComparison : Node
         }
 
         return bestResult;
+    }
+
+    public static double LearningFunc(double x, double a, double b, double c, double d, double e, double f, double g)
+    {
+        return x;
     }
 
     public static double BasicSecondOrderCurve(double x, double a, double b, double c, double d, double e, double f, double g)

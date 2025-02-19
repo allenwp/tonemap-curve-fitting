@@ -6,6 +6,7 @@
 [node name="CurveComparison" type="Node2D"]
 position = Vector2(1, 0)
 script = ExtResource("1_2rroq")
+OptionB = true
 A = 307.292
 B = 278.351
 C = -0.0832486
@@ -39,7 +40,7 @@ log2_middle_grey = 0.18
 log2_min_x = -10.0
 log2_max_x = 6.5
 log2_min_y = -10.0
-log2_max_y = 2.835
+log2_max_y = 2.474
 clip = true
 
 [node name="CurveView3" parent="." node_paths=PackedStringArray("curves") instance=ExtResource("1_t77ya")]
@@ -96,8 +97,8 @@ clip = true
 position = Vector2(1381, 1366)
 scale = Vector2(0.62, 0.62)
 curves = NodePath("..")
-linear_max_x = 0.275
-linear_max_y = 0.26
+linear_max_x = 0.4
+linear_max_y = 0.4
 log2_middle_grey = 0.18
 log2_min_x = -8.305
 log2_max_x = -2.0
@@ -109,7 +110,7 @@ clip = true
 position = Vector2(2093, 1366)
 scale = Vector2(0.62, 0.62)
 curves = NodePath("..")
-linear_max_x = 16.3
+linear_max_x = 16.292
 log2_middle_grey = 0.18
 log2_max_x = 6.5
 log2_min_y = -10.0
@@ -143,12 +144,12 @@ offset_bottom = 1433.0
 [node name="TotalErrorLinearLabel" type="Label" parent="VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Total weighted error (linear): 0.1526549"
+text = "Total weighted error (linear): 0.7020743"
 
 [node name="TotalErrorLog2Label" type="Label" parent="VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Total weighted error (log2, middle grey: 0.18): 2.2800064"
+text = "Total weighted error (log2, middle grey: 0.18): 16.9851730"
 
 [node name="ErrorTree" type="Tree" parent="VBoxContainer"]
 unique_name_in_owner = true
@@ -161,9 +162,13 @@ hide_root = true
 
 [node name="RationalApproxTextEdit" type="TextEdit" parent="VBoxContainer"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 67.265)
+custom_minimum_size = Vector2(0, 209.145)
 layout_mode = 2
-text = "(x * (x * 307.291807204614940 + (278.351198169419092)) + (-0.083248551465594)) / (x * (x * 1501.909890760163080 + (1514.372484404502075)) + (913.695999999999344)) + (0.000000000000000)"
+text = "(x * (x * 307.291999999999973 + (278.350999999999999)) + (-0.083248600000000)) / (x * (x * 1501.910000000000082 + (1514.369999999999891)) + (913.696000000000026)) + (0.000000000000000)
+
+x  = pow(x, 0.307292000000000) / (0.278351000000000 / x) + -0.000083248600000;
+x = max(0.0, x); // x might be negative from c
+x = x / (pow(x, 0.913696000000000) * 1.501910000000000 + 1.514370000000000);"
 wrap_mode = 1
 
 [connection signal="toggled" from="CheckButton" to="." method="set_option_b"]

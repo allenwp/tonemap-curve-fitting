@@ -110,7 +110,7 @@ func _process(_delta: float) -> void:
 		if approx_inflection.x >= 0.0 && approx_inflection.x <= 1000.0 && approx_inflection.y <= 0.0 && approx_inflection.y >= -1000.0:
 			%ApproxInflectionMiddle.position = approx_inflection
 			%ApproxInflectionMiddle.position.y += 1000.0
-			%ApproxInflectionMiddle.visible = true
+			%ApproxInflectionMiddle.visible = false
 		else:
 			%ApproxInflectionMiddle.visible = false
 	else:
