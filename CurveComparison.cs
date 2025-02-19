@@ -2,6 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Transactions;
@@ -27,14 +28,31 @@ public partial class CurveComparison : Node
     //[Export] public double F = ballparkStartingPoint;
     //[Export] public double G = ballparkStartingPoint;
 
-    // default to self_shadow ACES:
-    [Export] public double A = 1.0;
-    [Export] public double B = 0.0245786;
-    [Export] public double C = -0.000090537;
-    [Export] public double D = 0.983729;
-    [Export] public double E = 0.4329510;
-    [Export] public double F = 0.238081;
+    // Pretty close with power functions
+    [Export] public double A = 307.292;
+    [Export] public double B = 278.351;
+    [Export] public double C = -0.0832486;
+    [Export] public double D = 1501.91;
+    [Export] public double E = 1514.37;
+    [Export] public double F = 913.696;
     [Export] public double G = 0.0;
+
+    // default to self_shadow ACES:
+    //[Export] public double A = 1.0;
+    //[Export] public double B = 0.0245786;
+    //[Export] public double C = -0.000090537;
+    //[Export] public double D = 0.983729;
+    //[Export] public double E = 0.4329510;
+    //[Export] public double F = 0.238081;
+    //[Export] public double G = 0.0;
+
+
+    [Export] public double Lottes_A = 0.0;
+    [Export] public double Lottes_D = 0.0;
+
+    [Export] public double Lottes_A_new = 0.0;
+    [Export] public double Lottes_D_new = 0.0;
+    [Export] public double Lottes_additional = 0.0;
 
     // alternative starting point calculated from John Hable's, but matching AgX
     //[Export] public double A = 1.0526;
@@ -132,7 +150,8 @@ public partial class CurveComparison : Node
     {
         if (OptionB)
         {
-            return LearningFunc(x, A, B, C, D, E, F, G);
+            return TimothyLottes(x, Lottes_A, Lottes_D);
+            //return LearningFunc(x, A, B, C, D, E, F, G);
             //return nonlinearfit_amdform(x);
             //return AgXLog2Approx(x);
             //return AgXNewWhiteParam1(x);
@@ -141,7 +160,8 @@ public partial class CurveComparison : Node
         }
         else
         {
-            return RandomNonsense(x);
+            return TimothyLottesModifed(x, Lottes_A_new, Lottes_D_new, Lottes_additional);
+            //return RandomNonsense(x);
             //return NonlinearModelFitApproximation(x);
             //return AgXNewWhiteParam(x);
             //return GodotACES(x, A, B, C, D, E, F, G);
@@ -179,9 +199,9 @@ public partial class CurveComparison : Node
 
         errorValues.Clear();
 
-        AddValue(Math.Pow(2, agxRefLog2Min) * agxRefMiddleGrey, 1.0);
-        AddValue(Math.Pow(2, -9.0) * agxRefMiddleGrey, 1.0);
-        AddValue(Math.Pow(2, -8.0) * agxRefMiddleGrey, 1.0);
+        //AddValue(Math.Pow(2, agxRefLog2Min) * agxRefMiddleGrey, 1.0);
+        //AddValue(Math.Pow(2, -9.0) * agxRefMiddleGrey, 1.0);
+        //AddValue(Math.Pow(2, -8.0) * agxRefMiddleGrey, 1.0);
         AddValue(Math.Pow(2, -7.0) * agxRefMiddleGrey, 1.0);
         AddValue(Math.Pow(2, -6.0) * agxRefMiddleGrey, 1.0);
         AddValue(Math.Pow(2, -5.0) * agxRefMiddleGrey, 1.0);
@@ -217,7 +237,8 @@ public partial class CurveComparison : Node
         }
         GetNode<Label>("%TotalErrorLinearLabel").Text = $"Total weighted error (linear): {error.totalErrorLinear:F7}";
         GetNode<Label>("%TotalErrorLog2Label").Text = $"Total weighted error (log2, middle grey: {agxRefMiddleGrey:F2}): {error.totalErrorLog2:F7}";
-        GetNode<TextEdit>("%RationalApproxTextEdit").Text = $"(x * (x * {A:F15} + ({B:F15})) + ({C:F15})) / (x * (x * {D:F15} + ({E:F15})) + ({F:F15})) + ({G:F15})\n\nx  = pow(x, vec3({(A/1000.0):F15})) / ({(B / 1000.0):F15} / x) + {(C / 1000.0):F15};\nx = max(x, 0.0); // x might be negative from c\nx = x / (pow(x, vec3({(F / 1000.0):F15})) * {(D / 1000.0):F15} + {(E / 1000.0):F15});";
+        GetNode<TextEdit>("%RationalApproxTextEdit").Text = $"(x * (x * {A:F15} + ({B:F15})) + ({C:F15})) / (x * (x * {D:F15} + ({E:F15})) + ({F:F15})) + ({G:F15})\n\nx  = pow(x, vec3({(A/1000.0):F15})) / ({(B / 1000.0):F15} / x) + {(C / 1000.0):F15};\nx = max(x, 0.0); // x might be negative from c\nx = x / (pow(x, vec3({(F / 1000.0):F15})) * {(D / 1000.0):F15} + {(E / 1000.0):F15});" +
+            $"\n\nx = pow(x, vec3({timothy_lottes_a:F15}));\nx = x / (pow(x, vec3({timothy_lottes_d:F15})) * {timothy_lottes_b:F15} + {timothy_lottes_c:F15});";
 
         reference_inflection_point = CalculateInflectionPoint((double x) => { return ReferenceCurve(x); });
         approx_inflection_point = CalculateInflectionPoint((double x) => { return ApproxCurve(x); });
@@ -327,18 +348,18 @@ public partial class CurveComparison : Node
             if ((i == 0 && errorValues[i].Approx > Math.Max(1e-4, errorValues[i].Reference))
                 || (i == errorValues.Length - 1 && errorValues[i].Approx < Math.Min(1.0 - 1e-4, errorValues[i].Reference)))
             {
-                thisWeight *= 100.0;
+                //thisWeight *= 100.0;
             }
             else
             {
                 double pivot_x = 0.118835;
                 if (errorValues[i].Input < pivot_x && errorValues[i].Approx > errorValues[i].Reference)
                 {
-                    thisWeight *= 10.0;
+                    //thisWeight *= 10.0;
                 }
                 else if (errorValues[i].Input > pivot_x && errorValues[i].Approx < errorValues[i].Reference)
                 {
-                    thisWeight *= 10.0;
+                    //thisWeight *= 10.0;
                 }
             }
             result.totalErrorLinear += errorValues[i].ErrorLinear * thisWeight;
@@ -586,8 +607,68 @@ public partial class CurveComparison : Node
         return bestResult;
     }
 
+    static double timothy_lottes_a;
+    static double timothy_lottes_b;
+    static double timothy_lottes_c;
+    static double timothy_lottes_d;
+    public static double TimothyLottes(double x, double a, double d)
+    {
+        a /= 1000.0;
+        d /= 10.0;
+
+        double mid_in = 0.18;
+        double mid_out = 0.18;
+        double max_val = 16.2917402385381;
+
+        double b = (-1.0 * Math.Pow(mid_in, a) + Math.Pow(max_val, a) * mid_out) / ((Math.Pow(Math.Pow(max_val, a), d) - Math.Pow(Math.Pow(mid_in, a), d)) * mid_out);
+        double c = (Math.Pow(Math.Pow(max_val, a), d) * Math.Pow(mid_in, a) - Math.Pow(max_val, a) * Math.Pow(Math.Pow(mid_in, a), d) * mid_out) / ((Math.Pow(Math.Pow(max_val, a), d) - Math.Pow(Math.Pow(mid_in, a), d)) * mid_out);
+
+        timothy_lottes_a = a;
+        timothy_lottes_b = b;
+        timothy_lottes_c = c;
+        timothy_lottes_d = d;
+
+        x = Math.Min(x, max_val);
+        double z = Math.Pow(x, a);
+        return z / (Math.Pow(z, d) * b + c);
+    }
+
+    public double TimothyLottesModifed(double x, double a, double d, double adjustment)
+    {
+        a /= 1000.0;
+        d /= 10.0;
+        adjustment /= 1000.0;
+
+        double mid_in = 0.18;
+        double mid_out = 0.18 - adjustment;
+        double max_val = 16.2917402385381;
+
+        double b = (-1.0 * Math.Pow(mid_in, a) + Math.Pow(max_val, a) * mid_out) / ((Math.Pow(Math.Pow(max_val, a), d) - Math.Pow(Math.Pow(mid_in, a), d)) * mid_out);
+        double c = (Math.Pow(Math.Pow(max_val, a), d) * Math.Pow(mid_in, a) - Math.Pow(max_val, a) * Math.Pow(Math.Pow(mid_in, a), d) * mid_out) / ((Math.Pow(Math.Pow(max_val, a), d) - Math.Pow(Math.Pow(mid_in, a), d)) * mid_out);
+
+        x = Math.Min(x, max_val);
+        double z = Math.Pow(x, a);
+        return z / (Math.Pow(z, d) * b + c) + adjustment;
+    }
+
+
     public static double LearningFunc(double x, double a, double b, double c, double d, double e, double f, double g)
     {
+        x = x * (1 / 0.18);
+        //x = x * c;
+        x = Math.Log2(x);
+        //x = x * b;
+        x = (x + 10) / 16.5;
+
+        //double x2 = x * x;
+        //double x4 = x2 * x2;
+        //x = 0.021 * x + 4.0111 * x2 - 25.682 * x2 * x + 70.359 * x4 - 74.778 * x4 * x + 27.069 * x4 * x2;
+
+        //x = ;// / (b / x) + c;
+        x = Math.Max(0, x); // x might be negative from C
+        x = Math.Pow(x, a) / (Math.Pow(x, b) * c + d);// + e;
+
+        x = Math.Pow(x, 2.4);
         return x;
     }
 

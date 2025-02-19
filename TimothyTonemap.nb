@@ -1,0 +1,123 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Wolfram 14.2' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       154,          7]
+NotebookDataLength[      4272,        115]
+NotebookOptionsPosition[      3893,        101]
+NotebookOutlinePosition[      4315,        117]
+CellTagsIndexPosition[      4272,        114]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+Cell[BoxData[{
+ RowBox[{"Print", "[", "\"\<Generic solution:\>\"", "]"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"tonemap", "[", 
+    RowBox[{"x_", ",", "a_", ",", "d_"}], "]"}], ":=", 
+   RowBox[{
+    RowBox[{"(", 
+     RowBox[{"x", "^", "a"}], ")"}], "/", 
+    RowBox[{"(", 
+     RowBox[{
+      RowBox[{
+       RowBox[{"(", 
+        RowBox[{
+         RowBox[{"(", 
+          RowBox[{"x", "^", "a"}], ")"}], "^", "d"}], ")"}], "*", "b"}], "+", 
+      "c"}], ")"}]}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"Solve", "[", 
+   RowBox[{
+    RowBox[{"{", 
+     RowBox[{
+      RowBox[{
+       RowBox[{"tonemap", "[", 
+        RowBox[{"midIn", ",", "a", ",", "d"}], "]"}], "==", "midOut"}], ",", 
+      RowBox[{
+       RowBox[{"tonemap", "[", 
+        RowBox[{"maxVal", ",", "a", ",", "d"}], "]"}], "==", "1"}]}], "}"}], ",", 
+    RowBox[{"{", 
+     RowBox[{"b", ",", "c"}], "}"}]}], "]"}], "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{"Print", "[", "\"\<AgX default parameters:\>\"", "]"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"kNormLog2Max", " ", "=", " ", 
+   RowBox[{"Rationalize", "[", "6.5", "]"}]}], ";"}], "\n", 
+ RowBox[{
+  RowBox[{"kMidGray", "=", "0.18"}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"kLinearMax", "=", 
+   RowBox[{
+    RowBox[{"(", 
+     RowBox[{"2", "^", "kNormLog2Max"}], ")"}], "*", "kMidGray"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"kTermA", "=", "0.117244999999995"}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"kTermD", "=", 
+    RowBox[{"-", "10.409500000000117"}]}], ";"}], "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{"SetPrecision", "[", 
+  RowBox[{
+   RowBox[{"NSolve", "[", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"tonemap", "[", 
+         RowBox[{"kMidGray", ",", "kTermA", ",", "kTermD"}], "]"}], "==", 
+        "kMidGray"}], ",", 
+       RowBox[{
+        RowBox[{"tonemap", "[", 
+         RowBox[{"kLinearMax", ",", "kTermA", ",", "kTermD"}], "]"}], "==", 
+        "1"}]}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"b", ",", "c"}], "}"}]}], "]"}], ",", "15"}], 
+  "]"}], "\[IndentingNewLine]"}], "Input",
+ CellChangeTimes->{{3.9489818772516956`*^9, 3.948981991592222*^9}, {
+   3.948982034210209*^9, 3.9489820425786896`*^9}, {3.948982073348095*^9, 
+   3.9489820802382507`*^9}, {3.9489821662586155`*^9, 3.948982242724119*^9}, {
+   3.948982318788307*^9, 3.9489823259169884`*^9}, {3.9490664869986725`*^9, 
+   3.949066611102745*^9}, {3.9490730608798695`*^9, 3.949073070278763*^9}, {
+   3.9490731116115856`*^9, 3.9490731264248085`*^9}, 3.949073157313099*^9, {
+   3.9490736609409275`*^9, 3.949073661899639*^9}, {3.9490737213553047`*^9, 
+   3.9490737484811783`*^9}, {3.9490738009158306`*^9, 3.949073849200279*^9}, {
+   3.9490738819948254`*^9, 3.9490739049046*^9}, {3.9490740504635696`*^9, 
+   3.949074068477152*^9}, {3.9490741459831047`*^9, 3.94907419043272*^9}, {
+   3.949074377172224*^9, 3.9490744160222664`*^9}, {3.9490744555056343`*^9, 
+   3.9490745306315975`*^9}, {3.9490745608466663`*^9, 3.949074571160839*^9}, {
+   3.949074822308853*^9, 3.949074958632223*^9}, {3.949074994251705*^9, 
+   3.9490750852837753`*^9}, {3.9490751586793346`*^9, 3.949075263767498*^9}},
+ CellLabel->
+  "In[165]:=",ExpressionUUID->"15e5025e-07b2-4643-a3c8-e10c0b066b87"]
+},
+WindowSize->{1150.8, 1216.8},
+WindowMargins->{{Automatic, 275.4000000000001}, {Automatic, 0}},
+FrontEndVersion->"14.2 for Microsoft Windows (64-bit) (December 26, 2024)",
+StyleDefinitions->"Default.nb",
+ExpressionUUID->"5ba267fc-ff67-3740-a347-d2abc389576d"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[554, 20, 3335, 79, 256, "Input",ExpressionUUID->"15e5025e-07b2-4643-a3c8-e10c0b066b87"]
+}
+]
+*)
+

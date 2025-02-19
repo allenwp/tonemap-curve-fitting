@@ -1,0 +1,15 @@
+Print["Generic solution:"]
+tonemap[x_, a_, d_] := (x^a)/(((x^a)^d)*b + c);
+Solve[{tonemap[midIn, a, d] == midOut, 
+  tonemap[maxVal, a, d] == 1}, {b, c}]
+
+Print["AgX default parameters:"]
+kNormLog2Max = Rationalize[6.5];
+kMidGray = 0.18;
+kLinearMax = (2^kNormLog2Max)*kMidGray;
+kTermA = 0.117244999999995;
+kTermD = -10.409500000000117;
+
+SetPrecision[
+ NSolve[{tonemap[kMidGray, kTermA, kTermD] == kMidGray, 
+   tonemap[kLinearMax, kTermA, kTermD] == 1}, {b, c}], 15]

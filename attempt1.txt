@@ -1,3 +1,10 @@
 x  = pow(x, 0.307292) / (0.278351 / x) + -0.0000832486;
 x = max(0.0, x); // x might be negative from c
 x = x / (pow(x, 0.913696) * 1.50191 + 1.51437);
+
+even simpler version:
+
+vec3 x = color;
+x = pow(x, vec3(0.117244999999995));
+x = x / (pow(x, vec3(-10.409500000000117)) * 0.390927991610331 + 1.37409609854750);
+color = x;
