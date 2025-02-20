@@ -7,8 +7,8 @@
 position = Vector2(1, 0)
 script = ExtResource("1_2rroq")
 OptionB = true
-Lottes_A = 117.245
-Lottes_D = -104.095
+Lottes_A = 1.391
+Lottes_D = 0.904
 Lottes_A_new = 120.04
 Lottes_D_new = -105.475
 white = 16.365
@@ -142,12 +142,12 @@ offset_bottom = 1433.0
 [node name="TotalErrorLinearLabel" type="Label" parent="VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Total weighted error (linear): 0.0555305"
+text = "Total weighted error (linear): 0.0826709"
 
 [node name="TotalErrorLog2Label" type="Label" parent="VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Total weighted error (log2, middle grey: 0.18): 1.3380734"
+text = "Total weighted error (log2, middle grey: 0.18): 2.4693187"
 
 [node name="ErrorTree" type="Tree" parent="VBoxContainer"]
 unique_name_in_owner = true
@@ -168,8 +168,8 @@ x  = pow(x, vec3(0.307292000000000)) / (0.278351000000000 / x) + -0.000083248600
 x = max(x, 0.0); // x might be negative from c
 x = x / (pow(x, vec3(0.913696000000000)) * 1.501910000000000 + 1.514370000000000);
 
-x = pow(x, vec3(0.117244999999995));
-x = x / (pow(x, vec3(-10.409500000000117)) * 0.390927991610328 + 1.374096098547505);"
+x = pow(x, vec3(1.391000000003260));
+x = x / (pow(x, vec3(0.903999999994994)) * 1.441268972506006 + 0.344628749439947);"
 wrap_mode = 1
 
 [connection signal="toggled" from="CheckButton" to="." method="set_option_b"]

@@ -10,10 +10,10 @@
 NotebookFileLineBreakTest
 NotebookFileLineBreakTest
 NotebookDataPosition[       154,          7]
-NotebookDataLength[      4272,        115]
-NotebookOptionsPosition[      3893,        101]
-NotebookOutlinePosition[      4315,        117]
-CellTagsIndexPosition[      4272,        114]
+NotebookDataLength[      4976,        135]
+NotebookOptionsPosition[      4610,        121]
+NotebookOutlinePosition[      5019,        137]
+CellTagsIndexPosition[      4976,        134]
 WindowFrame->Normal*)
 
 (* Beginning of Notebook Content *)
@@ -53,18 +53,35 @@ Cell[BoxData[{
   RowBox[{"kNormLog2Max", " ", "=", " ", 
    RowBox[{"Rationalize", "[", "6.5", "]"}]}], ";"}], "\n", 
  RowBox[{
-  RowBox[{"kMidGray", "=", "0.18"}], ";"}], "\[IndentingNewLine]", 
+  RowBox[{"kMidGray", "=", 
+   RowBox[{"Rationalize", "[", "0.18", "]"}]}], 
+  ";"}], "\[IndentingNewLine]", 
  RowBox[{
   RowBox[{"kLinearMax", "=", 
    RowBox[{
     RowBox[{"(", 
      RowBox[{"2", "^", "kNormLog2Max"}], ")"}], "*", "kMidGray"}]}], ";"}], "\[IndentingNewLine]", 
  RowBox[{
-  RowBox[{"kTermA", "=", "0.117244999999995"}], ";"}], "\[IndentingNewLine]", 
+  RowBox[{"kTermA", "=", "1.391000000003260"}], ";"}], "\[IndentingNewLine]", 
+
  RowBox[{
   RowBox[{
-   RowBox[{"kTermD", "=", 
-    RowBox[{"-", "10.409500000000117"}]}], ";"}], "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+   RowBox[{"kTermD", "=", "0.903999999994994"}], ";"}], 
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"Solve", "[", 
+   RowBox[{
+    RowBox[{"{", 
+     RowBox[{
+      RowBox[{
+       RowBox[{"tonemap", "[", 
+        RowBox[{"kMidGray", ",", "a", ",", "d"}], "]"}], "==", "kMidGray"}], ",", 
+      RowBox[{
+       RowBox[{"tonemap", "[", 
+        RowBox[{"kLinearMax", ",", "a", ",", "d"}], "]"}], "==", "1"}]}], 
+     "}"}], ",", 
+    RowBox[{"{", 
+     RowBox[{"b", ",", "c"}], "}"}]}], "]"}], "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
  RowBox[{"SetPrecision", "[", 
   RowBox[{
    RowBox[{"NSolve", "[", 
@@ -95,12 +112,15 @@ Cell[BoxData[{
    3.949074377172224*^9, 3.9490744160222664`*^9}, {3.9490744555056343`*^9, 
    3.9490745306315975`*^9}, {3.9490745608466663`*^9, 3.949074571160839*^9}, {
    3.949074822308853*^9, 3.949074958632223*^9}, {3.949074994251705*^9, 
-   3.9490750852837753`*^9}, {3.9490751586793346`*^9, 3.949075263767498*^9}},
+   3.9490750852837753`*^9}, {3.9490751586793346`*^9, 3.949075263767498*^9}, {
+   3.949076855598778*^9, 3.9490769070645256`*^9}, {3.949076941133625*^9, 
+   3.9490769497275543`*^9}, 3.9490783825528793`*^9, {3.9490785800480785`*^9, 
+   3.9490786384249363`*^9}, {3.9490797226557903`*^9, 3.949079729789049*^9}},
  CellLabel->
-  "In[165]:=",ExpressionUUID->"15e5025e-07b2-4643-a3c8-e10c0b066b87"]
+  "In[411]:=",ExpressionUUID->"15e5025e-07b2-4643-a3c8-e10c0b066b87"]
 },
 WindowSize->{1150.8, 1216.8},
-WindowMargins->{{Automatic, 275.4000000000001}, {Automatic, 0}},
+WindowMargins->{{11.4, Automatic}, {Automatic, 0}},
 FrontEndVersion->"14.2 for Microsoft Windows (64-bit) (December 26, 2024)",
 StyleDefinitions->"Default.nb",
 ExpressionUUID->"5ba267fc-ff67-3740-a347-d2abc389576d"
@@ -116,7 +136,7 @@ CellTagsIndex->{}
 *)
 (*NotebookFileOutline
 Notebook[{
-Cell[554, 20, 3335, 79, 256, "Input",ExpressionUUID->"15e5025e-07b2-4643-a3c8-e10c0b066b87"]
+Cell[554, 20, 4052, 99, 294, "Input",ExpressionUUID->"15e5025e-07b2-4643-a3c8-e10c0b066b87"]
 }
 ]
 *)

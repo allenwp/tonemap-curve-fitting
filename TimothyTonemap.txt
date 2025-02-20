@@ -5,10 +5,13 @@ Solve[{tonemap[midIn, a, d] == midOut,
 
 Print["AgX default parameters:"]
 kNormLog2Max = Rationalize[6.5];
-kMidGray = 0.18;
+kMidGray = Rationalize[0.18];
 kLinearMax = (2^kNormLog2Max)*kMidGray;
-kTermA = 0.117244999999995;
-kTermD = -10.409500000000117;
+kTermA = 1.391000000003260;
+kTermD = 0.903999999994994;
+
+Solve[{tonemap[kMidGray, a, d] == kMidGray, 
+  tonemap[kLinearMax, a, d] == 1}, {b, c}]
 
 SetPrecision[
  NSolve[{tonemap[kMidGray, kTermA, kTermD] == kMidGray, 
