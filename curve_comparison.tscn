@@ -7,13 +7,13 @@
 position = Vector2(1, 0)
 script = ExtResource("1_2rroq")
 OptionB = true
-Lottes_A = 1.391
-Lottes_D = 0.904
-Lottes_A_new = 120.04
-Lottes_D_new = -105.475
-white = 16.365
+A = 1.0
+B = 0.0245786
+C = -9.0537e-05
+D = 0.983729
+E = 0.432951
+F = 0.238081
 input_exposure_scale = 0.631
-pivot_x = 149.255
 
 [node name="CurveView" parent="." node_paths=PackedStringArray("curves") instance=ExtResource("1_t77ya")]
 position = Vector2(1381, 24)
@@ -34,11 +34,12 @@ scale = Vector2(0.62, 0.62)
 curves = NodePath("..")
 x_encoding_type = 1
 y_encoding_type = 1
+linear_max_y = 0.0
 log2_middle_grey = 0.18
 log2_min_x = -10.0
 log2_max_x = 6.5
 log2_min_y = -10.0
-log2_max_y = 2.474
+log2_max_y = 5.0
 clip = true
 
 [node name="CurveView3" parent="." node_paths=PackedStringArray("curves") instance=ExtResource("1_t77ya")]
@@ -73,6 +74,7 @@ position = Vector2(2093, 696)
 scale = Vector2(0.62, 0.62)
 curves = NodePath("..")
 x_encoding_type = 1
+linear_max_y = 5.0
 log2_middle_grey = 0.18
 log2_min_x = -10.0
 log2_max_x = 6.5
@@ -96,7 +98,6 @@ position = Vector2(1381, 1366)
 scale = Vector2(0.62, 0.62)
 curves = NodePath("..")
 linear_max_x = 0.2
-linear_max_y = 0.2
 log2_middle_grey = 0.18
 log2_min_x = -7.89
 log2_max_x = -2.0
@@ -108,7 +109,8 @@ clip = true
 position = Vector2(2093, 1366)
 scale = Vector2(0.62, 0.62)
 curves = NodePath("..")
-linear_max_x = 16.292
+linear_max_x = 5.0
+linear_max_y = 5.0
 log2_middle_grey = 0.18
 log2_max_x = 6.5
 log2_min_y = -10.0
@@ -142,12 +144,12 @@ offset_bottom = 1433.0
 [node name="TotalErrorLinearLabel" type="Label" parent="VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Total weighted error (linear): 0.0826709"
+text = "Total weighted error (linear): 37.5835369"
 
 [node name="TotalErrorLog2Label" type="Label" parent="VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Total weighted error (log2, middle grey: 0.18): 2.4693187"
+text = "Total weighted error (log2, middle grey: 0.18): 41.4892026"
 
 [node name="ErrorTree" type="Tree" parent="VBoxContainer"]
 unique_name_in_owner = true
@@ -162,14 +164,14 @@ hide_root = true
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 297.725)
 layout_mode = 2
-text = "(x * (x * 307.291999999999973 + (278.350999999999999)) + (-0.083248600000000)) / (x * (x * 1501.910000000000082 + (1514.369999999999891)) + (913.696000000000026)) + (0.000000000000000)
+text = "(x * (x * 1.000000000000000 + (0.024578600000000)) + (-0.000090537000000)) / (x * (x * 0.983729000000000 + (0.432951000000000)) + (0.238081000000000)) + (0.000000000000000)
 
-x  = pow(x, vec3(0.307292000000000)) / (0.278351000000000 / x) + -0.000083248600000;
+x  = pow(x, vec3(0.001000000000000)) / (0.000024578600000 / x) + -0.000000090537000;
 x = max(x, 0.0); // x might be negative from c
-x = x / (pow(x, vec3(0.913696000000000)) * 1.501910000000000 + 1.514370000000000);
+x = x / (pow(x, vec3(0.000238081000000)) * 0.000983729000000 + 0.000432951000000);
 
-x = pow(x, vec3(1.391000000003260));
-x = x / (pow(x, vec3(0.903999999994994)) * 1.441268972506006 + 0.344628749439947);"
+x = pow(x, vec3(1.369899693788970));
+x = x / (pow(x, vec3(0.903916850555009)) * 2.375974045156057 + 551.948714669136848);"
 wrap_mode = 1
 
 [connection signal="toggled" from="CheckButton" to="." method="set_option_b"]

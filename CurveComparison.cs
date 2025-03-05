@@ -92,6 +92,12 @@ public partial class CurveComparison : Node
     public double white = Math.Pow(2.0, 6.5f) * 0.18;
 
     [Export]
+    public double ref_luminance = 200;
+
+    [Export]
+    public double max_luminance = 1000;
+
+    [Export]
     public double input_exposure_scale = 1.0;
 
     [Export]
@@ -150,7 +156,7 @@ public partial class CurveComparison : Node
     {
         if (OptionB)
         {
-            return TimothyLottes(x, Lottes_A, Lottes_D);
+            return HDRTimothyLottes(x);
             //return LearningFunc(x, A, B, C, D, E, F, G);
             //return nonlinearfit_amdform(x);
             //return AgXLog2Approx(x);
@@ -160,7 +166,8 @@ public partial class CurveComparison : Node
         }
         else
         {
-            return TimothyLottesModifed(x, Lottes_A_new, Lottes_D_new, Lottes_additional);
+            return TimothyLottes(x);
+            //return TimothyLottesModifed(x, Lottes_A_new, Lottes_D_new, Lottes_additional);
             //return RandomNonsense(x);
             //return NonlinearModelFitApproximation(x);
             //return AgXNewWhiteParam(x);
@@ -611,15 +618,8 @@ public partial class CurveComparison : Node
     static double timothy_lottes_b;
     static double timothy_lottes_c;
     static double timothy_lottes_d;
-    public static double TimothyLottes(double x, double a, double d)
+    public static double TimothyLottes(double x, double mid_in = 0.18, double mid_out = 0.18, double max_val = 16.2917402385381, double a = 1.36989969378897, double d = 0.903916850555009)
     {
-        a /= 1000.0;
-        d /= 10.0;
-
-        double mid_in = 0.18;
-        double mid_out = 0.18;
-        double max_val = 16.2917402385381;
-
         double b = (-1.0 * Math.Pow(mid_in, a) + Math.Pow(max_val, a) * mid_out) / ((Math.Pow(Math.Pow(max_val, a), d) - Math.Pow(Math.Pow(mid_in, a), d)) * mid_out);
         double c = (Math.Pow(Math.Pow(max_val, a), d) * Math.Pow(mid_in, a) - Math.Pow(max_val, a) * Math.Pow(Math.Pow(mid_in, a), d) * mid_out) / ((Math.Pow(Math.Pow(max_val, a), d) - Math.Pow(Math.Pow(mid_in, a), d)) * mid_out);
 
@@ -627,10 +627,17 @@ public partial class CurveComparison : Node
         timothy_lottes_b = b;
         timothy_lottes_c = c;
         timothy_lottes_d = d;
-
-        x = Math.Min(x, max_val);
+        
         double z = Math.Pow(x, a);
         return z / (Math.Pow(z, d) * b + c);
+    }
+
+    public double HDRTimothyLottes(double x)
+    {
+        x *= ref_luminance;
+        x = TimothyLottes(x, 0.18 * ref_luminance, 0.18, max_luminance);
+        x *= max_luminance / ref_luminance;
+        return x;
     }
 
     public double TimothyLottesModifed(double x, double a, double d, double adjustment)
