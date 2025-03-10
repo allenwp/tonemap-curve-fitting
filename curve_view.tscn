@@ -36,6 +36,27 @@ points = PackedVector2Array(0, 0, 1000, 0)
 width = 3.0
 default_color = Color(0.192197, 0.192197, 0.192197, 1)
 
+[node name="X1Line" type="Line2D" parent="."]
+unique_name_in_owner = true
+position = Vector2(248, 0)
+points = PackedVector2Array(0, 0, 0, 1000)
+width = 3.0
+default_color = Color(0.244716, 0.244731, 0.102517, 1)
+
+[node name="Y1Line" type="Line2D" parent="."]
+unique_name_in_owner = true
+position = Vector2(0, 745.89)
+points = PackedVector2Array(0, 0, 1000, 0)
+width = 3.0
+default_color = Color(0.244716, 0.244731, 0.102517, 1)
+
+[node name="XWhiteLine" type="Line2D" parent="."]
+unique_name_in_owner = true
+position = Vector2(248, 0)
+points = PackedVector2Array(0, 0, 0, 1000)
+width = 3.0
+default_color = Color(0.441365, 0.441366, 0.441366, 1)
+
 [node name="LinearLine" type="Line2D" parent="."]
 unique_name_in_owner = true
 position = Vector2(0, 1000)

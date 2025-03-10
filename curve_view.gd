@@ -8,13 +8,13 @@ enum EncodingType { LINEAR, LOG2}
 
 @export var num_points: int = 1000
 
+@export var middle_grey: float = 0.18
 @export var x_encoding_type: EncodingType = EncodingType.LINEAR
 @export var y_encoding_type: EncodingType = EncodingType.LINEAR
 @export var linear_min_x: float = 0.0
 @export var linear_max_x: float = 16.2917402385381
 @export var linear_min_y: float = 0.0
 @export var linear_max_y: float = 1.0
-@export var log2_middle_grey: float = 1.0
 @export var log2_min_x: float = -12.0
 @export var log2_max_x: float = 4.0
 @export var log2_min_y: float = -12.0
@@ -37,26 +37,35 @@ func _process(_delta: float) -> void:
 			%XLowerLable.text = "%.2f" % linear_min_x
 			%XUpperLable.text = "%.2f" % linear_max_x
 			%XLable.text = "Input (linear scale)"
-			%XMiddleGreyLine.position.x = (log2_middle_grey - linear_min_x) / (linear_max_x - linear_min_x) * 1000.0
+			%XMiddleGreyLine.position.x = (middle_grey - linear_min_x) / (linear_max_x - linear_min_x) * 1000.0
+			%X1Line.position.x = (1.0 - linear_min_x) / (linear_max_x - linear_min_x) * 1000.0
+			%XWhiteLine.position.x = (curves.white - linear_min_x) / (linear_max_x - linear_min_x) * 1000.0
 		EncodingType.LOG2:
 			%XLowerLable.text = "%+.2f" % log2_min_x
 			%XUpperLable.text = "%+.2f" % log2_max_x
-			%XLable.text = "Input (log2 scale, middle grey: %.2f)" % log2_middle_grey
-			%XMiddleGreyLine.position.x = (log2(log2_middle_grey / log2_middle_grey) + abs(log2_min_x)) / (log2_max_x - log2_min_x) * 1000.0
+			%XLable.text = "Input (log2 scale, middle grey: %.2f)" % middle_grey
+			%XMiddleGreyLine.position.x = (log2(middle_grey / middle_grey) + abs(log2_min_x)) / (log2_max_x - log2_min_x) * 1000.0
+			%X1Line.position.x = (log2(1.0 / middle_grey) + abs(log2_min_x)) / (log2_max_x - log2_min_x) * 1000.0
+			%XWhiteLine.position.x = (log2(curves.white / middle_grey) + abs(log2_min_x)) / (log2_max_x - log2_min_x) * 1000.0
 	%XMiddleGreyLine.visible = %XMiddleGreyLine.position.x >= 0.0 && %XMiddleGreyLine.position.x <= 1000.0
+	%X1Line.visible = %X1Line.position.x >= 0.0 && %X1Line.position.x <= 1000.0
+	%XWhiteLine.visible = %XWhiteLine.position.x >= 0.0 && %XWhiteLine.position.x <= 1000.0
 
 	match y_encoding_type:
 		EncodingType.LINEAR:
 			%YLowerLable.text = "%.2f" % linear_min_y
 			%YUpperLable.text = "%.2f" % linear_max_y
 			%YLable.text = "Output (linear scale)"
-			%YMiddleGreyLine.position.y = (1.0 - (log2_middle_grey - linear_min_y) / (linear_max_y - linear_min_y)) * 1000.0
+			%YMiddleGreyLine.position.y = (1.0 - (middle_grey - linear_min_y) / (linear_max_y - linear_min_y)) * 1000.0
+			%Y1Line.position.y = (1.0 - (1.0 - linear_min_y) / (linear_max_y - linear_min_y)) * 1000.0
 		EncodingType.LOG2:
 			%YLowerLable.text = "%+.2f" % log2_min_y
 			%YUpperLable.text = "%+.2f" % log2_max_y
-			%YLable.text = "Output (log2 scale, middle grey: %.2f)" % log2_middle_grey
-			%YMiddleGreyLine.position.y = (1.0 - (log2(log2_middle_grey / log2_middle_grey) - log2_min_y) / (log2_max_y - log2_min_y)) * 1000.0
+			%YLable.text = "Output (log2 scale, middle grey: %.2f)" % middle_grey
+			%YMiddleGreyLine.position.y = (1.0 - (log2(middle_grey / middle_grey) - log2_min_y) / (log2_max_y - log2_min_y)) * 1000.0
+			%Y1Line.position.y = (1.0 - (log2(1.0 / middle_grey) - log2_min_y) / (log2_max_y - log2_min_y)) * 1000.0
 	%YMiddleGreyLine.visible = %YMiddleGreyLine.position.y >= 0.0 && %YMiddleGreyLine.position.y <= 1000.0
+	%Y1Line.visible = %Y1Line.position.y >= 0.0 && %Y1Line.position.y <= 1000.0
 
 	var linear_points: PackedVector2Array
 	var reference_points: PackedVector2Array
@@ -69,7 +78,7 @@ func _process(_delta: float) -> void:
 				x = (float(i) / (num_points - 1)) * (linear_max_x - linear_min_x) + linear_min_x
 			EncodingType.LOG2:
 				x = (float(i) / (num_points - 1)) * (log2_max_x - log2_min_x) + log2_min_x
-				x = pow(2.0, x) * log2_middle_grey # convert from log2 encoding to linear encoding
+				x = pow(2.0, x) * middle_grey # convert from log2 encoding to linear encoding
 
 		var y_linear: float = x
 		var y_reference: float = curves.ReferenceCurve(x)
@@ -80,18 +89,18 @@ func _process(_delta: float) -> void:
 		y_linear = prepare_y_for_graph(y_linear)
 		y_reference = prepare_y_for_graph(y_reference)
 		y_approx = prepare_y_for_graph(y_approx)
-		
+
 		if show_linear && (x >= 0.0 && x <= 1000.0 && y_linear <= 0.0 && y_linear >= -1000.0):
 			linear_points.push_back(Vector2(x, y_linear))
 		if !clip || (x >= 0.0 && x <= 1000.0 && y_reference <= 0.0 && y_reference >= -1000.0):
 			reference_points.push_back(Vector2(x, y_reference))
 		if !clip || (x >= 0.0 && x <= 1000.0 && y_approx <= 0.0 && y_approx >= -1000.0):
 			approx_points.push_back(Vector2(x, y_approx))
-	
+
 	%LinearLine.points = linear_points
 	%ReferenceLine.points = reference_points
 	%ApproxLine.points = approx_points
-	
+
 	var reference_inflection: Vector2 = curves.reference_inflection_point
 	if reference_inflection.x > 0:
 		reference_inflection = Vector2(prepare_x_for_graph(reference_inflection.x), prepare_y_for_graph(reference_inflection.y))
@@ -103,7 +112,7 @@ func _process(_delta: float) -> void:
 			%ReferenceInflectionMiddle.visible = false
 	else:
 		%ReferenceInflectionMiddle.visible = false
-	
+
 	var approx_inflection: Vector2 = curves.approx_inflection_point
 	if approx_inflection.x > 0:
 		approx_inflection = Vector2(prepare_x_for_graph(approx_inflection.x), prepare_y_for_graph(approx_inflection.y))
@@ -122,7 +131,7 @@ func prepare_x_for_graph(x: float) -> float:
 		EncodingType.LINEAR:
 			x = (x - linear_min_x) / (linear_max_x - linear_min_x) * 1000.0
 		EncodingType.LOG2:
-			x = (log2(x / log2_middle_grey) + abs(log2_min_x)) / (log2_max_x - log2_min_x) * 1000.0
+			x = (log2(x / middle_grey) + abs(log2_min_x)) / (log2_max_x - log2_min_x) * 1000.0
 	return x
 
 
@@ -132,7 +141,7 @@ func prepare_y_for_graph(y: float) -> float:
 		EncodingType.LINEAR:
 			y = (y - linear_min_y) / (linear_max_y - linear_min_y) * -1000.0
 		EncodingType.LOG2:
-			y = maxf(1e-10, y / log2_middle_grey) # prevent log2(0)
+			y = maxf(1e-10, y / middle_grey) # prevent log2(0)
 			y = (log2(y) - log2_min_y) / (log2_max_y - log2_min_y) * -1000.0
 	return y
 
