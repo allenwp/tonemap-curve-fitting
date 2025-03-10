@@ -1,9 +1,10 @@
-using Godot;
+﻿using Godot;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Runtime.InteropServices;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Transactions;
 using static CurveComparison;
@@ -92,6 +93,15 @@ public partial class CurveComparison : Node
     public double white = Math.Pow(2.0, 6.5f) * 0.18;
 
     [Export]
+    public double white_hdr = 1;
+
+    [Export]
+    public double ref_luminance = 200;
+
+    [Export]
+    public double max_luminance = 1000;
+
+    [Export]
     public double input_exposure_scale = 1.0;
 
     [Export]
@@ -141,8 +151,13 @@ public partial class CurveComparison : Node
 
     public double ReferenceCurve(double x)
     {
+        //return KrzysztofNarkowiczACES(x);
+        //return tonemap_reinhard(x, white);
+        //return TimothyLottes_white(x);
         //return BasicSecondOrderCurve(x, A, B, C, D, E, F, G);
         //return JohHableUncharted2(x, A, B, C, D, E, F, white);
+        //return TimothyLottes(x);
+        //return tonemap_reinhard(x, white);
         return AgxReference(x, agxRefLog2Max);
     }
 
@@ -150,9 +165,12 @@ public partial class CurveComparison : Node
     {
         if (OptionB)
         {
+            return LearningFunc(x, A, B, C, D, E, F, G);
+            //return reinhard_scaled(x, white);
             return TimothyLottesXStephenHill(x);
             //return TimothyLottes(x, Lottes_A, Lottes_D);
-            //return LearningFunc(x, A, B, C, D, E, F, G);
+            //return TimothyLottes_white(x);
+            //return HDRTimothyLottes2(x);
             //return nonlinearfit_amdform(x);
             //return AgXLog2Approx(x);
             //return AgXNewWhiteParam1(x);
@@ -161,7 +179,9 @@ public partial class CurveComparison : Node
         }
         else
         {
-            return TimothyLottesHardcoded(x);
+            return KrzysztofNarkowiczACESFilmRec2020(x);
+            //return HDRTimothyLottes(x);
+            //return TimothyLottesModifed(x, Lottes_A_new, Lottes_D_new, Lottes_additional);
             //return RandomNonsense(x);
             //return NonlinearModelFitApproximation(x);
             //return AgXNewWhiteParam(x);
@@ -612,19 +632,8 @@ public partial class CurveComparison : Node
     static double timothy_lottes_b;
     static double timothy_lottes_c;
     static double timothy_lottes_d;
-    public double TimothyLottes(double x, double a, double d)
+    public static double TimothyLottes(double x, double mid_in = 0.18, double mid_out = 0.18, double max_val = 16.2917402385381, double a = 1.36989969378897, double d = 0.903916850555009)
     {
-        //a /= 1000.0;
-        //d /= 10.0;
-
-        a = 1.36989969378897;
-        d = 0.903916850555009;
-
-        double mid_in = 0.18;
-        double mid_out = 0.18;
-        double max_val = white;
-        //double max_val = 16.2917402385381;
-
         double b = (-1.0 * Math.Pow(mid_in, a) + Math.Pow(max_val, a) * mid_out) / ((Math.Pow(Math.Pow(max_val, a), d) - Math.Pow(Math.Pow(mid_in, a), d)) * mid_out);
         double c = (Math.Pow(Math.Pow(max_val, a), d) * Math.Pow(mid_in, a) - Math.Pow(max_val, a) * Math.Pow(Math.Pow(mid_in, a), d) * mid_out) / ((Math.Pow(Math.Pow(max_val, a), d) - Math.Pow(Math.Pow(mid_in, a), d)) * mid_out);
 
@@ -637,9 +646,33 @@ public partial class CurveComparison : Node
         return z / (Math.Pow(z, d) * b + c);
     }
 
-    public double TimothyLottesHardcoded(double x)
+    public double TimothyLottes_white(double x)
     {
-        x = Math.Pow(x, 1.36989969378897);
+        return TimothyLottes(x, 0.18, 0.18, white);
+    }
+
+    public double HDRTimothyLottes(double x)
+    {
+        //x *= (ref_luminance / max_luminance);
+        // This is basically the same thing as a 0.18 mid_out with a white of ~0.765 so the contrast is all out of whack 😬
+        x = TimothyLottes(x, 0.18, 0.18 * (ref_luminance / max_luminance), 16.2917402385381);
+        x *= max_luminance / ref_luminance;
+        return x;
+    }
+
+    public double HDRTimothyLottes2(double x)
+    {
+        x *= A / 100;
+        x = TimothyLottes(x, 0.18, 0.18, white);
+        x *= max_luminance / ref_luminance;
+        return x;
+    }
+
+    public double TimothyLottesModifed(double x, double a, double d, double adjustment)
+    {
+        a /= 1000.0;
+        d /= 10.0;
+        adjustment /= 1000.0;
         x = x / (Math.Pow(x, 0.903916850555009) * 1.4325264680543 + 0.3589386656982);
         return x;
     }
@@ -679,8 +712,19 @@ x = exp2(x * a) / (exp2(x * a * d) * b + c);
     }
 
 
-    public static double LearningFunc(double x, double a, double b, double c, double d, double e, double f, double g)
+    public double LearningFunc(double x, double a, double b, double c, double d, double e, double f, double g)
     {
+        double w = white;
+        double t = a;
+        double s = d;
+        double k = ((1-t)*(c-b)) / ((1-s)*(w-c)+(1-t)*(c-b));
+        double toe = (k*(1-t)*(x-b)) / (c-(1-t)*b-t*x);
+        double shoulder = ((1-k)*(x-c)) / (s*x+(1-s)*w-c) + k;
+        //double toe = (0.0658537 * (-0.5 + x)) / (1.85 - 0.7 * x);
+        //double shoulder = 0.219512 + ((0.780488 * (-2 + x)) / (-4.44089 * 10e-16 + 0.8 * x));
+        return x > c ? shoulder : toe;
+
+
         x = x * (1 / 0.18);
         //x = x * c;
         x = Math.Log2(x);
@@ -725,6 +769,38 @@ x = exp2(x * a) / (exp2(x * a * d) * b + c);
         double color_tonemapped = BasicSecondOrderCurve(x * exposure, a, b, c, d, e, f, g);
         double white_tonemapped = BasicSecondOrderCurve(white * exposure, a, b, c, d, e, f, g);
         return color_tonemapped / white_tonemapped;
+    }
+
+    double tonemap_reinhard(double color, double white)
+    {
+        double white_squared = white * white;
+        return color * (1 + color / white_squared) / (1 + color);
+    }
+    double tonemap_reinhard_simple(double color)
+    {
+        return color / (1 + color);
+    }
+
+    double reinhard_scaled(double color, double white)
+    {
+        // modified white makes white behave the same between SDR and HDR, but causes apparent brightness to increase.
+        white *= ref_luminance / max_luminance;
+        white = Math.Max(1.0, white);
+        color *= ref_luminance / max_luminance;
+        color = tonemap_reinhard(color, white);
+        color *= max_luminance / ref_luminance;
+        return color;
+    }
+
+    public static double KrzysztofNarkowiczACESFilmRec2020(double x)
+    {
+        x *= 0.6;
+        double a = 15.8f;
+        double b = 2.12f;
+        double c = 1.2f;
+        double d = 5.92f;
+        double e = 1.9f;
+        return (x * (a * x + b)) / (x * (c * x + d) + e);
     }
 
     public static double KrzysztofNarkowiczACES(double x)
