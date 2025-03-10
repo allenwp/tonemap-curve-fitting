@@ -13,3 +13,12 @@ And even better (much more sane power values, starting point was Mathematica gen
 
 x = pow(x, vec3(1.391000000003260));
 x = x / (pow(x, vec3(0.903999999994994)) * 1.44126897250601 + 0.344628749439947);
+
+
+data = Table[{x, agxCurve[x]}, {x, 2^Range[kLog2Min + 6, 1, 0.001]}];:
+x = pow(x, vec3(1.37184870283913));
+x = x / (pow(x, vec3(0.903808032807764)) * 1.4339802231366 + 0.3574690171360);
+
+data = Table[{x, agxCurve[x]}, {x, 2^Range[kLog2Min, 1, 0.001]}];:
+x = pow(x, vec3(1.36989969378897));
+x = x / (pow(x, vec3(0.903916850555009)) * 1.4325264680543 + 0.3589386656982);

@@ -150,7 +150,8 @@ public partial class CurveComparison : Node
     {
         if (OptionB)
         {
-            return TimothyLottes(x, Lottes_A, Lottes_D);
+            return TimothyLottesXStephenHill(x);
+            //return TimothyLottes(x, Lottes_A, Lottes_D);
             //return LearningFunc(x, A, B, C, D, E, F, G);
             //return nonlinearfit_amdform(x);
             //return AgXLog2Approx(x);
@@ -160,7 +161,7 @@ public partial class CurveComparison : Node
         }
         else
         {
-            return TimothyLottesModifed(x, Lottes_A_new, Lottes_D_new, Lottes_additional);
+            return TimothyLottesHardcoded(x);
             //return RandomNonsense(x);
             //return NonlinearModelFitApproximation(x);
             //return AgXNewWhiteParam(x);
@@ -611,14 +612,18 @@ public partial class CurveComparison : Node
     static double timothy_lottes_b;
     static double timothy_lottes_c;
     static double timothy_lottes_d;
-    public static double TimothyLottes(double x, double a, double d)
+    public double TimothyLottes(double x, double a, double d)
     {
-        a /= 1000.0;
-        d /= 10.0;
+        //a /= 1000.0;
+        //d /= 10.0;
+
+        a = 1.36989969378897;
+        d = 0.903916850555009;
 
         double mid_in = 0.18;
         double mid_out = 0.18;
-        double max_val = 16.2917402385381;
+        double max_val = white;
+        //double max_val = 16.2917402385381;
 
         double b = (-1.0 * Math.Pow(mid_in, a) + Math.Pow(max_val, a) * mid_out) / ((Math.Pow(Math.Pow(max_val, a), d) - Math.Pow(Math.Pow(mid_in, a), d)) * mid_out);
         double c = (Math.Pow(Math.Pow(max_val, a), d) * Math.Pow(mid_in, a) - Math.Pow(max_val, a) * Math.Pow(Math.Pow(mid_in, a), d) * mid_out) / ((Math.Pow(Math.Pow(max_val, a), d) - Math.Pow(Math.Pow(mid_in, a), d)) * mid_out);
@@ -628,27 +633,49 @@ public partial class CurveComparison : Node
         timothy_lottes_c = c;
         timothy_lottes_d = d;
 
-        x = Math.Min(x, max_val);
         double z = Math.Pow(x, a);
         return z / (Math.Pow(z, d) * b + c);
     }
 
-    public double TimothyLottesModifed(double x, double a, double d, double adjustment)
+    public double TimothyLottesHardcoded(double x)
     {
-        a /= 1000.0;
-        d /= 10.0;
-        adjustment /= 1000.0;
+        x = Math.Pow(x, 1.36989969378897);
+        x = x / (Math.Pow(x, 0.903916850555009) * 1.4325264680543 + 0.3589386656982);
+        return x;
+    }
 
-        double mid_in = 0.18;
-        double mid_out = 0.18 - adjustment;
-        double max_val = 16.2917402385381;
+    public static double exp2(double x)
+    {
+        return Math.Pow(2.0, x);
+    }
 
-        double b = (-1.0 * Math.Pow(mid_in, a) + Math.Pow(max_val, a) * mid_out) / ((Math.Pow(Math.Pow(max_val, a), d) - Math.Pow(Math.Pow(mid_in, a), d)) * mid_out);
-        double c = (Math.Pow(Math.Pow(max_val, a), d) * Math.Pow(mid_in, a) - Math.Pow(max_val, a) * Math.Pow(Math.Pow(mid_in, a), d) * mid_out) / ((Math.Pow(Math.Pow(max_val, a), d) - Math.Pow(Math.Pow(mid_in, a), d)) * mid_out);
+    public static double log2(double x)
+    {
+        return Math.Log2(x);
+    }
 
-        x = Math.Min(x, max_val);
-        double z = Math.Pow(x, a);
-        return z / (Math.Pow(z, d) * b + c) + adjustment;
+    public double TimothyLottesXStephenHill(double x)
+    {
+        const double a = 1.36989969378897;
+        const double c = 0.3589386656982;
+        const double b = 1.4325264680543;
+        const double d = 0.903916850555009;
+        const double e = a * d;
+
+//x = exp2(log2(x) * a) / (exp2(log2(exp2(log2(x) * a)) * d) * b + c);
+
+//x = log2(x);
+//x = exp2(x * a) / (exp2(log2(exp2(x * a)) * d) * b + c);
+
+x = log2(x);
+x = exp2(x * a) / (exp2(x * a * d) * b + c);
+
+        return x;
+
+        x = Math.Max(x, 1e-10);
+        x = Math.Log2(x);
+        x = Math.Pow(2.0, x * a) / (Math.Pow(2.0, x * e) * b + c);
+        return x;
     }
 
 
