@@ -38,6 +38,11 @@ public partial class CurveComparison : Node
     [Export] public double F = 913.696;
     [Export] public double G = 0.0;
 
+    [Export] public double insomniac_b = 0.5;
+    [Export] public double insomniac_c = 2;
+    [Export] public double insomniac_t = 0.7;
+    [Export] public double insomniac_s = 0.8;
+
     [Export] public float jh_toeStrength = 0.0f; // as a ratio
     [Export] public float jh_toeLength = 0.5f; // as a ratio
     [Export] public float jh_shoulderStrength = 0.0f; // as a ratio
@@ -55,8 +60,8 @@ public partial class CurveComparison : Node
     //[Export] public double G = 0.0;
 
 
-    [Export] public double Lottes_A = 0.0;
-    [Export] public double Lottes_D = 0.0;
+    [Export] public double Lottes_A = 1.36989969378897;
+    [Export] public double Lottes_D = 0.903916850555009;
 
     [Export] public double Lottes_A_new = 0.0;
     [Export] public double Lottes_D_new = 0.0;
@@ -561,6 +566,28 @@ public partial class CurveComparison : Node
 
 
 
+    public double insomniac(double x)
+    {
+        double b = insomniac_b;
+        double c = insomniac_c;
+        double w = white;
+        double t = insomniac_t;
+        double s = insomniac_s;
+
+        double k = ((1 - t) * (c - b)) / ((1 - s) * (w - c) + (1 - t) * (c - b));
+        double toe = (k * (1 - t) * (x - b)) / (c - (1 - t) * b - t * x);
+        double shoulder = ((1 - k) * (x - c)) / (s * x + (1 - s) * w - c) + k;
+        if (x < c)
+        {
+            return toe;
+        }
+        else
+        {
+            return shoulder;
+        }
+    }
+
+
 
 
 
@@ -582,6 +609,7 @@ public partial class CurveComparison : Node
     {
         if (OptionB)
         {
+            //return insomniac(x);
             return JohnHablePiecewise(x);
             //return LearningFunc(x, A, B, C, D, E, F, G);
             //return reinhard_scaled(x, white);
@@ -595,7 +623,7 @@ public partial class CurveComparison : Node
         }
         else
         {
-            return HDRTimothyLottesA(x);
+            return HDRTimothyLottesB(x);
             //return KrzysztofNarkowiczACESFilmRec2020(x);
             //return HDRTimothyLottes(x);
             //return TimothyLottesModifed(x, Lottes_A_new, Lottes_D_new, Lottes_additional);
@@ -1072,6 +1100,13 @@ public partial class CurveComparison : Node
     {
         // This is basically the same thing as a 0.18 mid_out with a white of ~0.765 so the contrast is all out of whack 😬
         x = TimothyLottes(x, 0.18, 0.18 * (ref_luminance / max_luminance));
+        x *= max_luminance / ref_luminance;
+        return x;
+    }
+
+    public double HDRTimothyLottesB(double x)
+    {
+        x = TimothyLottes(x, 0.18, 0.18 * (ref_luminance / max_luminance), 16.2917402385381, Lottes_A, Lottes_D);
         x *= max_luminance / ref_luminance;
         return x;
     }
