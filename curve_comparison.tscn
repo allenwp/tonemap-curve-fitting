@@ -13,7 +13,13 @@ C = 0.12
 D = 0.949
 E = 0.432951
 F = 0.238081
+jh_toeStrength = 2.485
+jh_toeLength = 0.525
+jh_shoulderStrength = 1.305
+jh_shoulderLength = 0.945
+jh_shoulderAngle = 0.43
 white_hdr = 1.14
+max_luminance = 200.0
 input_exposure_scale = 0.631
 
 [node name="CurveView" parent="." node_paths=PackedStringArray("curves") instance=ExtResource("1_t77ya")]
@@ -103,6 +109,7 @@ clip = true
 position = Vector2(2093, 1366)
 scale = Vector2(0.62, 0.62)
 curves = NodePath("..")
+linear_max_y = 5.0
 log2_max_x = 6.5
 log2_min_y = -10.0
 clip = true
