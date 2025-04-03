@@ -7,3 +7,6 @@ This Godot project tool has two parts:
 The brute force fitting is probably best ignored, as it doesn't do as good of a job as Mathematica's `NonlinearModelFit` function when it is configured correctly.
 
 The [sibling repository](https://github.com/allenwp/AgX-GLSL-Shaders) has the Mathematica notebooks used for curve fitting. I'd recommend ignoring the notebooks and text documents in this repository, as they're just scrap notes of mine.
+
+# Version
+This project is made with Godot 4.3 with .NET support.
