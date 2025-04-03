@@ -15,11 +15,6 @@ public partial class CurveComparison : Node
     [Export]
     public bool OptionB { get; set; } = false;
 
-    public void set_option_b(bool value)
-    {
-        OptionB = value;
-    }
-
     //const double ballparkStartingPoint = 30.0;
     //[Export] public double A = ballparkStartingPoint;
     //[Export] public double B = ballparkStartingPoint;
@@ -105,7 +100,7 @@ public partial class CurveComparison : Node
     public double white = Math.Pow(2.0, 6.5f) * 0.18;
 
     [Export]
-    public double white_hdr = 1;
+    public double white_hdr = Math.Pow(2.0, 6.5f) * 0.18;
 
     [Export]
     public double ref_luminance = 200;
@@ -168,7 +163,7 @@ public partial class CurveComparison : Node
     public struct CurveParamsUser
     {
         public CurveParamsUser() { }
-        
+
         public float m_toeStrength = 0.0f; // as a ratio
         public float m_toeLength = 0.5f; // as a ratio
         public float m_shoulderStrength = 0.0f; // as a ratio
@@ -310,7 +305,7 @@ public partial class CurveComparison : Node
             m_x1 = .75f;
             m_y1 = .75f;
 
-            
+
             for (int i = 0; i < 3; i++)
             {
                 m_segments[i].Reset();
@@ -594,7 +589,8 @@ public partial class CurveComparison : Node
 
     public double ReferenceCurve(double x)
     {
-        return TimothyLottes(x);
+        //return TimothyLottes(x);
+        //return GodotJohHableUncharted2(x, white);
         //return KrzysztofNarkowiczACES(x);
         //return tonemap_reinhard(x, white);
         //return TimothyLottes_white(x);
@@ -602,18 +598,18 @@ public partial class CurveComparison : Node
         //return JohHableUncharted2(x, A, B, C, D, E, F, white);
         //return TimothyLottes(x);
         //return tonemap_reinhard(x, white);
-        //return AgxReference(x, agxRefLog2Max);
+        return AgxReference(x, agxRefLog2Max);
     }
 
     public double ApproxCurve(double x)
     {
         if (OptionB)
         {
-            //return insomniac(x);
-            return JohnHablePiecewise(x);
+            return insomniac(x);
+            //return JohnHablePiecewise(x);
             //return LearningFunc(x, A, B, C, D, E, F, G);
             //return reinhard_scaled(x, white);
-            return TimothyLottesXStephenHill(x);
+            //return TimothyLottesXStephenHill(x);
             //return TimothyLottes(x, Lottes_A, Lottes_D);
             //return TimothyLottes_white(x);
             //return HDRTimothyLottes2(x);
@@ -626,6 +622,9 @@ public partial class CurveComparison : Node
         else
         {
             return HDRTimothyLottesB(x);
+            //return ACES2_0(x);
+            //return KrzysztofNarkowiczACESFilmRec2020(x);
+            //return GodotJohHableUncharted2HDR(x, white);
             //return KrzysztofNarkowiczACESFilmRec2020(x);
             //return HDRTimothyLottes(x);
             //return TimothyLottesModifed(x, Lottes_A_new, Lottes_D_new, Lottes_additional);
@@ -654,7 +653,7 @@ public partial class CurveComparison : Node
     }
 
     public override void _Process(double delta)
-	{
+    {
         Tree tree = GetNode<Tree>("%ErrorTree");
         tree.Clear();
         tree.SetColumnTitle(0, "Input");
@@ -705,7 +704,7 @@ public partial class CurveComparison : Node
         }
         GetNode<Label>("%TotalErrorLinearLabel").Text = $"Total weighted error (linear): {error.totalErrorLinear:F7}";
         GetNode<Label>("%TotalErrorLog2Label").Text = $"Total weighted error (log2, middle grey: {agxRefMiddleGrey:F2}): {error.totalErrorLog2:F7}";
-        GetNode<TextEdit>("%RationalApproxTextEdit").Text = $"(x * (x * {A:F15} + ({B:F15})) + ({C:F15})) / (x * (x * {D:F15} + ({E:F15})) + ({F:F15})) + ({G:F15})\n\nx  = pow(x, vec3({(A/1000.0):F15})) / ({(B / 1000.0):F15} / x) + {(C / 1000.0):F15};\nx = max(x, 0.0); // x might be negative from c\nx = x / (pow(x, vec3({(F / 1000.0):F15})) * {(D / 1000.0):F15} + {(E / 1000.0):F15});" +
+        GetNode<TextEdit>("%RationalApproxTextEdit").Text = $"(x * (x * {A:F15} + ({B:F15})) + ({C:F15})) / (x * (x * {D:F15} + ({E:F15})) + ({F:F15})) + ({G:F15})\n\nx  = pow(x, vec3({(A / 1000.0):F15})) / ({(B / 1000.0):F15} / x) + {(C / 1000.0):F15};\nx = max(x, 0.0); // x might be negative from c\nx = x / (pow(x, vec3({(F / 1000.0):F15})) * {(D / 1000.0):F15} + {(E / 1000.0):F15});" +
             $"\n\nx = pow(x, vec3({timothy_lottes_a:F15}));\nx = x / (pow(x, vec3({timothy_lottes_d:F15})) * {timothy_lottes_b:F15} + {timothy_lottes_c:F15});";
 
         reference_inflection_point = CalculateInflectionPoint((double x) => { return ReferenceCurve(x); });
@@ -713,7 +712,7 @@ public partial class CurveComparison : Node
 
         if (GD.Randf() < 0.1)
         {
-           //CalculateInflectionPoint((double x) => { return ReferenceCurve(x); }, 1000000);
+            //CalculateInflectionPoint((double x) => { return ReferenceCurve(x); }, 1000000);
         }
     }
 
@@ -775,7 +774,8 @@ public partial class CurveComparison : Node
 
             double middleY = (y_vals[inflection_indices[0]] + y_vals[inflection_indices[inflection_indices.Count - 1]]) / 2.0;
             result = new Vector2((float)middleX, (float)middleY);
-        } else if (inflection_indices.Count == 1)
+        }
+        else if (inflection_indices.Count == 1)
         {
             int i = inflection_indices[0];
             result = new Vector2((float)x_vals[i], (float)y_vals[i]);
@@ -784,7 +784,7 @@ public partial class CurveComparison : Node
         return result;
     }
 
-    
+
 
     public void AddValue(double input, double errorWeight)
     {
@@ -935,7 +935,7 @@ public partial class CurveComparison : Node
         values[0] = bfInput.A;
         for (int i = 1; i < bfInput.numSteps * 2; i++)
         {
-            values[i] = values[i-1] / (i % 2 == 0 ? -1.0 * bfInput.half_range_denom : -1.0);
+            values[i] = values[i - 1] / (i % 2 == 0 ? -1.0 * bfInput.half_range_denom : -1.0);
         }
         values[values.Length - 1] = 0.0;
         values[values.Length - 2] = 1.0;
@@ -1140,13 +1140,13 @@ public partial class CurveComparison : Node
         const double d = 0.903916850555009;
         const double e = a * d;
 
-//x = exp2(log2(x) * a) / (exp2(log2(exp2(log2(x) * a)) * d) * b + c);
+        //x = exp2(log2(x) * a) / (exp2(log2(exp2(log2(x) * a)) * d) * b + c);
 
-//x = log2(x);
-//x = exp2(x * a) / (exp2(log2(exp2(x * a)) * d) * b + c);
+        //x = log2(x);
+        //x = exp2(x * a) / (exp2(log2(exp2(x * a)) * d) * b + c);
 
-x = log2(x);
-x = exp2(x * a) / (exp2(x * a * d) * b + c);
+        x = log2(x);
+        x = exp2(x * a) / (exp2(x * a * d) * b + c);
 
         return x;
 
@@ -1169,7 +1169,7 @@ x = exp2(x * a) / (exp2(x * a * d) * b + c);
 
         var directParams = CalcDirectParamsFromUser(parameters);
         var curve = CreateCurve(directParams);
-        return curve.Eval((float) x);
+        return curve.Eval((float)x);
     }
 
     public double LearningFunc(double x, double a, double b, double c, double d, double e, double f, double g)
@@ -1177,9 +1177,9 @@ x = exp2(x * a) / (exp2(x * a * d) * b + c);
         double w = white;
         double t = a;
         double s = d;
-        double k = ((1-t)*(c-b)) / ((1-s)*(w-c)+(1-t)*(c-b));
-        double toe = (k*(1-t)*(x-b)) / (c-(1-t)*b-t*x);
-        double shoulder = ((1-k)*(x-c)) / (s*x+(1-s)*w-c) + k;
+        double k = ((1 - t) * (c - b)) / ((1 - s) * (w - c) + (1 - t) * (c - b));
+        double toe = (k * (1 - t) * (x - b)) / (c - (1 - t) * b - t * x);
+        double shoulder = ((1 - k) * (x - c)) / (s * x + (1 - s) * w - c) + k;
         //double toe = (0.0658537 * (-0.5 + x)) / (1.85 - 0.7 * x);
         //double shoulder = 0.219512 + ((0.780488 * (-2 + x)) / (-4.44089 * 10e-16 + 0.8 * x));
         return x > c ? shoulder : toe;
@@ -1229,6 +1229,57 @@ x = exp2(x * a) / (exp2(x * a * d) * b + c);
         double color_tonemapped = BasicSecondOrderCurve(x * exposure, a, b, c, d, e, f, g);
         double white_tonemapped = BasicSecondOrderCurve(white * exposure, a, b, c, d, e, f, g);
         return color_tonemapped / white_tonemapped;
+    }
+
+    public double GodotACES(double x)
+    {
+        double exposure = 1.8;
+        double a = 0.0245786f;
+        double b = 0.000090537f;
+        double d = 0.983729f;
+        double e = 0.432951f;
+        double f = 0.238081f;
+
+        double color_tonemapped = BasicSecondOrderCurve(x * exposure, a, b, 0, d, e, f, 0);
+        double white_tonemapped = BasicSecondOrderCurve(white * exposure, a, b, 0, d, e, f, 0);
+        return color_tonemapped / white_tonemapped;
+    }
+
+    public double ACES2_0(double x)
+    {
+        double linear_scale_factor = 1.0; // In practice, this would be something like this: ref_luminance / 100.0;
+
+        // Preset constants that set the desired behavior for the curve
+        double n = max_luminance / linear_scale_factor;
+
+        double n_r = 100;    // normalized white in nits (what 1.0 should be)
+        double g = 1.15;       // surround / contrast
+        double c = 0.18;       // anchor for 18% grey
+        double c_d = 10.013;   // output luminance of 18% grey (in nits)
+        double w_g = 0.14;     // change in grey between different peak luminance
+        double t_1 = 0.04;     // shadow toe or flare/glare compensation
+        double r_hit_min = 128.0;   // scene-referred value "hitting the roof"
+        double r_hit_max = 896.0;   // scene-referred value "hitting the roof"
+
+        // Calculate output constants
+        double r_hit = r_hit_min + r_hit_max * (Math.Log(n / n_r) / Math.Log(10000.0 / 100.0));
+        double m_0 = (n / n_r);
+        double m_1 = 0.5 * (m_0 + Math.Sqrt(m_0 * (m_0 + 4.0 * t_1)));
+        double u = Math.Pow((r_hit / m_1) / ((r_hit / m_1) + 1), g);
+        double m = m_1 / u;
+        double w_i = Math.Log(n / 100.0) / Math.Log(2.0);
+        double c_t = c_d / n_r * (1.0 + w_i * w_g);
+        double g_ip = 0.5 * (c_t + Math.Sqrt(c_t * (c_t + 4.0 * t_1)));
+        double g_ipp2 = -(m_1 * Math.Pow((g_ip / m), (1.0 / g))) / (Math.Pow(g_ip / m, 1.0 / g) - 1.0);
+        double w_2 = c / g_ipp2;
+        double s_2 = w_2 * m_1;
+        double u_2 = Math.Pow((r_hit / m_1) / ((r_hit / m_1) + w_2), g);
+        double m_2 = m_1 / u_2;
+
+        // forward MM tone scale
+        double f = m_2 * Math.Pow(Math.Max(0.0, x) / (x + s_2), g);
+        double h = Math.Max(0.0, f * f / (f + t_1));         // forward flare 
+        return h * linear_scale_factor;
     }
 
     double tonemap_reinhard(double color, double white)
@@ -1287,6 +1338,31 @@ x = exp2(x * a) / (exp2(x * a * d) * b + c);
             / JohHableUncharted2Func(g, a, b, c, d, e, f);
     }
 
+    public double GodotJohHableUncharted2(double x, double white)
+    {
+        double exposure_bias = 2.0f;
+        double A = 0.22f * exposure_bias * exposure_bias; // bias baked into constants for performance
+        double B = 0.30f * exposure_bias;
+        double C = 0.10f;
+        double D = 0.20f;
+        double E = 0.01f;
+        double F = 0.30f;
+
+        double color_tonemapped = JohHableUncharted2Func(x, A, B, C, D, E, F);
+        double white_tonemapped = JohHableUncharted2Func(white, A, B, C, D, E, F);
+
+        return color_tonemapped / white_tonemapped;
+    }
+
+    public double GodotJohHableUncharted2HDR(double x, double white)
+    {
+        double max_val = max_luminance / ref_luminance;
+        x /= max_val;
+        white /= max_val;
+        x = GodotJohHableUncharted2(x, white);
+        return x * max_val;
+    }
+
     public static double RationalInterpolation(double x)
     {
         return (-0.00169047 + 1.49227 * x + 0.194039 * x * x) / (1 + 1.86073 * x + 0.167678 * x * x);
@@ -1296,7 +1372,7 @@ x = exp2(x * a) / (exp2(x * a * d) * b + c);
     {
         return (-0.000264666 + 1.50561 * x + 0.225389 * x * x) / (1 + 1.91729 * x + 0.196494 * x * x);
     }
-    
+
     public static double NonlinearModelFitApproximation(double x)
     {
         return (0.000659361441666740 - 0.696889279695934 * x + 155.821863293030 * x * x) / (0.701797928424950 + 122.551728247573 * x + 155.782469136453 * x * x);
@@ -1315,7 +1391,7 @@ x = exp2(x * a) / (exp2(x * a * d) * b + c);
 
         if (x < pivot_x_scaled)
         {
-            return Math.Pow(x, A_scaled) / (B_scaled / x) + C_scaled; 
+            return Math.Pow(x, A_scaled) / (B_scaled / x) + C_scaled;
         }
         else
         {

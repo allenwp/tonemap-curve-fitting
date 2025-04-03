@@ -15,16 +15,12 @@ enum EncodingType { LINEAR, LOG2}
 @export var linear_max_x: float = 16.2917402385381
 @export var linear_min_y: float = 0.0
 @export var linear_max_y: float = 1.0
-@export var log2_min_x: float = -12.0
-@export var log2_max_x: float = 4.0
-@export var log2_min_y: float = -12.0
-@export var log2_max_y: float = 4.0
+@export var log2_min_x: float = -10.0
+@export var log2_max_x: float = 6.5
+@export var log2_min_y: float = -10.0
+@export var log2_max_y: float = 6.5
 @export var clip: bool = true
 @export var show_linear: bool = true
-
-# Called when the node enters the scene tree for the first time.
-func _ready() -> void:
-	pass # Replace with function body.
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -125,6 +121,7 @@ func _process(_delta: float) -> void:
 	else:
 		%ApproxInflectionMiddle.visible = false
 
+
 func prepare_x_for_graph(x: float) -> float:
 	# scale x from linear encoding to match the [0,1000] graph range
 	match x_encoding_type:
@@ -145,25 +142,6 @@ func prepare_y_for_graph(y: float) -> float:
 			y = (log2(y) - log2_min_y) / (log2_max_y - log2_min_y) * -1000.0
 	return y
 
-#func inflection_points(points: PackedVector2Array) -> PackedVector2Array:
-	#var inflection_indices: PackedVector2Array
-	#if points.size() < 3:
-		#return inflection_indices  # Need at least 3 points to check for curvature change
-#
-	#for i in range(1, points.size() - 1):
-		#var v1 = points[i] - points[i - 1]  # First segment vector
-		#var v2 = points[i + 1] - points[i]  # Second segment vector
-#
-		## Compute the cross product to determine signed curvature
-		#var cross_product = v1.cross(v2)
-#
-		## Check sign change in cross product
-		#if i > 1:
-			#var prev_cross_product = (points[i-1] - points[i-2]).x * v1.y - (points[i-1] - points[i-2]).y * v1.x
-			#if sign(prev_cross_product) != sign(cross_product):
-				#inflection_indices.append(points[i])  # Inflection occurs at points[i]
-#
-	#return inflection_indices
 
 func inflection_points(points: PackedVector2Array) -> PackedVector2Array:
 	var inflections: PackedVector2Array
