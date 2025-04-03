@@ -6,14 +6,23 @@
 [node name="CurveComparison" type="Node2D"]
 position = Vector2(1, 0)
 script = ExtResource("1_2rroq")
-OptionB = true
 A = 0.155
 B = 0.0
 C = 0.12
 D = 0.949
 E = 0.432951
 F = 0.238081
+insomniac_b = 0.0
+insomniac_c = 0.13
+insomniac_t = 0.225
+insomniac_s = 1.44
+jh_toeStrength = 0.08
+jh_toeLength = 0.52
+jh_shoulderStrength = 4.905
+jh_shoulderLength = 0.955
+jh_shoulderAngle = 0.165
 white_hdr = 1.14
+max_luminance = 200.0
 input_exposure_scale = 0.631
 
 [node name="CurveView" parent="." node_paths=PackedStringArray("curves") instance=ExtResource("1_t77ya")]
@@ -103,6 +112,7 @@ clip = true
 position = Vector2(2093, 1366)
 scale = Vector2(0.62, 0.62)
 curves = NodePath("..")
+linear_max_y = 5.0
 log2_max_x = 6.5
 log2_min_y = -10.0
 clip = true
