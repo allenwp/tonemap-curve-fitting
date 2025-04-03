@@ -6,17 +6,16 @@
 [node name="CurveComparison" type="Node2D"]
 position = Vector2(1, 0)
 script = ExtResource("1_2rroq")
+jh_toeStrength = 0.305
+jh_toeLength = 0.205
+jh_shoulderStrength = 0.885
+jh_shoulderLength = 0.53
 A = 0.155
 B = 0.0
 C = 0.12
 D = 0.949
 E = 0.432951
 F = 0.238081
-jh_toeStrength = 0.305
-jh_toeLength = 0.205
-jh_shoulderStrength = 0.885
-jh_shoulderLength = 0.53
-max_luminance = 200.0
 
 [node name="CurveView" parent="." node_paths=PackedStringArray("curves") instance=ExtResource("1_t77ya")]
 position = Vector2(1381, 24)
