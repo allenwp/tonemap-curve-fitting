@@ -145,7 +145,7 @@ public partial class CurveComparison : Node
     {
         if (OptionB)
         {
-            return HDRTimothyLottes(x);
+            return HDRTimothyLottesA(x);
             //return insomniac(x);
             //return JohnHablePiecewise(x);
             //return LearningFunc(x, A, B, C, D, E, F, G);
@@ -279,10 +279,10 @@ public partial class CurveComparison : Node
     static double timothy_lottes_b;
     static double timothy_lottes_c;
     static double timothy_lottes_d;
-    public static double TimothyLottes(double x, double mid_in = 0.18, double mid_out = 0.18, double max_val = 16.2917402385381, double a = 1.36989969378897, double d = 0.903916850555009)
+    public static double TimothyLottes(double x, double mid_in = 0.18, double mid_out = 0.18, double white = 16.2917402385381, double max_val = 1.0, double a = 1.36989969378897, double d = 0.903916850555009)
     {
-        double b = (-1.0 * Math.Pow(mid_in, a) + Math.Pow(max_val, a) * mid_out) / ((Math.Pow(Math.Pow(max_val, a), d) - Math.Pow(Math.Pow(mid_in, a), d)) * mid_out);
-        double c = (Math.Pow(Math.Pow(max_val, a), d) * Math.Pow(mid_in, a) - Math.Pow(max_val, a) * Math.Pow(Math.Pow(mid_in, a), d) * mid_out) / ((Math.Pow(Math.Pow(max_val, a), d) - Math.Pow(Math.Pow(mid_in, a), d)) * mid_out);
+        double b = (max_val * Math.Pow(mid_in, a) - mid_out * Math.Pow(white, a)) / (max_val * mid_out * (Math.Pow(Math.Pow(mid_in, a), d) - Math.Pow(Math.Pow(white, a), d)));
+        double c = (Math.Pow(Math.Pow(mid_in, a), d) * mid_out * Math.Pow(white, a) - max_val * Math.Pow(mid_in, a) * Math.Pow(Math.Pow(white, a), d)) / (max_val * mid_out * (Math.Pow(Math.Pow(mid_in, a), d) - Math.Pow(Math.Pow(white, a), d)));
 
         timothy_lottes_a = a;
         timothy_lottes_b = b;
@@ -298,10 +298,18 @@ public partial class CurveComparison : Node
         return TimothyLottes(x, 0.18, 0.18, white);
     }
 
-    public double HDRTimothyLottes(double x)
+    public double HDRTimothyLottesA(double x)
     {
+        double max_val = max_luminance / ref_luminance;
         // This is basically the same thing as a 0.18 mid_out with a white of ~0.765 so the contrast is all out of whack 😬
-        x = TimothyLottes(x, 0.18, 0.18 * (ref_luminance / max_luminance), 16.2917402385381, Lottes_A, Lottes_D);
+        x = TimothyLottes(x, 0.18, 0.18, 16.2917402385381, max_val, Lottes_A, Lottes_D);
+        return x;
+    }
+
+    public double HDRTimothyLottesB(double x)
+    {
+        // This approach gives same result as A, but with more GPU calculations.
+        x = TimothyLottes(x, 0.18, 0.18 * (ref_luminance / max_luminance), 16.2917402385381, 1.0, Lottes_A, Lottes_D);
         x *= max_luminance / ref_luminance;
         return x;
     }
