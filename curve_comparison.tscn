@@ -6,16 +6,21 @@
 [node name="CurveComparison" type="Node2D"]
 position = Vector2(1, 0)
 script = ExtResource("1_2rroq")
+OptionB = true
+insomniac_b = 0.0
+insomniac_c = 0.18
+insomniac_t = 0.305
+insomniac_s = 0.965
 jh_toeStrength = 0.305
 jh_toeLength = 0.205
 jh_shoulderStrength = 0.885
 jh_shoulderLength = 0.53
-A = 0.155
-B = 0.0
+B = 181.265
 C = 0.12
 D = 0.949
-E = 0.432951
+E = -0.075
 F = 0.238081
+max_luminance = 200.0
 
 [node name="CurveView" parent="." node_paths=PackedStringArray("curves") instance=ExtResource("1_t77ya")]
 position = Vector2(1381, 24)
@@ -96,6 +101,7 @@ clip = true
 position = Vector2(2093, 1366)
 scale = Vector2(0.62, 0.62)
 curves = NodePath("..")
+linear_max_y = 5.0
 log2_min_x = -12.0
 log2_max_y = 4.0
 clip = true
@@ -104,8 +110,10 @@ clip = true
 position = Vector2(2791, 1366)
 scale = Vector2(0.62, 0.62)
 curves = NodePath("..")
-linear_min_x = 1.0
-linear_min_y = 0.515
+linear_min_x = 0.17
+linear_max_x = 1.01
+linear_min_y = 0.17
+linear_max_y = 1.01
 clip = true
 
 [node name="CheckButton" type="CheckButton" parent="."]
@@ -124,12 +132,12 @@ offset_bottom = 1433.0
 [node name="TotalErrorLinearLabel" type="Label" parent="VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Total weighted error (linear): 0.0795152"
+text = "Total weighted error (linear): 0.2997942"
 
 [node name="TotalErrorLog2Label" type="Label" parent="VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Total weighted error (log2, middle grey: 0.18): 1.9558861"
+text = "Total weighted error (log2, middle grey: 0.18): 1.1062949"
 
 [node name="ErrorTree" type="Tree" parent="VBoxContainer"]
 unique_name_in_owner = true
@@ -144,14 +152,14 @@ hide_root = true
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 297.725)
 layout_mode = 2
-text = "(x * (x * 0.155000000000000 + (0.000000000000000)) + (0.120000000000000)) / (x * (x * 0.949000000000000 + (0.432951000000000)) + (0.238081000000000)) + (0.000000000000000)
+text = "(x * (x * 1.256527804014910 + (181.264999999999418)) + (0.120000000000000)) / (x * (x * 0.949000000000000 + (-0.074999999997090)) + (0.238081000000000)) + (0.000000000000000)
 
-x  = pow(x, vec3(0.000155000000000)) / (0.000000000000000 / x) + 0.000120000000000;
+x  = pow(x, vec3(0.001256527804015)) / (0.181264999999999 / x) + 0.000120000000000;
 x = max(x, 0.0); // x might be negative from c
-x = x / (pow(x, vec3(0.000238081000000)) * 0.000949000000000 + 0.000432951000000);
+x = x / (pow(x, vec3(0.000238081000000)) * 0.000949000000000 + -0.000074999999997);
 
-x = pow(x, vec3(1.369899693788970));
-x = x / (pow(x, vec3(0.903916850555009)) * 1.432526468054255 + 0.358938665698179);"
+x = pow(x, vec3(0.000000000000000));
+x = x / (pow(x, vec3(0.000000000000000)) * 0.000000000000000 + 0.000000000000000);"
 wrap_mode = 1
 
 [connection signal="toggled" from="CheckButton" to="." method="set_option_b"]

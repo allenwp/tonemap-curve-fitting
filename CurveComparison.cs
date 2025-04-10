@@ -27,8 +27,8 @@ public partial class CurveComparison : Node
     [Export] public float jh_shoulderAngle = 0.0f; // as a ratio
     [Export] public float jh_gamma = 1.0f;
 
-    [Export] public double Lottes_A = 1.36989969378897;
-    [Export] public double Lottes_D = 0.903916850555009;
+    [Export] public double Lottes_A = 1.37050642100377;
+    [Export] public double Lottes_D = 0.903848570004928;
 
     #region Generic paramters as starting point for brute force fitting
 
@@ -80,7 +80,16 @@ public partial class CurveComparison : Node
     //[Export] public double G = ballparkStartingPoint;
 
     // Pretty close with power functions
-    [Export] public double A = 307.292;
+    //[Export] public double A = 307.292;
+    //[Export] public double B = 278.351;
+    //[Export] public double C = -0.0832486;
+    //[Export] public double D = 1501.91;
+    //[Export] public double E = 1514.37;
+    //[Export] public double F = 913.696;
+    //[Export] public double G = 0.0;
+
+    // Whatevers
+    [Export] public double A = 1.25652780401491;
     [Export] public double B = 278.351;
     [Export] public double C = -0.0832486;
     [Export] public double D = 1501.91;
@@ -130,6 +139,7 @@ public partial class CurveComparison : Node
     public double ReferenceCurve(double x)
     {
         return AgxReference(x, agxRefLog2Max);
+        //return reinhard_hdr(x, white);
         //return TimothyLottes(x);
         //return GodotJohHableUncharted2(x, white);
         //return KrzysztofNarkowiczACES(x);
@@ -145,7 +155,7 @@ public partial class CurveComparison : Node
     {
         if (OptionB)
         {
-            return HDRTimothyLottesA(x);
+            return AllenPiecewise(x, agxRefMiddleGrey, agxRefMiddleGrey, white, max_luminance / ref_luminance, A);
             //return insomniac(x);
             //return JohnHablePiecewise(x);
             //return LearningFunc(x, A, B, C, D, E, F, G);
@@ -162,7 +172,7 @@ public partial class CurveComparison : Node
         }
         else
         {
-            return TimothyLottes(x);
+            return TimothyLottesXStephenHill(x);
             //return ACES2_0(x);
             //return KrzysztofNarkowiczACESFilmRec2020(x);
             //return GodotJohHableUncharted2HDR(x, white);
@@ -272,6 +282,44 @@ public partial class CurveComparison : Node
         x = Math.Max(0, x); // x might be negative from C
         return x / (Math.Pow(x, f) * d + e) + g;
     }
+    public static double AllenPiecewise(double x, double mid_in = 0.18, double mid_out = 0.18, double white = 16.2917402385381, double max_val = 1.0, double a_toe_contrast = 1.25652780401491)
+    {
+        if (x > mid_in)
+        {
+            //double b = (max_val * Math.Pow(mid_in, a) - mid_out * Math.Pow(white, a)) / (max_val * mid_out * (Math.Pow(Math.Pow(mid_in, a), d) - Math.Pow(Math.Pow(white, a), d)));
+            //double c = (Math.Pow(Math.Pow(mid_in, a), d) * mid_out * Math.Pow(white, a) - max_val * Math.Pow(mid_in, a) * Math.Pow(Math.Pow(white, a), d)) / (max_val * mid_out * (Math.Pow(Math.Pow(mid_in, a), d) - Math.Pow(Math.Pow(white, a), d)));
+            //double z = Math.Pow(x, a);
+            //return z / (Math.Pow(z, d) * b + c);
+
+            //d = 0.959129014177583;
+            //double b = (max_val * mid_in - mid_out * white) / (max_val * mid_out * (Math.Pow(mid_in, d) - Math.Pow(white, d)));
+            //double c = (Math.Pow(mid_in, d) * mid_out * white - max_val * mid_in * Math.Pow(white, d)) / (max_val * mid_out * (Math.Pow(mid_in, d) - Math.Pow(white, d)));
+            //return x / (Math.Pow(x, d) * b + c);
+
+            // TODO: According to the original rienhard paper: this version with a white paramter "blends between linear and reinhard".
+            // So this means that I should just need it to blend between linear with a different slope and reinhard to make it work
+            // with the power function toe.
+            // Not sure what to do with the top end of the shoulder yet, but wrost case, it's probably not too bad honestly.
+
+            white = Math.Max(white, max_val);
+            max_val -= mid_in;
+            white -= mid_in;
+            double white_squared = white * white;
+            white_squared /= max_val;
+
+            x -= mid_in;
+            x = x * (1 + x / white_squared) / (1 + x / max_val);
+            x += mid_in;
+            return x;
+        }
+        else
+        {
+            double c = -1.0 * ((Math.Pow(mid_in, a_toe_contrast) * (-1.0 + mid_out)) / mid_out);
+
+            double z = Math.Pow(x, a_toe_contrast);
+            return z / (z + c);
+        }
+    }
 
     #region Timothy Lottes' curves and variations
 
@@ -302,7 +350,7 @@ public partial class CurveComparison : Node
     {
         double max_val = max_luminance / ref_luminance;
         // This is basically the same thing as a 0.18 mid_out with a white of ~0.765 so the contrast is all out of whack 😬
-        x = TimothyLottes(x, 0.18, 0.18, 16.2917402385381, max_val, Lottes_A, Lottes_D);
+        x = TimothyLottes(x, 0.18, 0.18, white, max_val, Lottes_A, Lottes_D);
         return x;
     }
 
@@ -515,6 +563,17 @@ public partial class CurveComparison : Node
         color *= max_luminance / ref_luminance;
         return color;
     }
+
+    double reinhard_hdr(double color, double white)
+    {
+        double max_val = max_luminance / ref_luminance;
+        white = Math.Max(max_val, white);
+        double white_squared = white * white;
+        white_squared /= max_val;
+        color = color * (1 + color / white_squared) / (1 + color / max_val);
+        return color;
+    }
+
     double tonemap_reinhard(double color, double white)
     {
         double white_squared = white * white;
@@ -1058,6 +1117,46 @@ public partial class CurveComparison : Node
 
         return dstParams;
     }
+    #endregion
+
+    #region OETF/EOTF
+
+    // From https://github.com/ampas/aces-core/blob/0b632da885c29f1ca8e816b3995ad5fde976e9ae/lib/Lib.Academy.DisplayEncoding.ctl#L79-L93
+    // This funciton calculates the math exactly rather than using the spec's decimal form
+    public static double nonlinear_srgb_piecewise_fwd_eotf(double x, double gamma = 2.4, double offs = 0.055)
+    {
+        double y;
+        double fs = ((gamma - 1.0) / offs) * Math.Pow(offs * gamma / ((gamma - 1.0) * (1.0 + offs)), gamma);
+        double xb = offs / (gamma - 1.0);
+        if (x >= xb)
+        {
+            y = Math.Pow((x + offs) / (1.0 + offs), gamma);
+        }
+        else
+        {
+            y = x * fs;
+        }
+        return y;
+    }
+
+    // From https://github.com/ampas/aces-core/blob/0b632da885c29f1ca8e816b3995ad5fde976e9ae/lib/Lib.Academy.DisplayEncoding.ctl#L79-L93
+    // This funciton calculates the math exactly rather than using the spec's decimal form
+    public static double nonlinear_srgb_piecewise_inverse_eotf(double y, double gamma = 2.4, double offs = 0.055)
+    {
+        double x;
+        double yb = Math.Pow(offs * gamma / ((gamma - 1.0) * (1.0 + offs)), gamma);
+        double rs = Math.Pow((gamma - 1.0) / offs, gamma - 1.0) * Math.Pow((1.0 + offs) / gamma, gamma);
+        if (y >= yb)
+        {
+            x = (1.0 + offs) * Math.Pow(y, 1.0 / gamma) - offs;
+        }
+        else
+        {
+            x = y * rs;
+        }
+        return x;
+    }
+
     #endregion
 
     #region Learning and playing around
