@@ -139,10 +139,10 @@ public partial class CurveComparison : Node
     public double ReferenceCurve(double x)
     {
         return AgxReference(x, agxRefLog2Max);
-        //return reinhard_hdr(x, white);
         //return TimothyLottes(x);
         //return GodotJohHableUncharted2(x, white);
         //return KrzysztofNarkowiczACES(x);
+        //return reinhard_hdr(x, white);
         //return tonemap_reinhard(x, white);
         //return TimothyLottes_white(x);
         //return BasicSecondOrderCurve(x, A, B, C, D, E, F, G);
@@ -155,7 +155,7 @@ public partial class CurveComparison : Node
     {
         if (OptionB)
         {
-            return AllenPiecewise(x, agxRefMiddleGrey, agxRefMiddleGrey, white, max_luminance / ref_luminance, A);
+            return allenwp_piecewise(x, B, C, white, max_luminance / ref_luminance, A);
             //return insomniac(x);
             //return JohnHablePiecewise(x);
             //return LearningFunc(x, A, B, C, D, E, F, G);
@@ -282,43 +282,35 @@ public partial class CurveComparison : Node
         x = Math.Max(0, x); // x might be negative from C
         return x / (Math.Pow(x, f) * d + e) + g;
     }
-    public static double AllenPiecewise(double x, double mid_in = 0.18, double mid_out = 0.18, double white = 16.2917402385381, double max_val = 1.0, double a_toe_contrast = 1.25652780401491)
+
+    public double allenwp_piecewise(double x, double mid_in = 0.18, double mid_out = 0.18, double white = 16.2917402385381, double max_val = 1.0, double toe_contrast = 1.25652780401491)
     {
+        // CPU side calculations:
+        double toe_a = -1.0 * ((Math.Pow(mid_in, toe_contrast) * (-1.0 + mid_out)) / mid_out);
+        // Sope formula is simply the derivative of the toe function with an input of mid_out
+        double slope = -1 * ((toe_contrast * Math.Pow(mid_in, -1.0 + 2.0 * toe_contrast)) / Math.Pow(toe_a + Math.Pow(mid_in, toe_contrast), 2.0)) + ((toe_contrast * Math.Pow(mid_in, -1.0 + toe_contrast)) / (toe_a + Math.Pow(mid_in, toe_contrast)));
+        white = Math.Max(white, max_val);
+        double shoulder_max_val = max_val - mid_out;
+        white -= mid_in;
+        double w = white * white;
+        w /= shoulder_max_val;
+        w *= slope;
+
+        // GPU side calculations:
         if (x > mid_in)
         {
-            //double b = (max_val * Math.Pow(mid_in, a) - mid_out * Math.Pow(white, a)) / (max_val * mid_out * (Math.Pow(Math.Pow(mid_in, a), d) - Math.Pow(Math.Pow(white, a), d)));
-            //double c = (Math.Pow(Math.Pow(mid_in, a), d) * mid_out * Math.Pow(white, a) - max_val * Math.Pow(mid_in, a) * Math.Pow(Math.Pow(white, a), d)) / (max_val * mid_out * (Math.Pow(Math.Pow(mid_in, a), d) - Math.Pow(Math.Pow(white, a), d)));
-            //double z = Math.Pow(x, a);
-            //return z / (Math.Pow(z, d) * b + c);
-
-            //d = 0.959129014177583;
-            //double b = (max_val * mid_in - mid_out * white) / (max_val * mid_out * (Math.Pow(mid_in, d) - Math.Pow(white, d)));
-            //double c = (Math.Pow(mid_in, d) * mid_out * white - max_val * mid_in * Math.Pow(white, d)) / (max_val * mid_out * (Math.Pow(mid_in, d) - Math.Pow(white, d)));
-            //return x / (Math.Pow(x, d) * b + c);
-
-            // TODO: According to the original rienhard paper: this version with a white paramter "blends between linear and reinhard".
-            // So this means that I should just need it to blend between linear with a different slope and reinhard to make it work
-            // with the power function toe.
-            // Not sure what to do with the top end of the shoulder yet, but wrost case, it's probably not too bad honestly.
-
-            white = Math.Max(white, max_val);
-            max_val -= mid_in;
-            white -= mid_in;
-            double white_squared = white * white;
-            white_squared /= max_val;
-
+            // Shoulder
             x -= mid_in;
-            x = x * (1 + x / white_squared) / (1 + x / max_val);
-            x += mid_in;
-            return x;
+            x = slope * x * (1 + x / w) / (1 + (x * slope) / shoulder_max_val);
+            x += mid_out;
         }
         else
         {
-            double c = -1.0 * ((Math.Pow(mid_in, a_toe_contrast) * (-1.0 + mid_out)) / mid_out);
-
-            double z = Math.Pow(x, a_toe_contrast);
-            return z / (z + c);
+            // Toe
+            x = Math.Pow(x, toe_contrast);
+            x = x / (x + toe_a);
         }
+        return x;
     }
 
     #region Timothy Lottes' curves and variations
@@ -577,7 +569,7 @@ public partial class CurveComparison : Node
     double tonemap_reinhard(double color, double white)
     {
         double white_squared = white * white;
-        return color * (1 + color / white_squared) / (1 + color);
+        return D * color * (1 + (color) / (white_squared * D)) / (1 + (color * D));
     }
 
     double tonemap_reinhard_simple(double color)

@@ -15,9 +15,10 @@ jh_toeStrength = 0.305
 jh_toeLength = 0.205
 jh_shoulderStrength = 0.885
 jh_shoulderLength = 0.53
-B = 181.265
-C = 0.12
-D = 0.949
+Lottes_A = 5.311
+B = 0.18
+C = 0.18
+D = 0.74
 E = -0.075
 F = 0.238081
 max_luminance = 200.0
@@ -101,7 +102,6 @@ clip = true
 position = Vector2(2093, 1366)
 scale = Vector2(0.62, 0.62)
 curves = NodePath("..")
-linear_max_y = 5.0
 log2_min_x = -12.0
 log2_max_y = 4.0
 clip = true
@@ -132,12 +132,12 @@ offset_bottom = 1433.0
 [node name="TotalErrorLinearLabel" type="Label" parent="VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Total weighted error (linear): 0.2997942"
+text = "Total weighted error (linear): 0.3324512"
 
 [node name="TotalErrorLog2Label" type="Label" parent="VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Total weighted error (log2, middle grey: 0.18): 1.1062949"
+text = "Total weighted error (log2, middle grey: 0.18): 1.1812294"
 
 [node name="ErrorTree" type="Tree" parent="VBoxContainer"]
 unique_name_in_owner = true
@@ -152,11 +152,11 @@ hide_root = true
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 297.725)
 layout_mode = 2
-text = "(x * (x * 1.256527804014910 + (181.264999999999418)) + (0.120000000000000)) / (x * (x * 0.949000000000000 + (-0.074999999997090)) + (0.238081000000000)) + (0.000000000000000)
+text = "(x * (x * 1.256527804014910 + (0.180000000000000)) + (0.180000000000000)) / (x * (x * 0.740000000000000 + (-0.075000000000000)) + (0.238081000000000)) + (0.000000000000000)
 
-x  = pow(x, vec3(0.001256527804015)) / (0.181264999999999 / x) + 0.000120000000000;
+x  = pow(x, vec3(0.001256527804015)) / (0.000180000000000 / x) + 0.000180000000000;
 x = max(x, 0.0); // x might be negative from c
-x = x / (pow(x, vec3(0.000238081000000)) * 0.000949000000000 + -0.000074999999997);
+x = x / (pow(x, vec3(0.000238081000000)) * 0.000740000000000 + -0.000075000000000);
 
 x = pow(x, vec3(0.000000000000000));
 x = x / (pow(x, vec3(0.000000000000000)) * 0.000000000000000 + 0.000000000000000);"
