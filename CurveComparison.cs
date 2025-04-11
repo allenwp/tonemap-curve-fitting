@@ -286,9 +286,9 @@ public partial class CurveComparison : Node
     public double allenwp_piecewise(double x, double mid_in = 0.18, double mid_out = 0.18, double white = 16.2917402385381, double max_val = 1.0, double toe_contrast = 1.25652780401491)
     {
         // CPU side calculations:
-        double toe_a = -1.0 * ((Math.Pow(mid_in, toe_contrast) * (-1.0 + mid_out)) / mid_out);
+        double toe_a = -1.0 * ((Math.Pow(mid_in, toe_contrast) * (-1.0 + mid_out)) / mid_out); // Can be simplified when mid_in == mid_out == 0.18: (41.0 / 9.0) * Math.Pow(mid_in, toe_contrast)
         // Sope formula is simply the derivative of the toe function with an input of mid_out
-        double slope = -1 * ((toe_contrast * Math.Pow(mid_in, -1.0 + 2.0 * toe_contrast)) / Math.Pow(toe_a + Math.Pow(mid_in, toe_contrast), 2.0)) + ((toe_contrast * Math.Pow(mid_in, -1.0 + toe_contrast)) / (toe_a + Math.Pow(mid_in, toe_contrast)));
+        double slope = (Math.Pow(mid_in, -1.0 + toe_contrast) * toe_a * toe_contrast) / Math.Pow(Math.Pow(mid_in, toe_contrast) + toe_a, 2.0);
         white = Math.Max(white, max_val);
         double shoulder_max_val = max_val - mid_out;
         white -= mid_in;
