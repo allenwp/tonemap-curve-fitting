@@ -19,14 +19,24 @@ enum EncodingType { LINEAR, LOG2}
 @export var log2_max_x: float = 6.5
 @export var log2_min_y: float = -10.0
 @export var log2_max_y: float = 6.5
+@export var match_white: bool = false
+@export var match_max_value: bool = false
 @export var clip: bool = true
-@export var show_linear: bool = true
+@export var show_unity: bool = true
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta: float) -> void:
 	if !curves:
 		return
+	
+	if match_white:
+		linear_max_x = curves.white
+		log2_max_x = log2(curves.white / middle_grey)
+	
+	if match_max_value:
+		linear_max_y = curves.max_value
+		log2_max_y = log2(curves.max_value / middle_grey)
 
 	match x_encoding_type:
 		EncodingType.LINEAR:
@@ -54,14 +64,17 @@ func _process(_delta: float) -> void:
 			%YLable.text = "Output (linear scale)"
 			%YMiddleGreyLine.position.y = (1.0 - (middle_grey - linear_min_y) / (linear_max_y - linear_min_y)) * 1000.0
 			%Y1Line.position.y = (1.0 - (1.0 - linear_min_y) / (linear_max_y - linear_min_y)) * 1000.0
+			%YMaxValueLine.position.y = (1.0 - (curves.max_value - linear_min_y) / (linear_max_y - linear_min_y)) * 1000.0
 		EncodingType.LOG2:
 			%YLowerLable.text = "%+.2f" % log2_min_y
 			%YUpperLable.text = "%+.2f" % log2_max_y
 			%YLable.text = "Output (log2 scale, middle grey: %.2f)" % middle_grey
 			%YMiddleGreyLine.position.y = (1.0 - (log2(middle_grey / middle_grey) - log2_min_y) / (log2_max_y - log2_min_y)) * 1000.0
 			%Y1Line.position.y = (1.0 - (log2(1.0 / middle_grey) - log2_min_y) / (log2_max_y - log2_min_y)) * 1000.0
+			%YMaxValueLine.position.y = (1.0 - (log2(curves.max_value / middle_grey) - log2_min_y) / (log2_max_y - log2_min_y)) * 1000.0
 	%YMiddleGreyLine.visible = %YMiddleGreyLine.position.y >= 0.0 && %YMiddleGreyLine.position.y <= 1000.0
 	%Y1Line.visible = %Y1Line.position.y >= 0.0 && %Y1Line.position.y <= 1000.0
+	%YMaxValueLine.visible = %YMaxValueLine.position.y >= 0.0 && %YMaxValueLine.position.y <= 1000.0
 
 	var linear_points: PackedVector2Array
 	var reference_points: PackedVector2Array
@@ -86,7 +99,7 @@ func _process(_delta: float) -> void:
 		y_reference = prepare_y_for_graph(y_reference)
 		y_approx = prepare_y_for_graph(y_approx)
 
-		if show_linear && (x >= 0.0 && x <= 1000.0 && y_linear <= 0.0 && y_linear >= -1000.0):
+		if show_unity && (x >= 0.0 && x <= 1000.0 && y_linear <= 0.0 && y_linear >= -1000.0):
 			linear_points.push_back(Vector2(x, y_linear))
 		if !clip || (x >= 0.0 && x <= 1000.0 && y_reference <= 0.0 && y_reference >= -1000.0):
 			reference_points.push_back(Vector2(x, y_reference))
