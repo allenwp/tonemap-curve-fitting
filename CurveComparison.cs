@@ -92,7 +92,7 @@ public partial class CurveComparison : Node
     [Export] public double A = 1.25652780401491;
     [Export] public double B = 278.351;
     [Export] public double C = -0.0832486;
-    [Export] public double D = 1501.91;
+    [Export] public double D = 0.939812905544296;
     [Export] public double E = 1514.37;
     [Export] public double F = 913.696;
     [Export] public double G = 0.0;
@@ -109,13 +109,13 @@ public partial class CurveComparison : Node
     public double white = Math.Pow(2.0, 6.5f) * 0.18;
 
     [Export]
-    public double white_hdr = Math.Pow(2.0, 6.5f) * 0.18;
-
-    [Export]
     public double ref_luminance = 200;
 
     [Export]
-    public double max_luminance = 1000;
+    public double max_luminance = 200;
+
+    [Export]
+    public double max_value = 1.0;
 
     [Export]
     public double input_exposure_scale = 1.0;
@@ -138,7 +138,7 @@ public partial class CurveComparison : Node
 
     public double ReferenceCurve(double x)
     {
-        return AgxReference(x, agxRefLog2Max);
+        return tonemap_reinhard(x, white);
         //return TimothyLottes(x);
         //return GodotJohHableUncharted2(x, white);
         //return KrzysztofNarkowiczACES(x);
@@ -155,7 +155,7 @@ public partial class CurveComparison : Node
     {
         if (OptionB)
         {
-            return allenwp_piecewise(x, B, C, white, max_luminance / ref_luminance, A);
+            return allenwp_piecewise_power(x, .18, .18, white, max_value, A, D);
             //return insomniac(x);
             //return JohnHablePiecewise(x);
             //return LearningFunc(x, A, B, C, D, E, F, G);
@@ -172,7 +172,7 @@ public partial class CurveComparison : Node
         }
         else
         {
-            return TimothyLottesXStephenHill(x);
+            return allenwp_reinhard_simple_sdr(x, .18, .18, white, A);
             //return ACES2_0(x);
             //return KrzysztofNarkowiczACESFilmRec2020(x);
             //return GodotJohHableUncharted2HDR(x, white);
@@ -283,31 +283,96 @@ public partial class CurveComparison : Node
         return x / (Math.Pow(x, f) * d + e) + g;
     }
 
-    public double allenwp_piecewise(double x, double mid_in = 0.18, double mid_out = 0.18, double white = 16.2917402385381, double max_val = 1.0, double toe_contrast = 1.25652780401491)
+    public double allenwp_reinhard_simple_sdr(double x, double midIn = 0.18, double midOut = 0.18, double white = 16.2917402385381, double contrast = 1.25652780401491)
     {
         // CPU side calculations:
-        double toe_a = -1.0 * ((Math.Pow(mid_in, toe_contrast) * (-1.0 + mid_out)) / mid_out); // Can be simplified when mid_in == mid_out == 0.18: (41.0 / 9.0) * Math.Pow(mid_in, toe_contrast)
-        // Sope formula is simply the derivative of the toe function with an input of mid_out
-        double slope = (Math.Pow(mid_in, -1.0 + toe_contrast) * toe_a * toe_contrast) / Math.Pow(Math.Pow(mid_in, toe_contrast) + toe_a, 2.0);
-        white = Math.Max(white, max_val);
-        double shoulder_max_val = max_val - mid_out;
-        white -= mid_in;
+        double toe_a = -1.0 * ((Math.Pow(midIn, contrast) * (midOut - 1.0)) / midOut); // Can be simplified when midIn == midOut == 0.18: (41.0 / 9.0) * Math.Pow(0.18, contrast)
+        // Slope formula is simply the derivative of the toe function with an input of midOut
+        double slope_a = Math.Pow(midIn, contrast) + toe_a;
+        double slope = (contrast * Math.Pow(midIn, contrast - 1.0) * toe_a) / (slope_a * slope_a);
+
+        x = slope * x * (D + x / (E * slope)) / (D + (x * slope)); // Solve for E such that white outputs maxValue
+
+        // This seems to work...
+        //x = (x * (D + x / (E)) / (D + x)); // Solve for E such that white outputs maxValue
+
+        return x;
+    }
+
+    public double allenwp_piecewise_reinhard(double x, double midIn = 0.18, double midOut = 0.18, double white = 16.2917402385381, double maxVal = 1.0, double contrast = 1.25652780401491)
+    {
+        // CPU side calculations:
+        maxVal = Math.Max(maxVal, 1.0);
+        white = Math.Max(white, maxVal);
+
+        double toe_a = -1.0 * ((Math.Pow(midIn, contrast) * (midOut - 1.0)) / midOut); // Can be simplified when midIn == midOut == 0.18: (41.0 / 9.0) * Math.Pow(0.18, contrast)
+        // Slope formula is simply the derivative of the toe function with an input of midOut
+        double slope_a = Math.Pow(midIn, contrast) + toe_a;
+        double slope = (contrast * Math.Pow(midIn, contrast - 1.0) * toe_a) / (slope_a * slope_a);
+
+        double shoulder_max_val = maxVal - midOut;
+        white -= midIn;
         double w = white * white;
         w /= shoulder_max_val;
         w *= slope;
 
         // GPU side calculations:
-        if (x > mid_in)
+        if (x > midIn)
         {
             // Shoulder
-            x -= mid_in;
+            x -= midIn;
             x = slope * x * (1 + x / w) / (1 + (x * slope) / shoulder_max_val);
-            x += mid_out;
+            x += midOut;
         }
         else
         {
             // Toe
-            x = Math.Pow(x, toe_contrast);
+            x = Math.Pow(x, contrast);
+            x = x / (x + toe_a);
+        }
+        return x;
+    }
+
+    public double allenwp_piecewise_power(double x, double midIn = 0.18, double midOut = 0.18, double white = 16.2917402385381, double maxVal = 1.0, double contrast = 1.25652780401491, double shoulder = 0.939812905544296)
+    {
+        // CPU side calculations:
+        maxVal = Math.Max(maxVal, 1.0);
+        white = Math.Max(white, maxVal);
+
+        double toe_a = -1.0 * ((Math.Pow(midIn, contrast) * (midOut - 1.0)) / midOut); // Can be simplified when midIn == midOut == 0.18: (41.0 / 9.0) * Math.Pow(0.18, contrast)
+        // Slope formula is simply the derivative of the toe function with an input of midOut
+        double slope_a = Math.Pow(midIn, contrast) + toe_a;
+        double slope = (contrast * Math.Pow(midIn, contrast - 1.0) * toe_a) / (slope_a * slope_a);
+
+        //double c = Math.Max(-1.0 * maxVal + midOut + slope * Math.Pow(-1.0 * midIn + white, shoulder), 0) / (-1.0 * maxVal + midOut + slope * (-1.0 * midIn + white)); // This seems to be a problem when it goes negative (when white is just a small amount larger than maxVal)
+        //double temp_top = (-1.0 * maxVal + midOut + slope * Math.Pow(-1.0 * midIn + white, shoulder)); // This goes negative and causes problems
+        //double temp_bottom = (-1.0 * maxVal + midOut + slope * (-1.0 * midIn + white));
+
+        //double shoulderMaxVal = maxVal - midOut;
+        //double w = white - midIn;
+        //w = w * w;
+        //w = w / shoulderMaxVal;
+        //w = w * slope;
+
+        // GPU side calculations:
+        if (x > midIn)
+        {
+            // Shoulder
+            //double result = x - midIn;
+            //result = slope * result * (c + result / w) / (c + (Math.Pow(result, shoulder) * slope) / shoulderMaxVal);
+            //result = result + midOut;
+            //if (x > 0.99 && x < 1.01 && GD.Randf() < 0.001)
+            //{
+            //    GD.Print($"slope: {slope} c: {c} result: {result} temp_top: {temp_top} temp_bottom: {temp_bottom}");
+            //}
+            //x = result;
+
+            x = 0.180000000000000 + (-0.12359954326067 + (0.6862116180061 + 0.0025139512212481 * x) * x) / (0.6668751139588 + Math.Pow(-0.180000000000000 + x, 0.939812905544296));
+        }
+        else
+        {
+            // Toe
+            x = Math.Pow(x, contrast);
             x = x / (x + toe_a);
         }
         return x;
@@ -319,10 +384,10 @@ public partial class CurveComparison : Node
     static double timothy_lottes_b;
     static double timothy_lottes_c;
     static double timothy_lottes_d;
-    public static double TimothyLottes(double x, double mid_in = 0.18, double mid_out = 0.18, double white = 16.2917402385381, double max_val = 1.0, double a = 1.36989969378897, double d = 0.903916850555009)
+    public static double TimothyLottes(double x, double mid_in = 0.18, double midOut = 0.18, double white = 16.2917402385381, double max_val = 1.0, double a = 1.36989969378897, double d = 0.903916850555009)
     {
-        double b = (max_val * Math.Pow(mid_in, a) - mid_out * Math.Pow(white, a)) / (max_val * mid_out * (Math.Pow(Math.Pow(mid_in, a), d) - Math.Pow(Math.Pow(white, a), d)));
-        double c = (Math.Pow(Math.Pow(mid_in, a), d) * mid_out * Math.Pow(white, a) - max_val * Math.Pow(mid_in, a) * Math.Pow(Math.Pow(white, a), d)) / (max_val * mid_out * (Math.Pow(Math.Pow(mid_in, a), d) - Math.Pow(Math.Pow(white, a), d)));
+        double b = (max_val * Math.Pow(mid_in, a) - midOut * Math.Pow(white, a)) / (max_val * midOut * (Math.Pow(Math.Pow(mid_in, a), d) - Math.Pow(Math.Pow(white, a), d)));
+        double c = (Math.Pow(Math.Pow(mid_in, a), d) * midOut * Math.Pow(white, a) - max_val * Math.Pow(mid_in, a) * Math.Pow(Math.Pow(white, a), d)) / (max_val * midOut * (Math.Pow(Math.Pow(mid_in, a), d) - Math.Pow(Math.Pow(white, a), d)));
 
         timothy_lottes_a = a;
         timothy_lottes_b = b;
@@ -341,7 +406,7 @@ public partial class CurveComparison : Node
     public double HDRTimothyLottesA(double x)
     {
         double max_val = max_luminance / ref_luminance;
-        // This is basically the same thing as a 0.18 mid_out with a white of ~0.765 so the contrast is all out of whack 😬
+        // This is basically the same thing as a 0.18 midOut with a white of ~0.765 so the contrast is all out of whack 😬
         x = TimothyLottes(x, 0.18, 0.18, white, max_val, Lottes_A, Lottes_D);
         return x;
     }
@@ -569,7 +634,9 @@ public partial class CurveComparison : Node
     double tonemap_reinhard(double color, double white)
     {
         double white_squared = white * white;
-        return D * color * (1 + (color) / (white_squared * D)) / (1 + (color * D));
+        double white_squared_color = white_squared * color;
+        // Equivalent to color * (1 + color / white_squared) / (1 + color)
+        return (white_squared_color + color * color) / (white_squared_color + white_squared);
     }
 
     double tonemap_reinhard_simple(double color)
@@ -1264,6 +1331,8 @@ public partial class CurveComparison : Node
 
     public override void _Process(double delta)
     {
+        max_luminance = ref_luminance * max_value;
+
         Tree tree = GetNode<Tree>("%ErrorTree");
         tree.Clear();
         tree.SetColumnTitle(0, "Input");
