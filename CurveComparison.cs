@@ -138,7 +138,7 @@ public partial class CurveComparison : Node
 
     public double ReferenceCurve(double x)
     {
-        return tonemap_reinhard(x, white);
+        return AgxReference(x, agxRefLog2Max);
         //return TimothyLottes(x);
         //return GodotJohHableUncharted2(x, white);
         //return KrzysztofNarkowiczACES(x);
@@ -172,7 +172,7 @@ public partial class CurveComparison : Node
         }
         else
         {
-            return allenwp_reinhard_simple_sdr(x, .18, .18, white, A);
+            return insomniac(x);
             //return ACES2_0(x);
             //return KrzysztofNarkowiczACESFilmRec2020(x);
             //return GodotJohHableUncharted2HDR(x, white);
@@ -283,19 +283,34 @@ public partial class CurveComparison : Node
         return x / (Math.Pow(x, f) * d + e) + g;
     }
 
-    public double allenwp_reinhard_simple_sdr(double x, double midIn = 0.18, double midOut = 0.18, double white = 16.2917402385381, double contrast = 1.25652780401491)
+    public double allenwp_piecewise_reinhard_adjustable(double x, double midIn = 0.18, double midOut = 0.18, double white = 16.2917402385381, double maxVal = 1.0, double contrast = 1.25652780401491, double shoulder=0.875)
     {
         // CPU side calculations:
+        maxVal = Math.Max(maxVal, 1.0);
+        white = Math.Max(white, maxVal);
+
         double toe_a = -1.0 * ((Math.Pow(midIn, contrast) * (midOut - 1.0)) / midOut); // Can be simplified when midIn == midOut == 0.18: (41.0 / 9.0) * Math.Pow(0.18, contrast)
         // Slope formula is simply the derivative of the toe function with an input of midOut
         double slope_a = Math.Pow(midIn, contrast) + toe_a;
         double slope = (contrast * Math.Pow(midIn, contrast - 1.0) * toe_a) / (slope_a * slope_a);
 
-        x = slope * x * (D + x / (E * slope)) / (D + (x * slope)); // Solve for E such that white outputs maxValue
+        double shoulderMaxVal = maxVal - midOut;
 
-        // This seems to work...
-        //x = (x * (D + x / (E)) / (D + x)); // Solve for E such that white outputs maxValue
-
+        // GPU side calculations:
+        if (x > midIn)
+        {
+            // Shoulder
+            x -= midIn;
+            // Original modified Reinhard function in [0,1]: x = (x * (D + x / (E)) / (D + x)); // Solve for E such that white outputs 1.0
+            x = slope * x * (shoulder + x / (E * slope)) / (shoulder + (x * slope) / shoulderMaxVal); // Solve for E such that white outputs maxValue
+            x += midOut;
+        }
+        else
+        {
+            // Toe
+            x = Math.Pow(x, contrast);
+            x = x / (x + toe_a);
+        }
         return x;
     }
 
@@ -310,18 +325,18 @@ public partial class CurveComparison : Node
         double slope_a = Math.Pow(midIn, contrast) + toe_a;
         double slope = (contrast * Math.Pow(midIn, contrast - 1.0) * toe_a) / (slope_a * slope_a);
 
-        double shoulder_max_val = maxVal - midOut;
-        white -= midIn;
-        double w = white * white;
-        w /= shoulder_max_val;
-        w *= slope;
+        double shoulderMaxVal = maxVal - midOut;
+
+        double w = white - midIn;
+        w = w * w;
+        w = w / shoulderMaxVal;
 
         // GPU side calculations:
         if (x > midIn)
         {
             // Shoulder
             x -= midIn;
-            x = slope * x * (1 + x / w) / (1 + (x * slope) / shoulder_max_val);
+            x = slope * x * (1 + x / (w * slope)) / (1 + (x * slope) / shoulderMaxVal);
             x += midOut;
         }
         else
@@ -344,30 +359,23 @@ public partial class CurveComparison : Node
         double slope_a = Math.Pow(midIn, contrast) + toe_a;
         double slope = (contrast * Math.Pow(midIn, contrast - 1.0) * toe_a) / (slope_a * slope_a);
 
-        //double c = Math.Max(-1.0 * maxVal + midOut + slope * Math.Pow(-1.0 * midIn + white, shoulder), 0) / (-1.0 * maxVal + midOut + slope * (-1.0 * midIn + white)); // This seems to be a problem when it goes negative (when white is just a small amount larger than maxVal)
-        //double temp_top = (-1.0 * maxVal + midOut + slope * Math.Pow(-1.0 * midIn + white, shoulder)); // This goes negative and causes problems
-        //double temp_bottom = (-1.0 * maxVal + midOut + slope * (-1.0 * midIn + white));
+        // TODO: c should be the user parameter; solve for shoulder instaed of c! Maybe this will fix the instabilities.
+        double c = (-1.0 * maxVal + midOut + slope * Math.Pow(-1.0 * midIn + white, shoulder)) / (-1.0 * maxVal + midOut + slope * (-1.0 * midIn + white)); // This seems to be a problem when it goes negative (when white is just a small amount larger than maxVal)
 
-        //double shoulderMaxVal = maxVal - midOut;
-        //double w = white - midIn;
-        //w = w * w;
-        //w = w / shoulderMaxVal;
-        //w = w * slope;
+        double shoulderMaxVal = maxVal - midOut;
+        double w = white - midIn;
+        w = w * w;
+        w = w / shoulderMaxVal;
+        w = w * slope;
 
         // GPU side calculations:
         if (x > midIn)
         {
             // Shoulder
-            //double result = x - midIn;
-            //result = slope * result * (c + result / w) / (c + (Math.Pow(result, shoulder) * slope) / shoulderMaxVal);
-            //result = result + midOut;
-            //if (x > 0.99 && x < 1.01 && GD.Randf() < 0.001)
-            //{
-            //    GD.Print($"slope: {slope} c: {c} result: {result} temp_top: {temp_top} temp_bottom: {temp_bottom}");
-            //}
-            //x = result;
-
-            x = 0.180000000000000 + (-0.12359954326067 + (0.6862116180061 + 0.0025139512212481 * x) * x) / (0.6668751139588 + Math.Pow(-0.180000000000000 + x, 0.939812905544296));
+            double result = x - midIn;
+            result = slope * result * (c + result / w) / (c + (Math.Pow(result, shoulder) * slope) / shoulderMaxVal);
+            result = result + midOut;
+            x = result;
         }
         else
         {
