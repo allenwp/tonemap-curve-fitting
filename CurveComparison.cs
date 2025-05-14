@@ -109,6 +109,9 @@ public partial class CurveComparison : Node
     public double white = Math.Pow(2.0, 6.5f) * 0.18;
 
     [Export]
+    public double lowClip = 0.0;
+
+    [Export]
     public double ref_luminance = 200;
 
     [Export]
@@ -155,7 +158,7 @@ public partial class CurveComparison : Node
     {
         if (OptionB)
         {
-            return allenwp_piecewise_power(x, .18, .18, white, max_value, A, D);
+            return allenwp_piecewise_reinhard(x, .18, .18, white, max_value, A, lowClip);
             //return insomniac(x);
             //return JohnHablePiecewise(x);
             //return LearningFunc(x, A, B, C, D, E, F, G);
@@ -316,11 +319,12 @@ public partial class CurveComparison : Node
         return x;
     }
 
-    public double allenwp_piecewise_reinhard(double x, double midIn = 0.18, double midOut = 0.18, double white = 16.2917402385381, double maxVal = 1.0, double contrast = 1.25652780401491)
+    public double allenwp_piecewise_reinhard(double x, double midIn = 0.18, double midOut = 0.18, double white = 16.2917402385381, double maxVal = 1.0, double contrast = 1.25652780401491, double lowClip = 1.0)
     {
         // CPU side calculations:
         maxVal = Math.Max(maxVal, 1.0);
         white = Math.Max(white, maxVal);
+        midIn = midIn - lowClip;
 
         double toe_a = -1.0 * ((Math.Pow(midIn, contrast) * (midOut - 1.0)) / midOut); // Can be simplified when midIn == midOut == 0.18: (41.0 / 9.0) * Math.Pow(0.18, contrast)
         // Slope formula is simply the derivative of the toe function with an input of midOut
@@ -334,6 +338,8 @@ public partial class CurveComparison : Node
         w = w / shoulderMaxVal;
 
         // GPU side calculations:
+        x = Math.Max(lowClip, x);
+        x -= lowClip;
         if (x > midIn)
         {
             // Shoulder
