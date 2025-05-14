@@ -92,7 +92,7 @@ public partial class CurveComparison : Node
     [Export] public double A = 1.25652780401491;
     [Export] public double B = 278.351;
     [Export] public double C = -0.0832486;
-    [Export] public double D = 0.939812905544296;
+    [Export] public double D = 0.867980409496234;
     [Export] public double E = 1514.37;
     [Export] public double F = 913.696;
     [Export] public double G = 0.0;
@@ -283,7 +283,7 @@ public partial class CurveComparison : Node
         return x / (Math.Pow(x, f) * d + e) + g;
     }
 
-    public double allenwp_piecewise_reinhard_adjustable(double x, double midIn = 0.18, double midOut = 0.18, double white = 16.2917402385381, double maxVal = 1.0, double contrast = 1.25652780401491, double shoulder=0.875)
+    public double allenwp_piecewise_reinhard_adjustable(double x, double midIn = 0.18, double midOut = 0.18, double white = 16.2917402385381, double maxVal = 1.0, double contrast = 1.25652780401491, double shoulder= 0.867980409496234)
     {
         // CPU side calculations:
         maxVal = Math.Max(maxVal, 1.0);
@@ -294,6 +294,8 @@ public partial class CurveComparison : Node
         double slope_a = Math.Pow(midIn, contrast) + toe_a;
         double slope = (contrast * Math.Pow(midIn, contrast - 1.0) * toe_a) / (slope_a * slope_a);
 
+        double c = Math.Pow(midIn - white, 2) / (maxVal * shoulder - midOut * shoulder + (-1 + shoulder) * slope * (midIn - white));
+
         double shoulderMaxVal = maxVal - midOut;
 
         // GPU side calculations:
@@ -301,8 +303,8 @@ public partial class CurveComparison : Node
         {
             // Shoulder
             x -= midIn;
-            // Original modified Reinhard function in [0,1]: x = (x * (D + x / (E)) / (D + x)); // Solve for E such that white outputs 1.0
-            x = slope * x * (shoulder + x / (E * slope)) / (shoulder + (x * slope) / shoulderMaxVal); // Solve for E such that white outputs maxValue
+            // Original modified Reinhard function in [0,1]: x = (x * (D + x / (C)) / (D + x)); // Solve for C such that white outputs 1.0
+            x = slope * x * (shoulder + x / (c * slope)) / (shoulder + (x * slope) / shoulderMaxVal);
             x += midOut;
         }
         else
@@ -348,7 +350,8 @@ public partial class CurveComparison : Node
         return x;
     }
 
-    public double allenwp_piecewise_power(double x, double midIn = 0.18, double midOut = 0.18, double white = 16.2917402385381, double maxVal = 1.0, double contrast = 1.25652780401491, double shoulder = 0.939812905544296)
+    // Unstable no matter which paramter I solve for :(
+    public double allenwp_piecewise_power_alt(double x, double midIn = 0.18, double midOut = 0.18, double white = 16.2917402385381, double maxVal = 1.0, double contrast = 1.25652780401491, double shoulder = 0.939812905544296)
     {
         // CPU side calculations:
         maxVal = Math.Max(maxVal, 1.0);
@@ -359,7 +362,6 @@ public partial class CurveComparison : Node
         double slope_a = Math.Pow(midIn, contrast) + toe_a;
         double slope = (contrast * Math.Pow(midIn, contrast - 1.0) * toe_a) / (slope_a * slope_a);
 
-        // TODO: c should be the user parameter; solve for shoulder instaed of c! Maybe this will fix the instabilities.
         double c = (-1.0 * maxVal + midOut + slope * Math.Pow(-1.0 * midIn + white, shoulder)) / (-1.0 * maxVal + midOut + slope * (-1.0 * midIn + white)); // This seems to be a problem when it goes negative (when white is just a small amount larger than maxVal)
 
         double shoulderMaxVal = maxVal - midOut;
@@ -376,6 +378,43 @@ public partial class CurveComparison : Node
             result = slope * result * (c + result / w) / (c + (Math.Pow(result, shoulder) * slope) / shoulderMaxVal);
             result = result + midOut;
             x = result;
+        }
+        else
+        {
+            // Toe
+            x = Math.Pow(x, contrast);
+            x = x / (x + toe_a);
+        }
+        return x;
+    }
+
+    // Unstable no matter which paramter I solve for :(
+    public double allenwp_piecewise_power(double x, double midIn = 0.18, double midOut = 0.18, double white = 16.2917402385381, double maxVal = 1.0, double contrast = 1.25652780401491, double shoulder = 0.837947122500002)
+    {
+        // CPU side calculations:
+        maxVal = Math.Max(maxVal, 1.0);
+        white = Math.Max(white, maxVal);
+
+        double toe_a = -1.0 * ((Math.Pow(midIn, contrast) * (midOut - 1.0)) / midOut); // Can be simplified when midIn == midOut == 0.18: (41.0 / 9.0) * Math.Pow(0.18, contrast)
+        // Slope formula is simply the derivative of the toe function with an input of midOut
+        double slope_a = Math.Pow(midIn, contrast) + toe_a;
+        double slope = (contrast * Math.Pow(midIn, contrast - 1.0) * toe_a) / (slope_a * slope_a);
+
+        double c = Math.Log((maxVal + midOut * (-1 + shoulder) - maxVal * shoulder + shoulder * slope * (-midIn + white)) / slope) / Math.Log(-midIn + white); // unstable Could also solve for shoulder instead of c, but it's unsatable too.
+
+        double shoulderMaxVal = maxVal - midOut;
+        double w = white - midIn;
+        w = w * w;
+        w = w / shoulderMaxVal;
+        w = w * slope;
+
+        // GPU side calculations:
+        if (x > midIn)
+        {
+            // Shoulder
+            x -= midIn;
+            x = slope * x * (shoulder + x / w) / (shoulder + (Math.Pow(x, c) * slope) / shoulderMaxVal);
+            x += midOut;
         }
         else
         {
