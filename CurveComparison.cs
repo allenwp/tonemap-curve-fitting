@@ -141,7 +141,8 @@ public partial class CurveComparison : Node
 
     public double ReferenceCurve(double x)
     {
-        return AgxReference(x, agxRefLog2Max);
+        //return allenwp_piecewise_reinhard(x, .18, .18, white, max_value, A, lowClip);
+        //return AgxReference(x, agxRefLog2Max);
         //return TimothyLottes(x);
         //return GodotJohHableUncharted2(x, white);
         //return KrzysztofNarkowiczACES(x);
@@ -151,14 +152,14 @@ public partial class CurveComparison : Node
         //return BasicSecondOrderCurve(x, A, B, C, D, E, F, G);
         //return JohHableUncharted2(x, A, B, C, D, E, F, white);
         //return TimothyLottes(x);
-        //return tonemap_reinhard(x, white);
+        return tonemap_reinhard(x, white);
     }
 
     public double ApproxCurve(double x)
     {
         if (OptionB)
         {
-            return allenwp_piecewise_reinhard(x, .18, .18, white, max_value, A, lowClip);
+            return allenwp_piecewise_reinhard(x, .18, .18, white, max_value, A, lowClip, true);
             //return insomniac(x);
             //return JohnHablePiecewise(x);
             //return LearningFunc(x, A, B, C, D, E, F, G);
@@ -175,7 +176,7 @@ public partial class CurveComparison : Node
         }
         else
         {
-            return insomniac(x);
+           // return insomniac(x);
             //return ACES2_0(x);
             //return KrzysztofNarkowiczACESFilmRec2020(x);
             //return GodotJohHableUncharted2HDR(x, white);
@@ -188,7 +189,7 @@ public partial class CurveComparison : Node
             //return GodotACES(x, A, B, C, D, E, F, G);
 
             //agxRefLog2Max = Math.Log2(white / 0.18);
-            //return AgxReference(x, agxRefLog2Max);
+            return AgxReference(x, agxRefLog2Max);
             //return AgxReference(x, agxRefLog2Max);
             //return BruteForceResult2(x);
             //return BasicSecondOrderCurve(x, A, B, C, D, E, F, G);
@@ -319,11 +320,16 @@ public partial class CurveComparison : Node
         return x;
     }
 
-    public double allenwp_piecewise_reinhard(double x, double midIn = 0.18, double midOut = 0.18, double white = 16.2917402385381, double maxVal = 1.0, double contrast = 1.25652780401491, double lowClip = 1.0)
+    public double allenwp_piecewise_reinhard(double x, double midIn = 0.18, double midOut = 0.18, double white = 16.2917402385381, double maxVal = 1.0, double contrast = 1.25652780401491, double lowClip = 1.0, bool scaleWhite = false)
     {
         // CPU side calculations:
         maxVal = Math.Max(maxVal, 1.0);
+        if (scaleWhite)
+        {
+            white *= maxVal;
+        }
         white = Math.Max(white, maxVal);
+        white -= lowClip;
         midIn = midIn - lowClip;
 
         double toe_a = -1.0 * ((Math.Pow(midIn, contrast) * (midOut - 1.0)) / midOut); // Can be simplified when midIn == midOut == 0.18: (41.0 / 9.0) * Math.Pow(0.18, contrast)
@@ -686,6 +692,10 @@ public partial class CurveComparison : Node
 
     double tonemap_reinhard(double color, double white)
     {
+        color = Math.Max(lowClip, color);
+        color -= lowClip;
+        white -= lowClip;
+
         double white_squared = white * white;
         double white_squared_color = white_squared * color;
         // Equivalent to color * (1 + color / white_squared) / (1 + color)
