@@ -690,10 +690,10 @@ public partial class CurveComparison : Node
     {
         double max_val = max_luminance / ref_luminance;
         white = Math.Max(max_val, white);
+        white -= lowClip;
 
         color = Math.Max(lowClip, color);
         color -= lowClip;
-        white -= lowClip;
 
         double white_squared = white * white;
         white_squared /= max_val;
