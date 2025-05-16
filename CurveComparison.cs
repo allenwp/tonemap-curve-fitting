@@ -329,11 +329,12 @@ public partial class CurveComparison : Node
             white *= maxVal;
         }
         white = Math.Max(white, maxVal);
+
         white -= lowClip;
         midIn = midIn - lowClip;
 
-        double toe_a = -1.0 * ((Math.Pow(midIn, contrast) * (midOut - 1.0)) / midOut); // Can be simplified when midIn == midOut == 0.18: (41.0 / 9.0) * Math.Pow(0.18, contrast)
-        // Slope formula is simply the derivative of the toe function with an input of midOut
+        double toe_a = -1.0 * ((Math.Pow(midIn, contrast) * (midOut - 1.0)) / midOut);
+        // Slope formula is simply the derivative of the toe function with an input of midIn
         double slope_a = Math.Pow(midIn, contrast) + toe_a;
         double slope = (contrast * Math.Pow(midIn, contrast - 1.0) * toe_a) / (slope_a * slope_a);
 
