@@ -141,6 +141,7 @@ public partial class CurveComparison : Node
 
     public double ReferenceCurve(double x)
     {
+        return reinhard_hdr(x, white);
         //return allenwp_piecewise_reinhard(x, .18, .18, white, max_value, A, lowClip);
         //return AgxReference(x, agxRefLog2Max);
         //return TimothyLottes(x);
@@ -152,14 +153,14 @@ public partial class CurveComparison : Node
         //return BasicSecondOrderCurve(x, A, B, C, D, E, F, G);
         //return JohHableUncharted2(x, A, B, C, D, E, F, white);
         //return TimothyLottes(x);
-        return tonemap_reinhard(x, white);
+        //return tonemap_reinhard(x, white);
     }
 
     public double ApproxCurve(double x)
     {
         if (OptionB)
         {
-            return allenwp_piecewise_reinhard(x, .18, .18, white, max_value, A, lowClip, true);
+            return allenwp_piecewise_reinhard(x, .18, .18, white, max_value, A, lowClip, false);
             //return insomniac(x);
             //return JohnHablePiecewise(x);
             //return LearningFunc(x, A, B, C, D, E, F, G);
@@ -328,8 +329,11 @@ public partial class CurveComparison : Node
         {
             white *= maxVal;
         }
-        white = Math.Max(white, maxVal);
-
+        else
+        {
+            white = Math.Max(white, maxVal);
+        }
+        
         white -= lowClip;
         midIn = midIn - lowClip;
 
@@ -681,10 +685,16 @@ public partial class CurveComparison : Node
         return color;
     }
 
+    // This is what should be used for HDR
     double reinhard_hdr(double color, double white)
     {
         double max_val = max_luminance / ref_luminance;
         white = Math.Max(max_val, white);
+
+        color = Math.Max(lowClip, color);
+        color -= lowClip;
+        white -= lowClip;
+
         double white_squared = white * white;
         white_squared /= max_val;
         color = color * (1 + color / white_squared) / (1 + color / max_val);
