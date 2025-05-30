@@ -6,7 +6,6 @@
 [node name="CurveComparison" type="Node2D"]
 position = Vector2(1, 0)
 script = ExtResource("1_2rroq")
-OptionB = true
 insomniac_b = 0.0
 insomniac_c = 0.18
 insomniac_t = 0.305
@@ -15,17 +14,13 @@ jh_toeStrength = 0.305
 jh_toeLength = 0.205
 jh_shoulderStrength = 0.885
 jh_shoulderLength = 0.53
-Lottes_A = 5.311
-Lottes_D = 1.214
-A = 1.667
+A = 2.59
 B = 1.335
 C = 0.838
 D = 1.0
 E = 5.87
 F = 0.238081
-white = 12.812
-lowClip = 0.015
-max_value = 1.305
+white = 2.0
 
 [node name="CurveView" parent="." node_paths=PackedStringArray("curves") instance=ExtResource("1_t77ya")]
 position = Vector2(1381, 24)
@@ -79,9 +74,7 @@ position = Vector2(2093, 696)
 scale = Vector2(0.62, 0.62)
 curves = NodePath("..")
 x_encoding_type = 1
-linear_max_x = 41.737
 linear_max_y = 3.925
-log2_max_x = 7.85719
 log2_min_y = -12.0
 log2_max_y = 4.44662
 match_white = false
@@ -116,7 +109,6 @@ match_max_value = false
 position = Vector2(2093, 1366)
 scale = Vector2(0.62, 0.62)
 curves = NodePath("..")
-linear_max_x = 41.737
 linear_max_y = 3.925
 log2_min_x = -12.0
 log2_max_x = 7.85719
@@ -141,44 +133,5 @@ offset_top = 23.0
 offset_right = 177.0
 offset_bottom = 54.0
 text = "Option B"
-
-[node name="VBoxContainer" type="VBoxContainer" parent="."]
-offset_left = 67.0
-offset_top = 65.0
-offset_right = 987.0
-offset_bottom = 1433.0
-
-[node name="TotalErrorLinearLabel" type="Label" parent="VBoxContainer"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "Total weighted error (linear): 1.5020883"
-
-[node name="TotalErrorLog2Label" type="Label" parent="VBoxContainer"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "Total weighted error (log2, middle grey: 0.18): 1.1933931"
-
-[node name="ErrorTree" type="Tree" parent="VBoxContainer"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 1000)
-layout_mode = 2
-columns = 6
-column_titles_visible = true
-allow_search = false
-hide_root = true
-
-[node name="RationalApproxTextEdit" type="TextEdit" parent="VBoxContainer"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 297.725)
-layout_mode = 2
-text = "(x * (x * 1.222000000008848 + (1.335000000006403)) + (0.838000000003376)) / (x * (x * 0.764999999999418 + (5.869999999995343)) + (0.238081000000000)) + (0.000000000000000)
-
-x  = pow(x, vec3(0.001222000000009)) / (0.001335000000006 / x) + 0.000838000000003;
-x = max(x, 0.0); // x might be negative from c
-x = x / (pow(x, vec3(0.000238081000000)) * 0.000764999999999 + 0.005869999999995);
-
-x = pow(x, vec3(0.000000000000000));
-x = x / (pow(x, vec3(0.000000000000000)) * 0.000000000000000 + 0.000000000000000);"
-wrap_mode = 1
 
 [connection signal="toggled" from="CheckButton" to="." method="set_option_b"]
