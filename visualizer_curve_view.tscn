@@ -1,0 +1,56 @@
+[gd_scene load_steps=2 format=3 uid="uid://bv4i3p6plsbhf"]
+
+[ext_resource type="PackedScene" uid="uid://cwk0gcnvakk2b" path="res://curve_view.tscn" id="1_8knrf"]
+
+[node name="CurveView" instance=ExtResource("1_8knrf")]
+show_one_line = null
+
+[node name="XMiddleGreyLine" parent="." index="1"]
+default_color = Color(0.567368, 0.567368, 0.567368, 1)
+
+[node name="YMiddleGreyLine" parent="." index="2"]
+default_color = Color(0.567368, 0.567368, 0.567368, 1)
+
+[node name="XWhiteLine" parent="." index="5"]
+width = 6.0
+default_color = Color(1, 1, 1, 1)
+
+[node name="YMaxValueLine" parent="." index="6"]
+width = 6.0
+default_color = Color(1, 1, 1, 1)
+
+[node name="LinearLine" parent="." index="7"]
+width = 3.0
+default_color = Color(0.53101, 0.53101, 0.53101, 1)
+
+[node name="ReferenceInflectionMiddle" parent="." index="8"]
+width = 6.0
+
+[node name="ApproxInflectionMiddle" parent="." index="9"]
+points = PackedVector2Array(0, 30, 0, -30, 0, 0, 30, 0, -30, 0)
+width = 6.0
+
+[node name="YUpperLable" parent="." index="10"]
+visible = false
+
+[node name="YLowerLable" parent="." index="11"]
+visible = false
+
+[node name="YLable" parent="." index="12"]
+visible = false
+
+[node name="XLowerLable" parent="." index="13"]
+visible = false
+
+[node name="XUpperLable" parent="." index="14"]
+visible = false
+
+[node name="XLable" parent="." index="15"]
+visible = false
+
+[node name="ReferenceLine" parent="." index="16"]
+visible = false
+width = 6.0
+
+[node name="ApproxLine" parent="." index="17"]
+width = 6.0

@@ -4,7 +4,6 @@
 [ext_resource type="PackedScene" uid="uid://cwk0gcnvakk2b" path="res://curve_view.tscn" id="1_t77ya"]
 
 [node name="CurveComparison" type="Node2D"]
-position = Vector2(1, 0)
 script = ExtResource("1_2rroq")
 insomniac_b = 0.0
 insomniac_c = 0.18
@@ -30,8 +29,6 @@ x_encoding_type = 1
 y_encoding_type = 1
 log2_max_x = -2.0
 log2_max_y = -2.07
-match_white = false
-match_max_value = false
 
 [node name="CurveView2" parent="." node_paths=PackedStringArray("curves") instance=ExtResource("1_t77ya")]
 position = Vector2(1381, 696)
@@ -40,8 +37,6 @@ curves = NodePath("..")
 x_encoding_type = 1
 y_encoding_type = 1
 linear_max_y = 0.0
-match_white = false
-match_max_value = false
 
 [node name="CurveView3" parent="." node_paths=PackedStringArray("curves") instance=ExtResource("1_t77ya")]
 position = Vector2(2791, 24)
@@ -52,8 +47,6 @@ y_encoding_type = 1
 log2_min_x = 0.0
 log2_min_y = 0.215
 log2_max_y = 2.58
-match_white = false
-match_max_value = false
 
 [node name="CurveView4" parent="." node_paths=PackedStringArray("curves") instance=ExtResource("1_t77ya")]
 position = Vector2(2093, 24)
@@ -66,8 +59,6 @@ log2_min_x = -8.305
 log2_max_x = -2.0
 log2_min_y = -10.59
 log2_max_y = -2.07
-match_white = false
-match_max_value = false
 
 [node name="CurveView5" parent="." node_paths=PackedStringArray("curves") instance=ExtResource("1_t77ya")]
 position = Vector2(2093, 696)
@@ -77,8 +68,6 @@ x_encoding_type = 1
 linear_max_y = 3.925
 log2_min_y = -12.0
 log2_max_y = 4.44662
-match_white = false
-match_max_value = false
 
 [node name="CurveView6" parent="." node_paths=PackedStringArray("curves") instance=ExtResource("1_t77ya")]
 position = Vector2(2791, 696)
@@ -89,8 +78,6 @@ linear_min_y = 0.15
 log2_min_x = 0.0
 log2_min_y = 0.215
 log2_max_y = 2.58
-match_white = false
-match_max_value = false
 
 [node name="CurveView7" parent="." node_paths=PackedStringArray("curves") instance=ExtResource("1_t77ya")]
 position = Vector2(1381, 1366)
@@ -102,8 +89,6 @@ log2_min_x = -7.89
 log2_max_x = -2.0
 log2_min_y = -10.59
 log2_max_y = -2.07
-match_white = false
-match_max_value = false
 
 [node name="CurveView8" parent="." node_paths=PackedStringArray("curves") instance=ExtResource("1_t77ya")]
 position = Vector2(2093, 1366)
@@ -113,8 +98,6 @@ linear_max_y = 3.925
 log2_min_x = -12.0
 log2_max_x = 7.85719
 log2_max_y = 4.44662
-match_white = false
-match_max_value = false
 
 [node name="CurveView9" parent="." node_paths=PackedStringArray("curves") instance=ExtResource("1_t77ya")]
 position = Vector2(2791, 1366)
@@ -124,8 +107,6 @@ linear_min_x = 0.17
 linear_max_x = 1.01
 linear_min_y = 0.17
 linear_max_y = 1.01
-match_white = false
-match_max_value = false
 
 [node name="CheckButton" type="CheckButton" parent="."]
 offset_left = 61.0

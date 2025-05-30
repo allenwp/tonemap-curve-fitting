@@ -1,0 +1,48 @@
+[gd_scene load_steps=3 format=3 uid="uid://dspc7qamheate"]
+
+[ext_resource type="Script" uid="uid://dlflru4ncb8cy" path="res://CurveComparison.cs" id="1_0d66u"]
+[ext_resource type="PackedScene" uid="uid://bv4i3p6plsbhf" path="res://visualizer_curve_view.tscn" id="2_0d66u"]
+
+[node name="CurveComparison" type="Node2D"]
+script = ExtResource("1_0d66u")
+insomniac_b = 0.0
+insomniac_c = 0.18
+insomniac_t = 0.305
+insomniac_s = 0.965
+jh_toeStrength = 0.305
+jh_toeLength = 0.205
+jh_shoulderStrength = 0.885
+jh_shoulderLength = 0.53
+B = 1.905
+C = 0.838
+D = 1.0
+E = 5.87
+F = 0.238081
+white = 16.0
+
+[node name="CurveView" parent="." node_paths=PackedStringArray("curves") instance=ExtResource("2_0d66u")]
+position = Vector2(9, 412)
+scale = Vector2(0.3, 0.3)
+curves = NodePath("..")
+linear_max_x = 0.2
+linear_max_y = 0.2
+show_ref_inflection = false
+show_approx_inflection = false
+show_one_line = false
+
+[node name="CurveView2" parent="." node_paths=PackedStringArray("curves") instance=ExtResource("2_0d66u")]
+position = Vector2(316, 412)
+scale = Vector2(0.3, 0.3)
+curves = NodePath("..")
+linear_max_x = 16.0
+show_ref_inflection = false
+show_approx_inflection = false
+show_middle_grey_line = false
+show_one_line = false
+
+[node name="Label" type="Label" parent="."]
+offset_left = 454.0
+offset_top = 657.0
+offset_right = 562.0
+offset_bottom = 680.0
+text = "Contrast: 1.25"
