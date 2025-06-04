@@ -1,7 +1,91 @@
-[gd_scene load_steps=3 format=3 uid="uid://dspc7qamheate"]
+[gd_scene load_steps=13 format=3 uid="uid://dspc7qamheate"]
 
 [ext_resource type="Script" uid="uid://dlflru4ncb8cy" path="res://CurveComparison.cs" id="1_0d66u"]
 [ext_resource type="PackedScene" uid="uid://bv4i3p6plsbhf" path="res://visualizer_curve_view.tscn" id="2_0d66u"]
+[ext_resource type="Shader" uid="uid://c2nphuj012sk1" path="res://curve_visualizer.gdshader" id="3_p0sm6"]
+[ext_resource type="Texture2D" uid="uid://cmwhilyruonna" path="res://hdri/abandoned_garage_4k.exr" id="4_7ya8c"]
+[ext_resource type="Script" uid="uid://drqihcog1xrfu" path="res://curve_visualizer_properties.gd" id="5_uxhy8"]
+
+[sub_resource type="Environment" id="Environment_7ya8c"]
+tonemap_mode = 3
+tonemap_white = 4.66
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_uxhy8"]
+render_priority = 0
+shader = ExtResource("3_p0sm6")
+shader_parameter/image = ExtResource("4_7ya8c")
+shader_parameter/exposure = 1.75
+shader_parameter/awp_contrast = 1.0
+shader_parameter/awp_high_clip_uniform = 3.0
+shader_parameter/awp_crossover_point = 0.18
+shader_parameter/output_max_value = 1.0
+
+[sub_resource type="QuadMesh" id="QuadMesh_t2tvu"]
+size = Vector2(2, 1)
+
+[sub_resource type="Animation" id="Animation_uxhy8"]
+resource_name = "contrast_animation"
+length = 8.0
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:contrast")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 1, 2, 3, 4, 5, 6, 7, 8),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1),
+"update": 0,
+"values": [1.25, 1.25, 1.5, 1.5, 2.5, 2.5, 1.0, 1.0, 1.25]
+}
+
+[sub_resource type="Animation" id="Animation_t2tvu"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:contrast")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [1.25]
+}
+tracks/1/type = "bezier"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath(".:high_clip")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"handle_modes": PackedInt32Array(0),
+"points": PackedFloat32Array(3, -0.25, 0, 0.25, 0),
+"times": PackedFloat32Array(0)
+}
+
+[sub_resource type="Animation" id="Animation_qurbt"]
+resource_name = "high_clip_animation"
+tracks/0/type = "bezier"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:high_clip")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"handle_modes": PackedInt32Array(0),
+"points": PackedFloat32Array(3, -0.25, 0, 0.25, 0),
+"times": PackedFloat32Array(0)
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_qurbt"]
+_data = {
+&"RESET": SubResource("Animation_t2tvu"),
+&"contrast_animation": SubResource("Animation_uxhy8"),
+&"high_clip_animation": SubResource("Animation_qurbt")
+}
 
 [node name="CurveComparison" type="Node2D"]
 script = ExtResource("1_0d66u")
@@ -18,10 +102,10 @@ C = 0.838
 D = 1.0
 E = 5.87
 F = 0.238081
-white = 16.0
+white = 3.0
 
 [node name="CurveView" parent="." node_paths=PackedStringArray("curves") instance=ExtResource("2_0d66u")]
-position = Vector2(9, 412)
+position = Vector2(9, 413)
 scale = Vector2(0.3, 0.3)
 curves = NodePath("..")
 linear_max_x = 0.2
@@ -29,20 +113,81 @@ linear_max_y = 0.2
 show_ref_inflection = false
 show_approx_inflection = false
 show_one_line = false
+show_white = false
+show_max = false
 
 [node name="CurveView2" parent="." node_paths=PackedStringArray("curves") instance=ExtResource("2_0d66u")]
-position = Vector2(316, 412)
+position = Vector2(316, 413)
 scale = Vector2(0.3, 0.3)
 curves = NodePath("..")
-linear_max_x = 16.0
+linear_max_x = 3.0
 show_ref_inflection = false
 show_approx_inflection = false
 show_middle_grey_line = false
 show_one_line = false
+show_white = false
+show_max = false
+
+[node name="Label2" type="Label" parent="."]
+offset_left = 9.0
+offset_top = 370.0
+offset_right = 309.0
+offset_bottom = 411.0
+theme_override_font_sizes/font_size = 20
+text = "Dark to middle values"
+horizontal_alignment = 1
+vertical_alignment = 2
+
+[node name="Label4" type="Label" parent="."]
+offset_left = 316.0
+offset_top = 370.0
+offset_right = 616.0
+offset_bottom = 411.0
+theme_override_font_sizes/font_size = 20
+text = "All values"
+horizontal_alignment = 1
+vertical_alignment = 2
 
 [node name="Label" type="Label" parent="."]
-offset_left = 454.0
-offset_top = 657.0
-offset_right = 562.0
-offset_bottom = 680.0
+offset_left = 443.0
+offset_top = 507.0
+offset_right = 612.0
+offset_bottom = 686.0
+theme_override_font_sizes/font_size = 20
 text = "Contrast: 1.25"
+vertical_alignment = 2
+
+[node name="Label3" type="Label" parent="."]
+offset_left = 1048.0
+offset_top = 6.0
+offset_right = 1266.0
+offset_bottom = 69.0
+theme_override_constants/line_spacing = -2
+theme_override_font_sizes/font_size = 15
+text = " Abandoned Garage HDRI
+by Grzegorz Wronkowski"
+horizontal_alignment = 2
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_7ya8c")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(4.571, 0, 0, 0, 4.571, 0, 0, 0, 4.571, 0.0881615, 0.136134, 0)
+material_override = SubResource("ShaderMaterial_uxhy8")
+mesh = SubResource("QuadMesh_t2tvu")
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.201158, -0.0881237, 0.993944)
+
+[node name="Node" type="Node" parent="." node_paths=PackedStringArray("curve_comparison", "label", "animation", "mesh")]
+script = ExtResource("5_uxhy8")
+curve_comparison = NodePath("..")
+label = NodePath("../Label")
+animation = NodePath("AnimationPlayer")
+mesh = NodePath("../MeshInstance3D")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="Node"]
+libraries = {
+&"": SubResource("AnimationLibrary_qurbt")
+}
+autoplay = "contrast_animation"

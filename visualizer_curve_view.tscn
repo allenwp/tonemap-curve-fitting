@@ -3,54 +3,60 @@
 [ext_resource type="PackedScene" uid="uid://cwk0gcnvakk2b" path="res://curve_view.tscn" id="1_8knrf"]
 
 [node name="CurveView" instance=ExtResource("1_8knrf")]
-show_one_line = null
 
-[node name="XMiddleGreyLine" parent="." index="1"]
+[node name="Backing2" type="ColorRect" parent="." index="0"]
+offset_top = -103.0
+offset_right = 1000.0
+offset_bottom = 1000.0
+color = Color(0.241022, 0.241022, 0.241022, 1)
+
+[node name="XMiddleGreyLine" parent="." index="2"]
+width = 4.5
 default_color = Color(0.567368, 0.567368, 0.567368, 1)
 
-[node name="YMiddleGreyLine" parent="." index="2"]
+[node name="YMiddleGreyLine" parent="." index="3"]
+width = 4.5
 default_color = Color(0.567368, 0.567368, 0.567368, 1)
 
-[node name="XWhiteLine" parent="." index="5"]
+[node name="XWhiteLine" parent="." index="6"]
 width = 6.0
 default_color = Color(1, 1, 1, 1)
 
-[node name="YMaxValueLine" parent="." index="6"]
+[node name="YMaxValueLine" parent="." index="7"]
 width = 6.0
 default_color = Color(1, 1, 1, 1)
 
-[node name="LinearLine" parent="." index="7"]
-width = 3.0
+[node name="LinearLine" parent="." index="8"]
+width = 4.5
 default_color = Color(0.53101, 0.53101, 0.53101, 1)
 
-[node name="ReferenceInflectionMiddle" parent="." index="8"]
+[node name="ReferenceInflectionMiddle" parent="." index="9"]
 width = 6.0
 
-[node name="ApproxInflectionMiddle" parent="." index="9"]
+[node name="ApproxInflectionMiddle" parent="." index="10"]
 points = PackedVector2Array(0, 30, 0, -30, 0, 0, 30, 0, -30, 0)
 width = 6.0
 
-[node name="YUpperLable" parent="." index="10"]
+[node name="YUpperLable" parent="." index="11"]
 visible = false
 
-[node name="YLowerLable" parent="." index="11"]
+[node name="YLowerLable" parent="." index="12"]
 visible = false
 
-[node name="YLable" parent="." index="12"]
+[node name="YLable" parent="." index="13"]
 visible = false
 
-[node name="XLowerLable" parent="." index="13"]
+[node name="XLowerLable" parent="." index="14"]
 visible = false
 
-[node name="XUpperLable" parent="." index="14"]
+[node name="XUpperLable" parent="." index="15"]
 visible = false
 
-[node name="XLable" parent="." index="15"]
+[node name="XLable" parent="." index="16"]
 visible = false
 
-[node name="ReferenceLine" parent="." index="16"]
-visible = false
-width = 6.0
+[node name="ReferenceLine" parent="." index="17"]
+width = 8.0
 
-[node name="ApproxLine" parent="." index="17"]
-width = 6.0
+[node name="ApproxLine" parent="." index="18"]
+width = 8.0

@@ -13,13 +13,12 @@ jh_toeStrength = 0.305
 jh_toeLength = 0.205
 jh_shoulderStrength = 0.885
 jh_shoulderLength = 0.53
-A = 2.59
+A = 1.337
 B = 1.335
 C = 0.838
-D = 1.0
+D = 0.923
 E = 5.87
 F = 0.238081
-white = 2.0
 
 [node name="CurveView" parent="." node_paths=PackedStringArray("curves") instance=ExtResource("1_t77ya")]
 position = Vector2(1381, 24)
@@ -94,7 +93,8 @@ log2_max_y = -2.07
 position = Vector2(2093, 1366)
 scale = Vector2(0.62, 0.62)
 curves = NodePath("..")
-linear_max_y = 3.925
+linear_max_x = 200.0
+linear_max_y = 1.99
 log2_min_x = -12.0
 log2_max_x = 7.85719
 log2_max_y = 4.44662

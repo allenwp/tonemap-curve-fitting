@@ -27,6 +27,8 @@ enum EncodingType { LINEAR, LOG2}
 @export var show_approx_inflection: bool = true
 @export var show_middle_grey_line: bool = true
 @export var show_one_line: bool = true
+@export var show_white: bool = true
+@export var show_max: bool = true
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -59,7 +61,7 @@ func _process(_delta: float) -> void:
 			%XWhiteLine.position.x = (log2(curves.white / middle_grey) + abs(log2_min_x)) / (log2_max_x - log2_min_x) * 1000.0
 	%XMiddleGreyLine.visible = %XMiddleGreyLine.position.x >= 0.0 && %XMiddleGreyLine.position.x <= 1000.0 && show_middle_grey_line
 	%X1Line.visible = %X1Line.position.x >= 0.0 && %X1Line.position.x <= 1000.0 && show_one_line
-	%XWhiteLine.visible = %XWhiteLine.position.x >= 0.0 && %XWhiteLine.position.x <= 1000.0
+	%XWhiteLine.visible = %XWhiteLine.position.x >= 0.0 && %XWhiteLine.position.x <= 1000.0 && show_white
 
 	match y_encoding_type:
 		EncodingType.LINEAR:
@@ -78,7 +80,7 @@ func _process(_delta: float) -> void:
 			%YMaxValueLine.position.y = (1.0 - (log2(curves.max_value / middle_grey) - log2_min_y) / (log2_max_y - log2_min_y)) * 1000.0
 	%YMiddleGreyLine.visible = %YMiddleGreyLine.position.y >= 0.0 && %YMiddleGreyLine.position.y <= 1000.0 && show_middle_grey_line
 	%Y1Line.visible = %Y1Line.position.y >= 0.0 && %Y1Line.position.y <= 1000.0 && show_one_line
-	%YMaxValueLine.visible = %YMaxValueLine.position.y >= 0.0 && %YMaxValueLine.position.y <= 1000.0
+	%YMaxValueLine.visible = %YMaxValueLine.position.y >= 0.0 && %YMaxValueLine.position.y <= 1000.0 && show_max
 
 	var linear_points: PackedVector2Array
 	var reference_points: PackedVector2Array
