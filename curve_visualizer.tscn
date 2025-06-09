@@ -1,23 +1,23 @@
-[gd_scene load_steps=18 format=3 uid="uid://dspc7qamheate"]
+[gd_scene load_steps=16 format=3 uid="uid://dspc7qamheate"]
 
 [ext_resource type="Script" uid="uid://dlflru4ncb8cy" path="res://CurveComparison.cs" id="1_0d66u"]
 [ext_resource type="PackedScene" uid="uid://bv4i3p6plsbhf" path="res://visualizer_curve_view.tscn" id="2_0d66u"]
 [ext_resource type="Shader" uid="uid://c2nphuj012sk1" path="res://curve_visualizer.gdshader" id="3_p0sm6"]
-[ext_resource type="Texture2D" uid="uid://cmwhilyruonna" path="res://hdri/abandoned_garage_4k.exr" id="4_7ya8c"]
+[ext_resource type="Texture2D" uid="uid://bpusl4xakkjfk" path="res://hdri/abandoned_garage_8k.exr" id="4_uxhy8"]
 [ext_resource type="Script" uid="uid://drqihcog1xrfu" path="res://curve_visualizer_properties.gd" id="5_uxhy8"]
 
-[sub_resource type="Environment" id="Environment_7ya8c"]
-tonemap_mode = 3
+[sub_resource type="Environment" id="Environment_uxhy8"]
 tonemap_white = 4.66
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_uxhy8"]
 render_priority = 0
 shader = ExtResource("3_p0sm6")
-shader_parameter/use_image = true
-shader_parameter/image = ExtResource("4_7ya8c")
-shader_parameter/exposure = 1.7
-shader_parameter/awp_contrast = 1.625
-shader_parameter/awp_high_clip_uniform = 3.0
+shader_parameter/image = ExtResource("4_uxhy8")
+shader_parameter/use_side_by_side = false
+shader_parameter/side_by_side = 0.34
+shader_parameter/exposure = 1.5
+shader_parameter/awp_contrast = 1.25
+shader_parameter/awp_high_clip_uniform = 12.0
 shader_parameter/awp_crossover_point = 0.18
 shader_parameter/output_max_value = 1.0
 
@@ -25,23 +25,6 @@ shader_parameter/output_max_value = 1.0
 size = Vector2(2, 1)
 
 [sub_resource type="QuadMesh" id="QuadMesh_uxhy8"]
-size = Vector2(16, 9)
-
-[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_uxhy8"]
-load_path = "res://.godot/imported/abandoned_garage_4k.exr-66c4f8539a36e6c781f379937997470c.ctex"
-
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_t2tvu"]
-render_priority = 0
-shader = ExtResource("3_p0sm6")
-shader_parameter/use_image = false
-shader_parameter/image = SubResource("CompressedTexture2D_uxhy8")
-shader_parameter/exposure = 1.7
-shader_parameter/awp_contrast = 1.25
-shader_parameter/awp_high_clip_uniform = 3.0
-shader_parameter/awp_crossover_point = 0.18
-shader_parameter/output_max_value = 1.0
-
-[sub_resource type="QuadMesh" id="QuadMesh_qurbt"]
 size = Vector2(16, 9)
 
 [sub_resource type="Animation" id="Animation_t2tvu"]
@@ -66,7 +49,7 @@ tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
 "handle_modes": PackedInt32Array(0),
-"points": PackedFloat32Array(3, -0.25, 0, 0.25, 0),
+"points": PackedFloat32Array(12, -0.25, 0, 0.25, 0),
 "times": PackedFloat32Array(0)
 }
 tracks/2/type = "bezier"
@@ -83,7 +66,7 @@ tracks/2/keys = {
 tracks/3/type = "value"
 tracks/3/imported = false
 tracks/3/enabled = true
-tracks/3/path = NodePath("../ColourSweep:visible")
+tracks/3/path = NodePath("../SideBySide:visible")
 tracks/3/interp = 1
 tracks/3/loop_wrap = true
 tracks/3/keys = {
@@ -95,7 +78,7 @@ tracks/3/keys = {
 tracks/4/type = "value"
 tracks/4/imported = false
 tracks/4/enabled = true
-tracks/4/path = NodePath("../ColourSweep:material_override:shader_parameter/use_image")
+tracks/4/path = NodePath("../Image:visible")
 tracks/4/interp = 1
 tracks/4/loop_wrap = true
 tracks/4/keys = {
@@ -107,34 +90,69 @@ tracks/4/keys = {
 tracks/5/type = "value"
 tracks/5/imported = false
 tracks/5/enabled = true
-tracks/5/path = NodePath("../Image:visible")
+tracks/5/path = NodePath("../SideBySide:material_override:shader_parameter/use_side_by_side")
 tracks/5/interp = 1
 tracks/5/loop_wrap = true
 tracks/5/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 1,
-"values": [true]
+"values": [false]
 }
 tracks/6/type = "value"
 tracks/6/imported = false
 tracks/6/enabled = true
-tracks/6/path = NodePath("../Image/ImageLabel:visible")
+tracks/6/path = NodePath("../SideBySideControls:visible")
 tracks/6/interp = 1
 tracks/6/loop_wrap = true
 tracks/6/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 1,
-"values": [true]
+"values": [false]
 }
 tracks/7/type = "value"
 tracks/7/imported = false
 tracks/7/enabled = true
-tracks/7/path = NodePath("../ColourSweep0_18:visible")
+tracks/7/path = NodePath("../CurveView2:linear_max_y")
 tracks/7/interp = 1
 tracks/7/loop_wrap = true
 tracks/7/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [1.0]
+}
+tracks/8/type = "bezier"
+tracks/8/imported = false
+tracks/8/enabled = true
+tracks/8/path = NodePath(".:output_max_value")
+tracks/8/interp = 1
+tracks/8/loop_wrap = true
+tracks/8/keys = {
+"handle_modes": PackedInt32Array(0),
+"points": PackedFloat32Array(1, -0.25, 0, 0.25, 0),
+"times": PackedFloat32Array(0)
+}
+tracks/9/type = "value"
+tracks/9/imported = false
+tracks/9/enabled = true
+tracks/9/path = NodePath("../CurveView2:show_max")
+tracks/9/interp = 1
+tracks/9/loop_wrap = true
+tracks/9/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+tracks/10/type = "value"
+tracks/10/imported = false
+tracks/10/enabled = true
+tracks/10/path = NodePath("../CurveView2:show_white")
+tracks/10/interp = 1
+tracks/10/loop_wrap = true
+tracks/10/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 1,
@@ -157,25 +175,9 @@ tracks/0/keys = {
 "times": PackedFloat32Array(0, 1, 2, 3, 4, 5, 6, 7, 8)
 }
 
-[sub_resource type="Animation" id="Animation_uxhy8"]
-resource_name = "high_clip"
-length = 4.0
-loop_mode = 1
-tracks/0/type = "bezier"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath(".:high_clip")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"handle_modes": PackedInt32Array(0, 0, 0, 0, 0),
-"points": PackedFloat32Array(3, -0.25, 0, 0.25, 0, 3, -0.25, 0, 0.25, 0, 1, -0.25, 0, 0.25, 0, 1, -0.25, 0, 0.25, 0, 3, -0.25, 0, 0.25, 0),
-"times": PackedFloat32Array(0, 1, 2, 3, 4)
-}
-
 [sub_resource type="Animation" id="Animation_qurbt"]
 resource_name = "crossover_point"
-length = 12.0
+length = 14.0
 loop_mode = 1
 tracks/0/type = "bezier"
 tracks/0/imported = false
@@ -186,23 +188,23 @@ tracks/0/loop_wrap = true
 tracks/0/keys = {
 "handle_modes": PackedInt32Array(0, 0, 0, 0, 0),
 "points": PackedFloat32Array(0.18, -0.25, 0, 0.25, 0, 0.18, -0.25, 0, 0.25, 0, 0.01, -0.25, 0, 0.25, 0, 0.01, -0.25, 0, 0.25, 0, 0.18, -0.25, 0, 0.25, 0),
-"times": PackedFloat32Array(0, 5, 6, 11, 12)
+"times": PackedFloat32Array(0, 5, 6, 13, 14)
 }
 tracks/1/type = "bezier"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath(".:high_clip")
+tracks/1/path = NodePath(".:output_max_value")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
 "handle_modes": PackedInt32Array(0, 0, 0, 0, 0, 0, 0, 0, 0),
-"points": PackedFloat32Array(3, -0.25, 0, 0.25, 0, 3, -0.25, 0, 0.25, 0, 1, -0.75, 0, 0.25, 0, 1, -0.25, 0, 0.75, 0, 3, -0.25, 0, 0.25, 0, 3, -0.25, 0, 0.25, 0, 1, -0.75, 0, 0.25, 0, 1, -0.25, 0, 0.75, 0, 3, -0.25, 0, 0.25, 0),
-"times": PackedFloat32Array(0, 0.966667, 2, 3, 4, 7, 8.03333, 9, 10)
+"points": PackedFloat32Array(1, -0.25, 0, 0.25, 0, 1, -0.75, 0, 0.75, 0, 12, -0.25, 0, 0.25, 0, 12, -0.25, 0, 0.25, 0, 1, -0.75, 0, 0.75, 0, 1, -0.75, 0, 0.75, 0, 12, -0.25, 0, 0.25, 0, 12, -0.25, 0, 0.25, 0, 1, -0.75, 0, 0.75, 0),
+"times": PackedFloat32Array(0, 0.966667, 2, 3, 4, 7, 8.03333, 11, 12)
 }
 tracks/2/type = "value"
 tracks/2/imported = false
 tracks/2/enabled = true
-tracks/2/path = NodePath("../ColourSweep:visible")
+tracks/2/path = NodePath("../SideBySide:visible")
 tracks/2/interp = 1
 tracks/2/loop_wrap = true
 tracks/2/keys = {
@@ -214,7 +216,7 @@ tracks/2/keys = {
 tracks/3/type = "value"
 tracks/3/imported = false
 tracks/3/enabled = true
-tracks/3/path = NodePath("../ColourSweep:material_override:shader_parameter/use_image")
+tracks/3/path = NodePath("../Image:visible")
 tracks/3/interp = 1
 tracks/3/loop_wrap = true
 tracks/3/keys = {
@@ -226,34 +228,90 @@ tracks/3/keys = {
 tracks/4/type = "value"
 tracks/4/imported = false
 tracks/4/enabled = true
-tracks/4/path = NodePath("../Image:visible")
+tracks/4/path = NodePath("../SideBySide:material_override:shader_parameter/use_side_by_side")
 tracks/4/interp = 1
 tracks/4/loop_wrap = true
 tracks/4/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 1,
-"values": [false]
+"values": [true]
 }
 tracks/5/type = "value"
 tracks/5/imported = false
 tracks/5/enabled = true
-tracks/5/path = NodePath("../Image/ImageLabel:visible")
+tracks/5/path = NodePath("../SideBySideControls:visible")
 tracks/5/interp = 1
 tracks/5/loop_wrap = true
 tracks/5/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 1,
-"values": [false]
+"values": [true]
 }
-tracks/6/type = "value"
-tracks/6/imported = false
-tracks/6/enabled = true
-tracks/6/path = NodePath("../ColourSweep0_18:visible")
-tracks/6/interp = 1
-tracks/6/loop_wrap = true
-tracks/6/keys = {
+
+[sub_resource type="Animation" id="Animation_uxhy8"]
+resource_name = "high_clip"
+length = 6.0
+loop_mode = 1
+tracks/0/type = "bezier"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:high_clip")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"handle_modes": PackedInt32Array(0, 0, 0, 0, 0, 0, 0),
+"points": PackedFloat32Array(12, -0.25, 0, 0.25, 0, 12, -0.25, 0, 0.25, 0, 3, -0.75, 0, 0.25, 0, 3, -0.25, 0, 0.25, 0, 1, -0.75, 0, 0.25, 0, 1, -0.25, 0, 0.75, 0, 12, -0.25, 0, 0.25, 0),
+"times": PackedFloat32Array(0, 1, 2, 3, 4, 5, 6)
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("../CurveView2:show_white")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+
+[sub_resource type="Animation" id="Animation_eudnw"]
+resource_name = "output_max_value"
+length = 4.0
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("../CurveView2:linear_max_y")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [3.0]
+}
+tracks/1/type = "bezier"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath(".:output_max_value")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"handle_modes": PackedInt32Array(0, 0, 0, 0, 0),
+"points": PackedFloat32Array(1, -0.75, 0, 0.75, 0, 1, -0.75, 0, 0.75, 0, 3, -0.25, 0, 0.25, 0, 3, -0.25, 0, 0.25, 0, 1, -0.75, 0, 0.75, 0),
+"times": PackedFloat32Array(0, 1, 2, 3, 4)
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("../CurveView2:show_max")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 1,
@@ -265,7 +323,8 @@ _data = {
 &"RESET": SubResource("Animation_t2tvu"),
 &"contrast": SubResource("Animation_so8tr"),
 &"crossover_point": SubResource("Animation_qurbt"),
-&"high_clip": SubResource("Animation_uxhy8")
+&"high_clip": SubResource("Animation_uxhy8"),
+&"output_max_value": SubResource("Animation_eudnw")
 }
 
 [node name="CurveComparison" type="Node2D"]
@@ -302,7 +361,7 @@ show_max = false
 position = Vector2(316, 413)
 scale = Vector2(0.3, 0.3)
 curves = NodePath("..")
-linear_max_x = 3.0
+linear_max_x = 12.0
 show_ref_line = false
 show_ref_inflection = false
 show_approx_inflection = false
@@ -332,23 +391,16 @@ horizontal_alignment = 1
 vertical_alignment = 2
 
 [node name="Label" type="Label" parent="."]
-offset_left = 443.0
-offset_top = 507.0
-offset_right = 612.0
-offset_bottom = 686.0
+offset_left = 321.0
+offset_top = 523.0
+offset_right = 604.0
+offset_bottom = 702.0
 theme_override_font_sizes/font_size = 20
 text = "Contrast: 1.25"
+horizontal_alignment = 2
 vertical_alignment = 2
 
-[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
-environment = SubResource("Environment_7ya8c")
-
-[node name="Image" type="MeshInstance3D" parent="."]
-transform = Transform3D(4.571, 0, 0, 0, 4.571, 0, 0, 0, 4.571, 0.0881615, 0.136134, 0)
-material_override = SubResource("ShaderMaterial_uxhy8")
-mesh = SubResource("QuadMesh_t2tvu")
-
-[node name="ImageLabel" type="Label" parent="Image"]
+[node name="ImageLabel" type="Label" parent="."]
 offset_left = 1048.0
 offset_top = 6.0
 offset_right = 1266.0
@@ -359,17 +411,53 @@ text = " Abandoned Garage HDRI
 by Grzegorz Wronkowski"
 horizontal_alignment = 2
 
-[node name="ColourSweep" type="MeshInstance3D" parent="."]
-transform = Transform3D(0.17, 0, 0, 0, 0.17, 0, 0, 0, 0.17, -0.53032, -0.088, 0)
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_uxhy8")
+
+[node name="Image" type="MeshInstance3D" parent="."]
+transform = Transform3D(4.571, 0, 0, 0, 4.571, 0, 0, 0, 4.571, 0.0881615, 0.136134, 0)
+material_override = SubResource("ShaderMaterial_uxhy8")
+mesh = SubResource("QuadMesh_t2tvu")
+
+[node name="SideBySide" type="MeshInstance3D" parent="."]
+transform = Transform3D(1.405, 0, 0, 0, 1.405, 0, 0, 0, 1.405, 4.39479, -0.286477, 0)
 visible = false
 material_override = SubResource("ShaderMaterial_uxhy8")
 mesh = SubResource("QuadMesh_uxhy8")
 
-[node name="ColourSweep0_18" type="MeshInstance3D" parent="."]
-transform = Transform3D(0.17, 0, 0, 0, 0.17, 0, 0, 0, 0.17, 2.1876, -0.088, 0)
+[node name="SideBySideControls" type="Control" parent="."]
 visible = false
-material_override = SubResource("ShaderMaterial_t2tvu")
-mesh = SubResource("QuadMesh_qurbt")
+layout_mode = 3
+anchors_preset = 0
+
+[node name="SideBySide_constant" type="Label" parent="SideBySideControls"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 957.0
+offset_top = 77.0
+offset_right = 1256.0
+offset_bottom = 167.0
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 12
+theme_override_font_sizes/font_size = 20
+text = "Constant Dynamic Range (SDR)
+Crossover Point: 0.18
+Output Max Value: 1.00"
+
+[node name="SideBySide_variable" type="Label" parent="SideBySideControls"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 525.0
+offset_top = 77.0
+offset_right = 884.0
+offset_bottom = 167.0
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 12
+theme_override_font_sizes/font_size = 20
+text = "Variable Dynamic Range (EDR & HDR)
+Crossover Point: 0.18
+Output Max Value: 1.00"
+horizontal_alignment = 2
 
 [node name="Camera3D" type="Camera3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.201158, -0.0881237, 0.993944)
@@ -380,6 +468,7 @@ curve_comparison = NodePath("..")
 label = NodePath("../Label")
 animation = NodePath("AnimationPlayer")
 mesh = NodePath("../Image")
+high_clip = 12.0
 curve_feature = 3
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="Node"]

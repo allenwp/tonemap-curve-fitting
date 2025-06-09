@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cmwhilyruonna"
-path="res://.godot/imported/abandoned_garage_4k.exr-66c4f8539a36e6c781f379937997470c.ctex"
+uid="uid://bpusl4xakkjfk"
+path="res://.godot/imported/abandoned_garage_8k.exr-da67f75ac476881c8f7871c5d025fd8a.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://hdri/abandoned_garage_4k.exr"
-dest_files=["res://.godot/imported/abandoned_garage_4k.exr-66c4f8539a36e6c781f379937997470c.ctex"]
+source_file="res://hdri/abandoned_garage_8k.exr"
+dest_files=["res://.godot/imported/abandoned_garage_8k.exr-da67f75ac476881c8f7871c5d025fd8a.ctex"]
 
 [params]
 
