@@ -1,9 +1,10 @@
 shader_type spatial;
 render_mode unshaded;
 
+uniform bool use_image = true;
 uniform sampler2D image;
 
-uniform float exposure = 1.75;
+uniform float exposure = 1.7;
 
 uniform float awp_contrast = 1.25; // Should be 1.0 or larger
 uniform float awp_high_clip_uniform = 3.0;
@@ -86,6 +87,69 @@ SOFTWARE.
 */
 
 void fragment() {
+	vec3 colour;
+	
+	if (use_image) {
+		colour = texture(image, UV).rgb * exposure;
+	} else {
+		float log2_min = -2.4739311883324123328331609710831;
+		float log2_max = -2.4739311883324123328331609710831; // 0.18 linear
+		float top_bar = 0.3;
+		float log2_value = UV.x * (log2_max - log2_min) - abs(log2_min);
+		float scale = pow(2.0, log2_value);
+
+		if (UV.y >= top_bar)
+		{
+			float padding = 0.005;
+			float y = (UV.y - top_bar - padding) / (1.0 - top_bar - padding * 2.0);
+			y = clamp(y, 0.0, 1.0);
+			float segments = 1.0 / 6.0;
+			vec3 col = vec3(0);
+			if (y < segments)
+			{
+				col.r = 1.0;
+				col.g = y / segments;
+				col.b = 0.0;
+			}
+			else if (y < segments * 2.0)
+			{
+				col.r = (y - segments * 2.0) / -segments;
+				col.g = 1.0;
+				col.b = 0.0;
+			}
+			else if (y < segments * 3.0)
+			{
+				col.r = 0.0;
+				col.g = 1.0;
+				col.b = (y - segments * 2.0) / segments;
+			}
+			else if (y < segments * 4.0)
+			{
+				col.r = 0.0;
+				col.g = (y - segments * 4.0) / -segments;
+				col.b = 1.0;
+			}
+			else if (y < segments * 5.0)
+			{
+				col.r = (y - segments * 4.0) / segments;
+				col.g = 0.0;
+				col.b = 1.0;
+			}
+			else
+			{
+				col.r = 1.0;
+				col.g = 0.0;
+				col.b = (y - segments * 6.0) / -segments;
+			}
+
+			colour = col * scale;
+		}
+		else
+		{
+			colour = vec3(1.0) * scale;
+		}
+	}
+	
 	// allenwp tonemapping curve; developed for use in the Godot game engine
 	// Source and details: https://allenwp.com/blog/2025/05/29/allenwp-tonemapping-curve/
 	//void allenwp_curve_cpu_code()
@@ -140,7 +204,7 @@ void fragment() {
 		awp_w = awp_w * awp_slope;
 
 		// Use the allenwp curve to support variable / extended dynamic range (EDR, SDR, and HDR):
-		ALBEDO = allenwp_curve(texture(image, UV).rgb * exposure,
+		ALBEDO = allenwp_curve(colour,
 			awp_toe_a,
 			awp_slope,
 			awp_w,

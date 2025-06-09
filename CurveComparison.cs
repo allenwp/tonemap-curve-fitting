@@ -177,7 +177,7 @@ public partial class CurveComparison : Node
         }
         else
         {
-            return allenwp_curve_cpu_code(x, A, white, max_value);
+            return allenwp_curve_cpu_code(x, A, white, max_value, agxRefMiddleGrey);
            // return insomniac(x);
             //return ACES2_0(x);
             //return KrzysztofNarkowiczACESFilmRec2020(x);
@@ -295,11 +295,12 @@ public partial class CurveComparison : Node
         double awp_toe_a,
         double awp_slope,
         double awp_w,
-        double awp_shoulder_max)
+        double awp_shoulder_max,
+        double awp_crossover_point)
     {
-        // This constant must match the CPU-side code that calculates the parameters.
-        // 18% "middle grey" is perceptually 50% of the brightness of reference white.
-        const double awp_crossover_point = 0.18;
+        //// This constant must match the CPU-side code that calculates the parameters.
+        //// 18% "middle grey" is perceptually 50% of the brightness of reference white.
+        //const double awp_crossover_point = 0.18;
 
         // Reinhard-like shoulder:
         double s = x - awp_crossover_point;
@@ -321,11 +322,11 @@ public partial class CurveComparison : Node
         }
     }
 
-    public double allenwp_curve_cpu_code(double x, double awp_contrast, double awp_high_clip, double output_max_value, bool scale_shoulder = false)
+    public double allenwp_curve_cpu_code(double x, double awp_contrast, double awp_high_clip, double output_max_value, double awp_crossover_point = 0.18, bool scale_shoulder = false)
     {
-        // This constant must match the one in the shader code.
-        // 18% "middle gray" is perceptually 50% of the brightness of reference constrained_white.
-        const double awp_crossover_point = 0.18;
+        //// This constant must match the one in the shader code.
+        //// 18% "middle gray" is perceptually 50% of the brightness of reference constrained_white.
+        //const double awp_crossover_point = 0.18;
 
         // Use one of the following four approaches to get your output_max_value:
 
@@ -381,7 +382,8 @@ public partial class CurveComparison : Node
             awp_toe_a,
             awp_slope,
             awp_w,
-            awp_shoulder_max);
+            awp_shoulder_max,
+            awp_crossover_point);
     }
 
     public double allenwp_piecewise_reinhard_adjustable(double x, double midIn = 0.18, double midOut = 0.18, double white = 16.2917402385381, double maxVal = 1.0, double contrast = 1.25652780401491, double shoulder= 0.867980409496234)

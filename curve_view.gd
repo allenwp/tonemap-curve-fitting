@@ -23,6 +23,7 @@ enum EncodingType { LINEAR, LOG2}
 @export var match_max_value: bool = false
 @export var clip: bool = true
 @export var show_unity: bool = true
+@export var show_ref_line: bool = true
 @export var show_ref_inflection: bool = true
 @export var show_approx_inflection: bool = true
 @export var show_middle_grey_line: bool = true
@@ -44,6 +45,9 @@ func _process(_delta: float) -> void:
 		linear_max_y = curves.max_value
 		log2_max_y = log2(curves.max_value / middle_grey)
 
+	%ReferenceLine.visible = show_ref_line;
+	middle_grey = curves.agxRefMiddleGrey
+	
 	match x_encoding_type:
 		EncodingType.LINEAR:
 			%XLowerLable.text = "%.2f" % linear_min_x
