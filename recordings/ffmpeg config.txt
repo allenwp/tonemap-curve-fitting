@@ -1,0 +1,1 @@
+ffmpeg -r 30 -i crossover_point_frame%08d.png -c:v libx264 -pix_fmt yuv420p -profile:v baseline -crf 18 crossover_point.mp4
