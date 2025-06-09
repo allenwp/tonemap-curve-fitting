@@ -5,10 +5,10 @@ uniform sampler2D image;
 uniform bool use_side_by_side = false;
 uniform float side_by_side = 0.5;
 
-uniform float exposure = 1.7;
+uniform float exposure = 1.5;
 
 uniform float awp_contrast = 1.25; // Should be 1.0 or larger
-uniform float awp_high_clip_uniform = 3.0;
+uniform float awp_high_clip_uniform = 12.0;
 
 // This constant must match the one in the shader code.
 // 18% "middle gray" is perceptually 50% of the brightness of reference white.
