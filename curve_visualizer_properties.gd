@@ -55,3 +55,8 @@ func _process(_delta: float) -> void:
 		label.text = "Crossover Point: %0.2f" % crossover_point
 	
 	
+
+
+func _on_animation_player_animation_finished(anim_name: StringName) -> void:
+	if OS.has_feature("movie"):
+		get_tree().quit()

@@ -64,3 +64,4 @@ width = 8.0
 
 [node name="ApproxLine" parent="." index="18"]
 width = 8.0
+default_color = Color(1, 0.433333, 0, 1)

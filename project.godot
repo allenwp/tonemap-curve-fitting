@@ -24,6 +24,11 @@ window/size/viewport_height=720
 
 project/assembly_name="Tonemap Curve Fitting"
 
+[editor]
+
+movie_writer/mjpeg_quality=1.0
+movie_writer/fps=30
+
 [importer_defaults]
 
 texture={
