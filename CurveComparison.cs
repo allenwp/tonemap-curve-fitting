@@ -99,6 +99,7 @@ public partial class CurveComparison : Node
 
     #endregion
 
+    [Export]
     public double agxRefMiddleGrey = 0.18f;
     [Export]
     public double agxRefLog2Min = -10.0f;
