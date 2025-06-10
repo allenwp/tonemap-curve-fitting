@@ -203,7 +203,7 @@ D = 1.0
 E = 5.87
 F = 0.238081
 white = 3.0
-metadata/movie_file = "recordings/crossover_point/crossover_point_frame.png"
+metadata/movie_file = "recordings/contrast/frame.png"
 
 [node name="CurveView" parent="." node_paths=PackedStringArray("curves") instance=ExtResource("2_0d66u")]
 position = Vector2(9, 413)
@@ -224,7 +224,7 @@ position = Vector2(316, 413)
 scale = Vector2(0.3, 0.3)
 script = ExtResource("3_t2tvu")
 curves = NodePath("..")
-linear_max_x = 1.0
+linear_max_x = 12.0
 show_ref_line = false
 show_ref_inflection = false
 show_approx_inflection = false
