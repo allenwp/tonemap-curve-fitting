@@ -16,7 +16,7 @@ shader_parameter/image = ExtResource("4_uxhy8")
 shader_parameter/use_side_by_side = false
 shader_parameter/side_by_side = 0.34
 shader_parameter/exposure = 1.5
-shader_parameter/awp_contrast = 1.25
+shader_parameter/awp_contrast = 1.5
 shader_parameter/awp_high_clip_uniform = 12.0
 shader_parameter/awp_crossover_point = 0.18
 shader_parameter/output_max_value = 1.0
@@ -39,7 +39,7 @@ tracks/0/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 0,
-"values": [1.25]
+"values": [1.5]
 }
 tracks/1/type = "bezier"
 tracks/1/imported = false
@@ -170,7 +170,7 @@ tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
 "handle_modes": PackedInt32Array(0, 0, 0, 0, 0, 0, 0, 0, 0),
-"points": PackedFloat32Array(1.25, -0.25, 0, 0.25, 0, 1.25, -0.25, 0, 0.25, 0, 1.5, -0.25, 0, 0.25, 0, 1.5, -0.25, 0, 0.25, 0, 2.5, -0.25, 0, 0.25, 0, 2.5, -0.25, 0, 0.25, 0, 1, -0.25, 0, 0.25, 0, 1, -0.25, 0, 0.25, 0, 1.25, -0.25, 0, 0.25, 0),
+"points": PackedFloat32Array(1.5, -0.25, 0, 0.25, 0, 1.5, -0.25, 0, 0.25, 0, 2.5, -0.25, 0, 0.25, 0, 2.5, -0.25, 0, 0.25, 0, 1, -0.25, 0, 0.25, 0, 1, -0.25, 0, 0.25, 0, 1.25, -0.25, 0, 0.25, 0, 1.25, -0.25, 0, 0.25, 0, 1.5, -0.25, 0, 0.25, 0),
 "times": PackedFloat32Array(0, 1, 2, 3, 4, 5, 6, 7, 8)
 }
 
@@ -288,7 +288,7 @@ tracks/0/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 0,
-"values": [3.0]
+"values": [10.0]
 }
 tracks/1/type = "bezier"
 tracks/1/imported = false
@@ -298,7 +298,7 @@ tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
 "handle_modes": PackedInt32Array(0, 0, 0, 0, 0),
-"points": PackedFloat32Array(1, -0.75, 0, 0.75, 0, 1, -0.75, 0, 0.75, 0, 3, -0.25, 0, 0.25, 0, 3, -0.25, 0, 0.25, 0, 1, -0.75, 0, 0.75, 0),
+"points": PackedFloat32Array(1, -0.75, 0, 0.75, 0, 1, -0.75, 0, 0.75, 0, 10, -0.25, 0, 0.25, 0, 10, -0.25, 0, 0.25, 0, 1, -0.75, 0, 0.75, 0),
 "times": PackedFloat32Array(0, 1, 2, 3, 4)
 }
 tracks/2/type = "value"
@@ -358,7 +358,7 @@ show_max = false
 position = Vector2(316, 413)
 scale = Vector2(0.3, 0.3)
 curves = NodePath("..")
-linear_max_x = 12.0
+linear_max_x = 1.0
 show_ref_line = false
 show_ref_inflection = false
 show_approx_inflection = false

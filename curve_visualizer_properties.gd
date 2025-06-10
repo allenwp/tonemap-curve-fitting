@@ -5,7 +5,7 @@ extends Node
 @export var animation: AnimationPlayer
 @export var mesh: MeshInstance3D
 
-@export var contrast: float = 1.25
+@export var contrast: float = 1.5
 @export var high_clip: float = 3.0
 @export var ref_luminance: float = 240
 @export var output_max_value: float = 1.0

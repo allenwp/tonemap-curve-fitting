@@ -7,7 +7,7 @@ uniform float side_by_side = 0.5;
 
 uniform float exposure = 1.5;
 
-uniform float awp_contrast = 1.25; // Should be 1.0 or larger
+uniform float awp_contrast = 1.5; // Should be 1.0 or larger
 uniform float awp_high_clip_uniform = 12.0;
 
 // This constant must match the one in the shader code.
