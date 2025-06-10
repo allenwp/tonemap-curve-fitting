@@ -9,7 +9,7 @@ extends Node
 @export var high_clip: float = 3.0
 @export var ref_luminance: float = 240
 @export var output_max_value: float = 1.0
-@export var crossover_point: float = 0.18
+@export var crossover_point: float = 0.1841865
 @export var low_clip: float = 0.0
 @export var brightness: float = 0.0
 

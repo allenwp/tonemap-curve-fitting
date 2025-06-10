@@ -1,8 +1,9 @@
-[gd_scene load_steps=16 format=3 uid="uid://dspc7qamheate"]
+[gd_scene load_steps=17 format=3 uid="uid://dspc7qamheate"]
 
 [ext_resource type="Script" uid="uid://dlflru4ncb8cy" path="res://CurveComparison.cs" id="1_0d66u"]
 [ext_resource type="PackedScene" uid="uid://bv4i3p6plsbhf" path="res://visualizer_curve_view.tscn" id="2_0d66u"]
 [ext_resource type="Shader" uid="uid://c2nphuj012sk1" path="res://curve_visualizer.gdshader" id="3_p0sm6"]
+[ext_resource type="Script" uid="uid://b7jlxrev1huc3" path="res://curve_view.gd" id="3_t2tvu"]
 [ext_resource type="Texture2D" uid="uid://bpusl4xakkjfk" path="res://hdri/abandoned_garage_8k.exr" id="4_uxhy8"]
 [ext_resource type="Script" uid="uid://drqihcog1xrfu" path="res://curve_visualizer_properties.gd" id="5_uxhy8"]
 
@@ -14,11 +15,11 @@ render_priority = 0
 shader = ExtResource("3_p0sm6")
 shader_parameter/image = ExtResource("4_uxhy8")
 shader_parameter/use_side_by_side = false
-shader_parameter/side_by_side = 0.34
+shader_parameter/side_by_side = 0.5
 shader_parameter/exposure = 1.5
 shader_parameter/awp_contrast = 1.5
 shader_parameter/awp_high_clip_uniform = 12.0
-shader_parameter/awp_crossover_point = 0.18
+shader_parameter/awp_crossover_point = 0.1841865
 shader_parameter/output_max_value = 1.0
 
 [sub_resource type="QuadMesh" id="QuadMesh_t2tvu"]
@@ -344,6 +345,7 @@ metadata/movie_file = "recordings/crossover_point/crossover_point_frame.png"
 [node name="CurveView" parent="." node_paths=PackedStringArray("curves") instance=ExtResource("2_0d66u")]
 position = Vector2(9, 413)
 scale = Vector2(0.3, 0.3)
+script = ExtResource("3_t2tvu")
 curves = NodePath("..")
 linear_max_x = 0.2
 linear_max_y = 0.2
@@ -357,6 +359,7 @@ show_max = false
 [node name="CurveView2" parent="." node_paths=PackedStringArray("curves") instance=ExtResource("2_0d66u")]
 position = Vector2(316, 413)
 scale = Vector2(0.3, 0.3)
+script = ExtResource("3_t2tvu")
 curves = NodePath("..")
 linear_max_x = 1.0
 show_ref_line = false

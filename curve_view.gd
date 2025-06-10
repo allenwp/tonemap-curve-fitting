@@ -8,7 +8,7 @@ enum EncodingType { LINEAR, LOG2}
 
 @export var num_points: int = 1000
 
-@export var middle_grey: float = 0.18
+@export var middle_grey: float = 0.1841865
 @export var x_encoding_type: EncodingType = EncodingType.LINEAR
 @export var y_encoding_type: EncodingType = EncodingType.LINEAR
 @export var linear_min_x: float = 0.0

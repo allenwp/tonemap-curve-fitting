@@ -11,8 +11,8 @@ uniform float awp_contrast = 1.5; // Should be 1.0 or larger
 uniform float awp_high_clip_uniform = 12.0;
 
 // This constant must match the one in the shader code.
-// 18% "middle gray" is perceptually 50% of the brightness of reference white.
-uniform float awp_crossover_point = 0.18;
+// 18% "middle grey" is perceptually 50% of the lightness of reference white.
+uniform float awp_crossover_point = 0.1841865;
 
 uniform float output_max_value = 1.0;
 
@@ -47,8 +47,8 @@ vec3 allenwp_curve(vec3 x,
 		float awp_w,
 		float awp_shoulder_max) {
 	// This constant must match the CPU-side code that calculates the parameters.
-	// 18% "middle grey" is perceptually 50% of the brightness of reference white.
-	//const float awp_crossover_point = 0.18;
+	// 18% "middle grey" is perceptually 50% of the lightness of reference white.
+	//const float awp_crossover_point = 0.1841865;
 
 	x = max(x, 0.0); // Negative input causes undefined behaviour from pow function!
 
@@ -109,8 +109,8 @@ void fragment() {
 		//float awp_high_clip = 16.0;
 
 		// This constant must match the one in the shader code.
-		// 18% "middle gray" is perceptually 50% of the brightness of reference white.
-		//float awp_crossover_point = 0.18;
+		// 18% "middle grey" is perceptually 50% of the lightness of reference white.
+		//float awp_crossover_point = 0.1841865;
 
 		// Use one of the following four approaches to get your output_max_value:
 
