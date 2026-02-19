@@ -20,7 +20,7 @@ enum CURVE_FEATURE { contrast, high_clip, output_max_value, low_clip, brightness
 @export var curve_feature: CURVE_FEATURE = CURVE_FEATURE.contrast
 
 func _ready() -> void:
-	get_window().hdr_output_auto_adjust_reference_luminance = false
+	#get_window().hdr_output_auto_adjust_reference_luminance = false
 	
 	match curve_feature:
 		CURVE_FEATURE.contrast:
@@ -46,7 +46,7 @@ func _process(_delta: float) -> void:
 	mesh.material_override.set("shader_parameter/output_max_value", output_max_value)
 	curve_comparison.max_value = output_max_value;
 	
-	get_window().hdr_output_reference_luminance = ref_luminance;
+	#get_window().hdr_output_reference_luminance = ref_luminance;
 	
 	if curve_feature == CURVE_FEATURE.contrast:
 		label.text = "Contrast: %0.2f" % contrast

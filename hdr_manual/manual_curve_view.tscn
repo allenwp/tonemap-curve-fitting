@@ -1,0 +1,105 @@
+[gd_scene format=3 uid="uid://r1iu6j4rk7uj"]
+
+[ext_resource type="PackedScene" uid="uid://cwk0gcnvakk2b" path="res://curve_view.tscn" id="1_bthdn"]
+[ext_resource type="Shader" uid="uid://db1j756nk61vh" path="res://hdr_manual/manual_curve_view_bar.gdshader" id="2_mq2rs"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_mq2rs"]
+shader = ExtResource("2_mq2rs")
+shader_parameter/max_value = 2.0
+
+[sub_resource type="QuadMesh" id="QuadMesh_3lls2"]
+
+[node name="CurveView" unique_id=1846113786 instance=ExtResource("1_bthdn")]
+
+[node name="Backing2" type="ColorRect" parent="." index="0" unique_id=603853410]
+offset_left = -573.0
+offset_top = -498.0
+offset_right = 1517.0
+offset_bottom = 1545.0
+color = Color(0.241022, 0.241022, 0.241022, 1)
+
+[node name="MeshInstance2D" type="MeshInstance2D" parent="." index="1" unique_id=181332733]
+material = SubResource("ShaderMaterial_mq2rs")
+position = Vector2(-50, 500)
+scale = Vector2(50, 1000)
+mesh = SubResource("QuadMesh_3lls2")
+
+[node name="MeshInstance2D2" type="MeshInstance2D" parent="." index="2" unique_id=492477304]
+material = SubResource("ShaderMaterial_mq2rs")
+position = Vector2(500, 1050)
+rotation = 1.5707964
+scale = Vector2(50, 1000)
+mesh = SubResource("QuadMesh_3lls2")
+
+[node name="XMiddleGreyLine" parent="." index="4"]
+visible = false
+default_color = Color(0.567368, 0.567368, 0.567368, 1)
+
+[node name="YMiddleGreyLine" parent="." index="5"]
+visible = false
+default_color = Color(0.567368, 0.567368, 0.567368, 1)
+
+[node name="X1Line" parent="." index="6"]
+visible = false
+
+[node name="Y1Line" parent="." index="7"]
+visible = false
+width = 3.805
+default_color = Color(1, 1, 1, 1)
+
+[node name="XWhiteLine" parent="." index="8"]
+default_color = Color(1, 1, 1, 1)
+
+[node name="YMaxValueLine" parent="." index="9"]
+default_color = Color(1, 1, 1, 1)
+
+[node name="LinearLine" parent="." index="10"]
+width = 4.5
+default_color = Color(0.53101, 0.53101, 0.53101, 1)
+
+[node name="ReferenceInflectionMiddle" parent="." index="11"]
+visible = false
+width = 6.0
+
+[node name="ApproxInflectionMiddle" parent="." index="12"]
+visible = false
+points = PackedVector2Array(0, 30, 0, -30, 0, 0, 30, 0, -30, 0)
+width = 6.0
+
+[node name="YUpperLable" parent="." index="13"]
+offset_left = -183.0
+offset_top = -16.0
+offset_right = -90.0
+offset_bottom = 18.0
+
+[node name="YLowerLable" parent="." index="14"]
+offset_left = -184.0
+offset_top = 982.5
+offset_right = -91.0
+offset_bottom = 1016.5
+
+[node name="YLable" parent="." index="15"]
+offset_left = -136.0
+offset_right = 464.0
+
+[node name="XLowerLable" parent="." index="16"]
+offset_left = -45.95
+offset_top = 1083.0
+offset_right = 47.05
+offset_bottom = 1117.0
+
+[node name="XUpperLable" parent="." index="17"]
+offset_top = 1083.0
+offset_bottom = 1117.0
+
+[node name="XLable" parent="." index="18"]
+offset_top = 1085.0
+offset_bottom = 1119.0
+
+[node name="ReferenceLine" parent="." index="19"]
+visible = false
+width = 8.0
+
+[node name="ApproxLine" parent="." index="20"]
+width = 8.0
+default_color = Color(1, 0.433333, 0, 1)

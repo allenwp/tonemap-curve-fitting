@@ -1,0 +1,36 @@
+[gd_scene format=3 uid="uid://dlukxpn64kk13"]
+
+[ext_resource type="PackedScene" uid="uid://r1iu6j4rk7uj" path="res://hdr_manual/manual_curve_view.tscn" id="1_f7ah8"]
+[ext_resource type="Script" uid="uid://dlflru4ncb8cy" path="res://CurveComparison.cs" id="2_p7n6j"]
+
+[sub_resource type="Environment" id="Environment_bdlje"]
+background_mode = 3
+tonemap_white = 16.0
+glow_enabled = true
+glow_levels/1 = 1.0
+glow_levels/4 = 0.0
+glow_blend_mode = 0
+glow_hdr_scale = 0.0
+
+[node name="Node2D" type="Node2D" unique_id=1993966185]
+
+[node name="Curves" type="Node" parent="." unique_id=1649476622]
+script = ExtResource("2_p7n6j")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=902314000]
+environment = SubResource("Environment_bdlje")
+
+[node name="CurveView" parent="." unique_id=1846113786 node_paths=PackedStringArray("curves") instance=ExtResource("1_f7ah8")]
+position = Vector2(54, 19.000002)
+scale = Vector2(0.33, 0.33)
+curves = NodePath("../Curves")
+linear_max_x = 3.0
+linear_max_y = 3.0
+clip = false
+show_unity = false
+show_ref_line = false
+show_ref_inflection = false
+show_approx_inflection = false
+show_middle_grey_line = false
+show_one_line = false
+show_white = false

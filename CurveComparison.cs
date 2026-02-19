@@ -163,6 +163,8 @@ public partial class CurveComparison : Node
 
 	public double ApproxCurve(double x)
 	{
+		return x > max_value ? max_value : x;
+
 		if (OptionB)
 		{
 			return allenwp_curve_cpu_code(x, A, white, max_value, crossoverPoint, true);
