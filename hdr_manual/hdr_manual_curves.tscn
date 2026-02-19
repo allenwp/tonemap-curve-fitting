@@ -7,7 +7,6 @@
 background_mode = 3
 tonemap_white = 16.0
 glow_enabled = true
-glow_levels/1 = 1.0
 glow_levels/4 = 0.0
 glow_blend_mode = 0
 glow_hdr_scale = 0.0
@@ -17,13 +16,27 @@ glow_hdr_scale = 0.0
 [node name="Curves" type="Node" parent="." unique_id=1649476622]
 script = ExtResource("2_p7n6j")
 
-[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=902314000]
+[node name="SubViewportContainer" type="SubViewportContainer" parent="." unique_id=903298885]
+offset_right = 1300.0
+offset_bottom = 1300.0
+scale = Vector2(0.33, 0.33)
+
+[node name="SubViewport" type="SubViewport" parent="SubViewportContainer" unique_id=1641108707]
+own_world_3d = true
+handle_input_locally = false
+msaa_2d = 3
+msaa_3d = 3
+use_hdr_2d = true
+canvas_item_default_texture_filter = 0
+size = Vector2i(1300, 1300)
+render_target_update_mode = 4
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="SubViewportContainer/SubViewport" unique_id=902314000]
 environment = SubResource("Environment_bdlje")
 
-[node name="CurveView" parent="." unique_id=1846113786 node_paths=PackedStringArray("curves") instance=ExtResource("1_f7ah8")]
-position = Vector2(54, 19.000002)
-scale = Vector2(0.33, 0.33)
-curves = NodePath("../Curves")
+[node name="CurveView" parent="SubViewportContainer/SubViewport" unique_id=1846113786 node_paths=PackedStringArray("curves") instance=ExtResource("1_f7ah8")]
+position = Vector2(134, 55)
+curves = NodePath("../../../Curves")
 linear_max_x = 3.0
 linear_max_y = 3.0
 clip = false
