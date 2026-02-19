@@ -15,6 +15,7 @@ glow_hdr_scale = 0.0
 
 [node name="Curves" type="Node" parent="." unique_id=1649476622]
 script = ExtResource("2_p7n6j")
+white = 1.0
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=902314000]
 environment = SubResource("Environment_bdlje")

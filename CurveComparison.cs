@@ -163,27 +163,29 @@ public partial class CurveComparison : Node
 
 	public double ApproxCurve(double x)
 	{
-		return x > max_value ? max_value : x;
-
 		if (OptionB)
 		{
-			return allenwp_curve_cpu_code(x, A, white, max_value, crossoverPoint, true);
-			//return insomniac(x);
-			//return JohnHablePiecewise(x);
-			//return LearningFunc(x, A, B, C, D, E, F, G);
-			//return reinhard_scaled(x, white);
-			//return TimothyLottesXStephenHill(x);
-			//return TimothyLottes_white(x);
-			//return HDRTimothyLottesA(x);
-			//return nonlinearfit_amdform(x);
-			//return AgXLog2Approx(x);
-			//return AgXNewWhiteParam1(x);
-			//return MinimaxApproximation(x);
-			//return NonlinearModelFitApproximation2(x);
-		}
-		else
-		{
-			return allenwp_curve_cpu_code(x, A, white, max_value, crossoverPoint);
+            x = reinhard_hdr_final_optimized(x, white);
+            return x > max_value ? max_value : x;
+
+            //return allenwp_curve_cpu_code(x, A, white, max_value, crossoverPoint, true);
+            //return insomniac(x);
+            //return JohnHablePiecewise(x);
+            //return LearningFunc(x, A, B, C, D, E, F, G);
+            //return reinhard_scaled(x, white);
+            //return TimothyLottesXStephenHill(x);
+            //return TimothyLottes_white(x);
+            //return HDRTimothyLottesA(x);
+            //return nonlinearfit_amdform(x);
+            //return AgXLog2Approx(x);
+            //return AgXNewWhiteParam1(x);
+            //return MinimaxApproximation(x);
+            //return NonlinearModelFitApproximation2(x);
+        }
+        else
+        {
+            return x > max_value ? max_value : x;
+            return allenwp_curve_cpu_code(x, A, white, max_value, crossoverPoint);
 			// return insomniac(x);
 			//return ACES2_0(x);
 			//return KrzysztofNarkowiczACESFilmRec2020(x);
@@ -731,10 +733,25 @@ public partial class CurveComparison : Node
 		return color;
 	}
 
+
+	double reinhard_hdr_final_optimized(double color, double white)
+	{
+		double max_val = max_luminance / ref_luminance;
+
+		// CPU: get white:
+		white = Math.Max(max_val, white);
+
+		// CPU: get white_squared:
+		double white_squared = (white * white) / max_val;
+
+		// GPU: compute reinhard:
+		return color * (1.0f + color / white_squared) / (1.0f + color / max_val);
+	}
+
 	// This is what should be used for HDR
 	double reinhard_hdr(double color, double white)
 	{
-		double max_val = max_luminance / ref_luminance;
+        double max_val = max_luminance / ref_luminance;
 		white = Math.Max(max_val, white);
 		white -= lowClip;
 
