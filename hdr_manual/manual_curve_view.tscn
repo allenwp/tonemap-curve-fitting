@@ -10,6 +10,10 @@ shader_parameter/max_value = 3.0
 
 [sub_resource type="QuadMesh" id="QuadMesh_3lls2"]
 
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_3lls2"]
+shader = ExtResource("2_mq2rs")
+shader_parameter/max_value = 3.0
+
 [node name="CurveView" unique_id=1846113786 instance=ExtResource("1_bthdn")]
 script = ExtResource("2_3lls2")
 current_config = 0
@@ -33,7 +37,7 @@ mesh = SubResource("QuadMesh_3lls2")
 
 [node name="XGradient" type="MeshInstance2D" parent="Scale" index="2" unique_id=492477304]
 unique_name_in_owner = true
-material = SubResource("ShaderMaterial_mq2rs")
+material = SubResource("ShaderMaterial_3lls2")
 position = Vector2(500, 1050)
 rotation = 1.5707964
 scale = Vector2(50, 1000)

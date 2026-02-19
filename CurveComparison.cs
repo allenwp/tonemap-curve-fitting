@@ -165,7 +165,7 @@ public partial class CurveComparison : Node
 	{
 		if (OptionB)
 		{
-            x = reinhard_hdr_final_optimized(x, white);
+            x = reinhard_hdr_final_optimized(x, white, max_value);
             return x > max_value ? max_value : x;
 
             //return allenwp_curve_cpu_code(x, A, white, max_value, crossoverPoint, true);
@@ -734,10 +734,8 @@ public partial class CurveComparison : Node
 	}
 
 
-	double reinhard_hdr_final_optimized(double color, double white)
+	double reinhard_hdr_final_optimized(double color, double white, double max_val)
 	{
-		double max_val = max_luminance / ref_luminance;
-
 		// CPU: get white:
 		white = Math.Max(max_val, white);
 
