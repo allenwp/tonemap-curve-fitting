@@ -14,20 +14,23 @@ shader_parameter/max_value = 1.0
 script = ExtResource("2_3lls2")
 
 [node name="Backing2" type="ColorRect" parent="." index="0" unique_id=603853410]
-offset_left = -573.0
-offset_top = -498.0
-offset_right = 1517.0
-offset_bottom = 1545.0
+offset_left = -155.0
+offset_top = -82.0
+offset_right = 544.0
+offset_bottom = 519.0
 color = Color(0.241022, 0.241022, 0.241022, 1)
 
-[node name="YGradient" type="MeshInstance2D" parent="Scale" parent_id_path=PackedInt32Array(1748902351) index="1" unique_id=181332733]
+[node name="Scale" parent="." index="1" unique_id=1748902351]
+scale = Vector2(0.3, 0.3)
+
+[node name="YGradient" type="MeshInstance2D" parent="Scale" index="1" unique_id=181332733]
 unique_name_in_owner = true
 material = SubResource("ShaderMaterial_mq2rs")
 position = Vector2(-50, 500)
 scale = Vector2(50, 1000)
 mesh = SubResource("QuadMesh_3lls2")
 
-[node name="XGradient" type="MeshInstance2D" parent="Scale" parent_id_path=PackedInt32Array(1748902351) index="2" unique_id=492477304]
+[node name="XGradient" type="MeshInstance2D" parent="Scale" index="2" unique_id=492477304]
 unique_name_in_owner = true
 material = SubResource("ShaderMaterial_mq2rs")
 position = Vector2(500, 1050)
@@ -35,84 +38,88 @@ rotation = 1.5707964
 scale = Vector2(50, 1000)
 mesh = SubResource("QuadMesh_3lls2")
 
-[node name="XMiddleGreyLine" parent="Scale" parent_id_path=PackedInt32Array(1748902351) index="3" unique_id=489767957]
+[node name="XMiddleGreyLine" parent="Scale" index="3" unique_id=489767957]
 visible = false
 default_color = Color(0.567368, 0.567368, 0.567368, 1)
 
-[node name="YMiddleGreyLine" parent="Scale" parent_id_path=PackedInt32Array(1748902351) index="4" unique_id=1582469089]
+[node name="YMiddleGreyLine" parent="Scale" index="4" unique_id=1582469089]
 visible = false
 default_color = Color(0.567368, 0.567368, 0.567368, 1)
 
-[node name="X1Line" parent="Scale" parent_id_path=PackedInt32Array(1748902351) index="5" unique_id=1569248101]
+[node name="X1Line" parent="Scale" index="5" unique_id=1569248101]
 visible = false
 
-[node name="Y1Line" parent="Scale" parent_id_path=PackedInt32Array(1748902351) index="6" unique_id=38792927]
+[node name="Y1Line" parent="Scale" index="6" unique_id=38792927]
 visible = false
 width = 3.805
 default_color = Color(1, 1, 1, 1)
 
-[node name="XWhiteLine" parent="Scale" parent_id_path=PackedInt32Array(1748902351) index="7" unique_id=1286945080]
+[node name="XWhiteLine" parent="Scale" index="7" unique_id=1286945080]
 default_color = Color(1, 1, 1, 1)
 
-[node name="YMaxValueLine" parent="Scale" parent_id_path=PackedInt32Array(1748902351) index="8" unique_id=1773122414]
+[node name="YMaxValueLine" parent="Scale" index="8" unique_id=1773122414]
 default_color = Color(1, 1, 1, 1)
 
-[node name="LinearLine" parent="Scale" parent_id_path=PackedInt32Array(1748902351) index="9" unique_id=627306427]
+[node name="LinearLine" parent="Scale" index="9" unique_id=627306427]
 width = 4.5
 default_color = Color(0.53101, 0.53101, 0.53101, 1)
 
-[node name="ReferenceInflectionMiddle" parent="Scale" parent_id_path=PackedInt32Array(1748902351) index="10" unique_id=561307529]
+[node name="ReferenceInflectionMiddle" parent="Scale" index="10" unique_id=561307529]
 visible = false
 width = 6.0
 
-[node name="ApproxInflectionMiddle" parent="Scale" parent_id_path=PackedInt32Array(1748902351) index="11" unique_id=711868903]
+[node name="ApproxInflectionMiddle" parent="Scale" index="11" unique_id=711868903]
 visible = false
 points = PackedVector2Array(0, 30, 0, -30, 0, 0, 30, 0, -30, 0)
 width = 6.0
 
-[node name="ReferenceLine" parent="Scale" parent_id_path=PackedInt32Array(1748902351) index="12" unique_id=338959847]
+[node name="ReferenceLine" parent="Scale" index="12" unique_id=338959847]
 visible = false
 width = 8.0
 
-[node name="ApproxLine" parent="Scale" parent_id_path=PackedInt32Array(1748902351) index="13" unique_id=30949901]
+[node name="ApproxLine" parent="Scale" index="13" unique_id=30949901]
 width = 8.0
 default_color = Color(1, 0.433333, 0, 1)
 
 [node name="YUpperLable" parent="." index="2" unique_id=667493188]
-offset_left = -183.0
-offset_top = -16.0
-offset_right = -90.0
-offset_bottom = 18.0
-theme_override_font_sizes/font_size = 40
+offset_left = -122.0
+offset_top = -17.0
+offset_right = -29.0
+offset_bottom = 17.0
+theme_override_font_sizes/font_size = 15
 
 [node name="YLowerLable" parent="." index="3" unique_id=345312258]
-offset_left = -184.0
-offset_right = -91.0
-theme_override_font_sizes/font_size = 40
+offset_left = -122.0
+offset_top = 283.0
+offset_right = -29.0
+offset_bottom = 317.0
+theme_override_font_sizes/font_size = 15
 
 [node name="YLable" parent="." index="4" unique_id=570837724]
-offset_left = -148.675
-offset_top = 1000.0
-offset_right = 851.325
-offset_bottom = 1055.0
-theme_override_font_sizes/font_size = 40
+offset_left = -52.715
+offset_top = 300.0
+offset_right = 247.285
+offset_bottom = 322.0
+theme_override_font_sizes/font_size = 15
 text = "Value displayed on screen (output)"
 
 [node name="XLowerLable" parent="." index="5" unique_id=850499089]
 offset_left = -45.95
-offset_top = 1083.0
+offset_top = 325.0
 offset_right = 47.05
-offset_bottom = 1117.0
-theme_override_font_sizes/font_size = 40
+offset_bottom = 359.0
+theme_override_font_sizes/font_size = 15
 
 [node name="XUpperLable" parent="." index="6" unique_id=828308343]
-offset_top = 1083.0
-offset_bottom = 1117.0
-theme_override_font_sizes/font_size = 40
+offset_left = 254.0
+offset_top = 325.0
+offset_right = 347.0
+offset_bottom = 359.0
+theme_override_font_sizes/font_size = 15
 
 [node name="XLable" parent="." index="7" unique_id=2134912918]
 offset_left = 0.0
-offset_top = 1078.975
-offset_right = 1000.0
-offset_bottom = 1133.9756
-theme_override_font_sizes/font_size = 40
+offset_top = 325.0
+offset_right = 300.0
+offset_bottom = 347.0
+theme_override_font_sizes/font_size = 15

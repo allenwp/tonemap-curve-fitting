@@ -50,8 +50,8 @@ func _process(_delta: float) -> void:
 	
 	match x_encoding_type:
 		EncodingType.LINEAR:
-			%XLowerLable.text = "%.2f" % linear_min_x
-			%XUpperLable.text = "%.2f" % linear_max_x
+			%XLowerLable.text = "%.1f" % linear_min_x
+			%XUpperLable.text = "%.1f" % linear_max_x
 			%XLable.text = "Input (linear scale)"
 			%XMiddleGreyLine.position.x = (middle_grey - linear_min_x) / (linear_max_x - linear_min_x) * 1000.0
 			%X1Line.position.x = (1.0 - linear_min_x) / (linear_max_x - linear_min_x) * 1000.0
@@ -69,8 +69,8 @@ func _process(_delta: float) -> void:
 
 	match y_encoding_type:
 		EncodingType.LINEAR:
-			%YLowerLable.text = "%.2f" % linear_min_y
-			%YUpperLable.text = "%.2f" % linear_max_y
+			%YLowerLable.text = "%.1f" % linear_min_y
+			%YUpperLable.text = "%.1f" % linear_max_y
 			%YLable.text = "Output (linear scale)"
 			%YMiddleGreyLine.position.y = (1.0 - (middle_grey - linear_min_y) / (linear_max_y - linear_min_y)) * 1000.0
 			%Y1Line.position.y = (1.0 - (1.0 - linear_min_y) / (linear_max_y - linear_min_y)) * 1000.0
