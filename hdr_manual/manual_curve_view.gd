@@ -1,6 +1,8 @@
 @tool
 extends CurveView
 
+@export var Lables: Array[Control]
+
 var Configurations: Array[Dictionary] = [{
 	"title":"SDR (no tonemapping)",
 	"show_white":false,
@@ -82,6 +84,10 @@ func _process(_delta: float) -> void:
 	%Title.text = str(Configurations[current_config]["title"])
 	%XLable.text = "Value in Godot scene"
 	%YLable.text = "Value shown on screen"
+	
+	for i in range(Configurations.size()):
+		Lables[i].visible = current_config == i
+	
 	
 func _constrain_config() -> void:
 	if current_config < 0:

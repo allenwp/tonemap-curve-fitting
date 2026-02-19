@@ -8,6 +8,7 @@ background_mode = 3
 tonemap_white = 16.0
 glow_enabled = true
 glow_levels/4 = 0.0
+glow_intensity = 0.15
 glow_blend_mode = 0
 glow_hdr_scale = 0.0
 
@@ -15,16 +16,22 @@ glow_hdr_scale = 0.0
 
 [node name="Curves" type="Node" parent="." unique_id=1649476622]
 script = ExtResource("2_p7n6j")
-white = 1.0
+OptionB = true
+white = 3.0
+max_luminance = 600.0
+max_value = 3.0
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=902314000]
 environment = SubResource("Environment_bdlje")
 
-[node name="CurveView" parent="." unique_id=1846113786 node_paths=PackedStringArray("curves") instance=ExtResource("1_f7ah8")]
+[node name="CurveView" parent="." unique_id=1846113786 node_paths=PackedStringArray("Lables", "curves") instance=ExtResource("1_f7ah8")]
+unique_name_in_owner = true
 position = Vector2(68, 41)
+Lables = [NodePath("../0"), NodePath("../1"), NodePath("../2"), NodePath("../3"), NodePath("../4"), NodePath("../5"), NodePath("../6")]
+current_config = 6
 curves = NodePath("../Curves")
-linear_max_x = 3.0
-linear_max_y = 3.0
+linear_max_x = 4.0
+linear_max_y = 4.0
 clip = false
 show_unity = false
 show_ref_line = false
@@ -32,4 +39,243 @@ show_ref_inflection = false
 show_approx_inflection = false
 show_middle_grey_line = false
 show_one_line = false
-show_white = false
+
+[node name="0" type="Control" parent="." unique_id=1754066978]
+visible = false
+layout_mode = 3
+anchors_preset = 0
+
+[node name="Max Val Label" type="Label" parent="0" unique_id=218153812]
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = 95.0
+offset_top = 204.0
+offset_right = 395.0
+offset_bottom = 227.0
+grow_horizontal = 0
+grow_vertical = 2
+theme_override_font_sizes/font_size = 16
+text = "output max value = 1.0"
+horizontal_alignment = 1
+
+[node name="1" type="Control" parent="." unique_id=783399264]
+visible = false
+layout_mode = 3
+anchors_preset = 0
+
+[node name="Max Val Label" type="Label" parent="1" unique_id=715857715]
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = 95.0
+offset_top = 65.0
+offset_right = 395.0
+offset_bottom = 88.0
+grow_horizontal = 0
+grow_vertical = 2
+theme_override_font_sizes/font_size = 16
+text = "output max value = 3.0"
+horizontal_alignment = 1
+
+[node name="2" type="Control" parent="." unique_id=72752792]
+visible = false
+layout_mode = 3
+anchors_preset = 0
+
+[node name="Max Val Label" type="Label" parent="2" unique_id=1014377217]
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = 164.0
+offset_top = 206.0
+offset_right = 370.0
+offset_bottom = 229.0
+grow_horizontal = 0
+grow_vertical = 2
+pivot_offset = Vector2(148, -391)
+theme_override_font_sizes/font_size = 16
+text = "output max value = 1.0"
+horizontal_alignment = 1
+
+[node name="Tonemap White Label" type="Label" parent="2" unique_id=1038170647]
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = 195.0
+offset_top = 165.0
+offset_right = 357.0
+offset_bottom = 188.0
+grow_horizontal = 0
+grow_vertical = 2
+pivot_offset = Vector2(135, -350)
+theme_override_font_sizes/font_size = 16
+text = "tonemap white = 1.0"
+horizontal_alignment = 1
+
+[node name="3" type="Control" parent="." unique_id=659893003]
+visible = false
+layout_mode = 3
+anchors_preset = 0
+
+[node name="Max Val Label" type="Label" parent="3" unique_id=2122836666]
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = 93.0
+offset_top = 206.0
+offset_right = 299.0
+offset_bottom = 229.0
+grow_horizontal = 0
+grow_vertical = 2
+theme_override_font_sizes/font_size = 16
+text = "output max value = 1.0"
+horizontal_alignment = 1
+
+[node name="Tonemap White Label" type="Label" parent="3" unique_id=283871162]
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = 94.0
+offset_top = 165.0
+offset_right = 256.0
+offset_bottom = 188.0
+grow_horizontal = 0
+grow_vertical = 2
+theme_override_font_sizes/font_size = 16
+text = "tonemap white = 3.0"
+horizontal_alignment = 1
+
+[node name="4" type="Control" parent="." unique_id=1934668963]
+visible = false
+layout_mode = 3
+anchors_preset = 0
+
+[node name="Max Val Label" type="Label" parent="4" unique_id=240754027]
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = 97.0
+offset_top = 224.0
+offset_right = 303.0
+offset_bottom = 247.0
+grow_horizontal = 0
+grow_vertical = 2
+theme_override_font_sizes/font_size = 16
+text = "output max value = 1.0"
+horizontal_alignment = 1
+
+[node name="Tonemap White Label" type="Label" parent="4" unique_id=2035599463]
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = 95.0
+offset_top = 195.0
+offset_right = 257.0
+offset_bottom = 218.0
+grow_horizontal = 0
+grow_vertical = 2
+theme_override_font_sizes/font_size = 16
+text = "tonemap white = 3.0"
+horizontal_alignment = 1
+
+[node name="5" type="Control" parent="." unique_id=1510057805]
+visible = false
+layout_mode = 3
+anchors_preset = 0
+
+[node name="Max Val Label" type="Label" parent="5" unique_id=1244718122]
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = 97.0
+offset_top = 146.0
+offset_right = 303.0
+offset_bottom = 169.0
+grow_horizontal = 0
+grow_vertical = 2
+theme_override_font_sizes/font_size = 16
+text = "output max value = 2.0"
+horizontal_alignment = 1
+
+[node name="Tonemap White Label" type="Label" parent="5" unique_id=1517015867]
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = 95.0
+offset_top = 117.0
+offset_right = 257.0
+offset_bottom = 140.0
+grow_horizontal = 0
+grow_vertical = 2
+theme_override_font_sizes/font_size = 16
+text = "tonemap white = 3.0"
+horizontal_alignment = 1
+
+[node name="6" type="Control" parent="." unique_id=1246810152]
+layout_mode = 3
+anchors_preset = 0
+
+[node name="Max Val Label" type="Label" parent="6" unique_id=1480566534]
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = 97.0
+offset_top = 76.0
+offset_right = 303.0
+offset_bottom = 99.0
+grow_horizontal = 0
+grow_vertical = 2
+theme_override_font_sizes/font_size = 16
+text = "output max value = 3.0"
+horizontal_alignment = 1
+
+[node name="Tonemap White Label" type="Label" parent="6" unique_id=1320700338]
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = 95.0
+offset_top = 47.0
+offset_right = 257.0
+offset_bottom = 70.0
+grow_horizontal = 0
+grow_vertical = 2
+theme_override_font_sizes/font_size = 16
+text = "tonemap white = 3.0"
+horizontal_alignment = 1
