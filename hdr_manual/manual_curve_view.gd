@@ -9,3 +9,6 @@ func _process(_delta: float) -> void:
 	sm.set_shader_parameter("max_value", linear_max_y)
 	
 	
+	%XLable.text = "Value in Godot scene"
+	%YLable.text = "Value shown on screen"
+	

@@ -20,7 +20,7 @@ script = ExtResource("2_p7n6j")
 environment = SubResource("Environment_bdlje")
 
 [node name="CurveView" parent="." unique_id=1846113786 node_paths=PackedStringArray("curves") instance=ExtResource("1_f7ah8")]
-position = Vector2(69, 46)
+position = Vector2(68, 41)
 curves = NodePath("../Curves")
 linear_max_x = 3.0
 linear_max_y = 3.0
